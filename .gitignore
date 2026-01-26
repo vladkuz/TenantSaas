@@ -1,0 +1,44 @@
+# .NET artifacts
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.dll
+*.exe
+*.pdb
+*.nupkg
+.vs/
+*.DotSettings.user
+
+# Node artifacts
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+.npm
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Build and output directories
+dist/
+build/
+out/
+
+# Environment and secrets
+.env
+.env.local
+*.key
+*.secret
+
+# Temporary and cache files
+*.tmp
+*.temp
+.cache/
