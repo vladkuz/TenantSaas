@@ -10,6 +10,7 @@ thisStepFile: './step-03-epic-coverage-validation.md'
 nextStepFile: './step-04-ux-alignment.md'
 workflowFile: '{workflow_path}/workflow.md'
 outputFile: '{planning_artifacts}/implementation-readiness-report-{{date}}.md'
+rubricFile: '{project-root}/_bmad/bmm/workflows/3-solutioning/check-implementation-readiness/rubric.md'
 ---
 
 # Step 3: Epic Coverage Validation
@@ -41,6 +42,7 @@ To validate that all Functional Requirements from the PRD are captured in the ep
 - 🚫 Don't analyze story quality (that's later)
 - 💬 Compare PRD FRs against epic coverage list
 - 🚪 Document every missing FR
+- ✅ Only report issues that match rubric section B (FR Coverage) or C (Epic Independence)
 
 ## EXECUTION PROTOCOLS:
 
@@ -77,6 +79,7 @@ From the epics document:
 - Find FR coverage mapping or list
 - Extract which FR numbers are claimed to be covered
 - Document which epics cover which FRs
+- Verify each mapped Epic/Story ID exists in the epics document
 
 Format as:
 
@@ -97,6 +100,7 @@ Using the PRD FR list from step 2:
 - Check each PRD FR against epic coverage
 - Identify FRs NOT covered in epics
 - Note any FRs in epics but NOT in PRD
+- Mark any FR mappings that reference missing Epic/Story IDs
 
 Create coverage matrix:
 
@@ -142,6 +146,10 @@ Append to {outputFile}:
 ### Missing Requirements
 
 [List of uncovered FRs from section 5]
+
+### Invalid Mappings
+
+[List any FRs mapped to Epic/Story IDs that do not exist]
 
 ### Coverage Statistics
 

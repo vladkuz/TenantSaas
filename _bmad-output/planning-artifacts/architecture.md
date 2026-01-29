@@ -229,6 +229,7 @@ Naming, structure, API formats, error handling, logging fields, and date/time fo
 - Use RFC 7807 Problem Details with fixed fields: `type`, `title`, `status`, `detail`, `instance`.
 - Extensions: `invariant_code`, `trace_id`, `tenant_ref` (only when safe), and `errors` for validation.
 - Tenant disclosure policy: include `tenant_ref` in Problem Details only when the caller is authenticated/authorized for that tenant and disclosure is not an enumeration risk; otherwise omit it.
+- Definition: `tenant_ref` is the disclosure-safe tenant identifier used in logs/errors. It is either an opaque public tenant ID or a safe-state token (`unknown`, `sensitive`, `cross_tenant`) when disclosure is unsafe; it must not be a raw internal ID or a reversible identifier.
 - `type` is stable and machine-meaningful (URN or URL).
 - `detail` must never leak internals or secrets.
 - For 500s, use generic title/detail with `trace_id` + `invariant_code`.
@@ -633,6 +634,25 @@ All project requirements are architecturally supported, with clear mapping from 
 The chosen starter template and architectural patterns provide a production-ready foundation following current best practices.
 
 ---
+
+## Glossary
+
+- **break-glass:** Explicit, audited override path for privileged or cross-tenant actions; never implicit or default.
+- **context taxonomy:** The defined set of tenancy scopes and states (tenant, shared-system, no-tenant + reasons) used across the system.
+- **contract tests:** Adopter-runnable tests that verify invariants, refusal behavior, and disclosure rules in CI.
+- **cross_tenant marker:** Log/error value indicating a cross-tenant administrative operation.
+- **disclosure policy:** Rules that determine when tenant-related information may be shown in logs/errors.
+- **execution kind:** Labeled execution flow type (request, background, admin, scripted) captured in context for enforcement.
+- **invariant_code:** Stable identifier for an invariant or refusal, used in errors/logs and tests.
+- **Problem Details:** RFC 7807 error format used as the sole error response shape.
+- **refusal mapping:** Schema that maps an invariant violation to status, invariant_code, and guidance link.
+- **request_id:** Correlation ID for request-scoped operations; included in logs/errors when applicable.
+- **sanctioned boundaries:** Approved integration points where enforcement occurs; bypass paths are disallowed.
+- **safe-state values:** `tenant_ref` values like `unknown`, `sensitive`, `cross_tenant` used when disclosure is unsafe.
+- **target_tenant_ref:** Disclosure-safe tenant identifier for the target of a privileged/cross-tenant operation.
+- **tenant attribution:** Rules and sources used to resolve tenant identity; ambiguity must refuse.
+- **trace_id:** End-to-end correlation ID present in refusals and logs.
+- **trust contract:** Canonical definition of invariants, scopes, attribution rules, refusal behavior, and disclosure policy.
 
 **Architecture Status:** READY FOR IMPLEMENTATION ✅
 

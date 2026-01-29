@@ -11,6 +11,7 @@ nextStepFile: './step-03-epic-coverage-validation.md'
 workflowFile: '{workflow_path}/workflow.md'
 outputFile: '{planning_artifacts}/implementation-readiness-report-{{date}}.md'
 epicsFile: '{planning_artifacts}/*epic*.md' # Will be resolved to actual file
+rubricFile: '{project-root}/_bmad/bmm/workflows/3-solutioning/check-implementation-readiness/rubric.md'
 ---
 
 # Step 2: PRD Analysis
@@ -42,6 +43,7 @@ To fully read and analyze the PRD document (whole or sharded) to extract all Fun
 - 🚫 Don't validate files (done in step 1)
 - 💬 Read PRD completely - whole or all sharded files
 - 🚪 Extract every FR and NFR with numbering
+- ✅ Only extract requirements explicitly stated in PRD (no inferred or rewritten requirements)
 
 ## EXECUTION PROTOCOLS:
 
@@ -62,7 +64,9 @@ I will:
 2. Read it completely and thoroughly
 3. Extract ALL Functional Requirements (FRs)
 4. Extract ALL Non-Functional Requirements (NFRs)
-5. Document findings for coverage validation"
+5. Document findings for coverage validation
+
+Note: Use the rubric file to ensure extraction is strict and literal."
 
 ### 2. Load and Read PRD
 

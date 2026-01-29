@@ -231,6 +231,7 @@ TenantSaas is a developer-facing foundation package for .NET-first multi-tenant 
 
 - Concise conceptual model.
 - Explicit trust contract.
+- Define `tenant_ref`: a disclosure-safe tenant identifier used in logs/errors; either an opaque public tenant ID or a safe-state token (`unknown`, `sensitive`, `cross_tenant`) when disclosure is unsafe.
 - Minimal integration guide.
 - Runnable verification/contract tests guide.
 - Small API reference (focused on the core surface only).

@@ -9,6 +9,7 @@ workflow_path: '{project-root}/_bmad/bmm/workflows/3-solutioning/implementation-
 thisStepFile: './step-06-final-assessment.md'
 workflowFile: '{workflow_path}/workflow.md'
 outputFile: '{planning_artifacts}/implementation-readiness-report-{{date}}.md'
+rubricFile: '{project-root}/_bmad/bmm/workflows/3-solutioning/check-implementation-readiness/rubric.md'
 ---
 
 # Step 6: Final Assessment
@@ -40,6 +41,7 @@ To provide a comprehensive summary of all findings and give the report a final p
 - 🚫 Don't soften the message - be direct
 - 💬 Provide specific examples for problems
 - 🚪 Add final section to the report
+- ✅ Only summarize issues that match the rubric
 
 ## EXECUTION PROTOCOLS:
 
@@ -68,6 +70,7 @@ Check the {outputFile} for sections added by previous steps:
 - File and FR Validation findings
 - UX Alignment issues
 - Epic Quality violations
+- Ensure all findings map to rubric sections A-H
 
 ### 3. Add Final Assessment Section
 
@@ -93,6 +96,17 @@ Append to {outputFile}:
 ### Final Note
 
 This assessment identified [X] issues across [Y] categories. Address the critical issues before proceeding to implementation. These findings can be used to improve the artifacts or you may choose to proceed as-is.
+```
+
+Include a rubric-based tally:
+
+- Critical: [count]
+- Major: [count]
+- Minor: [count]
+
+Set status:
+- READY if Critical=0 and Major=0
+- NEEDS WORK if Critical>0 or Major>0
 ```
 
 ### 4. Complete the Report

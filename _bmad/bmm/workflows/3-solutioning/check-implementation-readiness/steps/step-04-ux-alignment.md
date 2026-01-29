@@ -10,6 +10,7 @@ thisStepFile: './step-04-ux-alignment.md'
 nextStepFile: './step-05-epic-quality-review.md'
 workflowFile: '{workflow_path}/workflow.md'
 outputFile: '{planning_artifacts}/implementation-readiness-report-{{date}}.md'
+rubricFile: '{project-root}/_bmad/bmm/workflows/3-solutioning/check-implementation-readiness/rubric.md'
 ---
 
 # Step 4: UX Alignment
@@ -41,6 +42,7 @@ To check if UX documentation exists and validate that it aligns with PRD require
 - 🚫 Don't assume UX is not needed
 - 💬 Validate alignment between UX, PRD, and Architecture
 - 🚪 Add findings to the output report
+- ✅ Only report issues that match rubric section A (UX doc rule)
 
 ## EXECUTION PROTOCOLS:
 
@@ -85,13 +87,11 @@ Search patterns:
 
 ### 4. If No UX Document
 
-Assess if UX/UI is implied:
+Check PRD for the literal statement:
+`UX documentation is not required for this project.`
 
-- Does PRD mention user interface?
-- Are there web/mobile components implied?
-- Is this a user-facing application?
-
-If UX implied but missing: Add warning to report
+- If the statement exists: mark UX requirement as satisfied.
+- If the statement does NOT exist: record a **Major** issue per rubric A.
 
 ### 5. Add Findings to Report
 

@@ -3,9 +3,10 @@ stepsCompleted:
   - step-01-validate-prerequisites
   - step-02-design-epics
   - step-03-create-stories
+  - step-04-final-validation
 inputDocuments:
-  - "_bmad-output/planning-artifacts/prd.md"
-  - "_bmad-output/planning-artifacts/architecture.md"
+  - _bmad-output/planning-artifacts/prd.md
+  - _bmad-output/planning-artifacts/architecture.md
 ---
 
 # TenantSaas - Epic Breakdown
@@ -18,651 +19,1111 @@ This document provides the complete epic and story breakdown for TenantSaas, dec
 
 ### Functional Requirements
 
-FR1: Platform engineers can define the canonical tenant identity model used across the system.
-FR2: The system can represent tenant scope and shared-system scope as explicit, distinct contexts.
-FR3: The system can represent a no tenant state only when explicitly justified by the trust contract.
-FR4: Developers can attach tenant context explicitly to operations before execution.
-FR5: The baseline model can be referenced as a single source of truth by services integrating it.
-FR6: The system can refuse operations with ambiguous or missing tenant attribution.
-FR7: The system can enforce an explicit invariant set of <=7 invariants defined and enumerated in the trust contract.
-FR8: Invariant enforcement applies uniformly across request, background, administrative, and scripted execution paths.
-FR9: The system can surface refusal reasons explicitly to developers when invariants are violated.
-FR10: Privileged or cross-tenant operations require explicit intent and cannot proceed silently.
-FR11: The system provides a single, unavoidable integration point for tenant context initialization.
-FR12: The integration point can propagate tenant context to downstream operations consistently.
-FR13: The integration point can reject execution when required context is absent or inconsistent.
-FR14: Services can integrate the baseline without adopting a full framework or templated scaffold.
-FR15: The system provides runnable verification artifacts that test invariant enforcement.
-FR16: Teams can execute contract tests as part of CI to prove baseline adherence.
-FR17: Contract tests can be run by adopters without specialized tooling beyond the package.
-FR18: Verification artifacts can demonstrate behavior across multiple execution contexts.
-FR19: The system provides a conceptual model describing tenancy, scope, and shared-system context in <=800 words or <=2 pages.
-FR20: The system provides an explicit trust contract that defines invariants and refusal behavior.
-FR21: The system provides an integration guide with <=6 required steps and a reference setup time <=30 minutes.
-FR22: The system provides a verification guide that explains how to run and interpret contract tests.
-FR23: The system provides an API reference that covers 100% of public surface area and lists all public types/entry points.
-FR24: The system defines explicit boundaries where extensions may be built without weakening invariants.
-FR25: Adapters can integrate through sanctioned boundaries while preserving the trust contract.
-FR26: The core surface blocks bypass paths by restricting entry points to sanctioned boundaries, verified by contract tests covering 100% of public entry points.
-FR27: New engineers can locate the trust contract and run contract tests within 60 minutes using the docs alone.
-FR28: 100% of refusal errors include actionable guidance and a link to the relevant contract rule, verified by contract tests.
+Note: Letter-suffixed items (e.g., FR2a) are derived clarifications from the PRD or Architecture; they do not expand scope beyond PRD intent.
+
+FR1: The baseline defines a canonical tenant identity contract (type + validation + normalization) configurable by adopters.  
+FR2: The system represents tenant scope, shared-system scope, and no-tenant context when explicitly permitted by the trust contract.  
+FR2a: Shared-system scope is a distinct scope (not a wildcard) with its own allowed operations and invariants. (Derived from PRD FR2)  
+FR2b: No-tenant context is an explicit state (not a null tenant) and carries a reason/category defined by the trust contract (e.g., Public, Bootstrap, HealthCheck, SystemMaintenance). (Derived from PRD FR3)  
+FR3: Developers can attach tenant context explicitly to operations before execution.  
+FR4: Tenant context is available via an explicit API and optionally via an ambient context with deterministic propagation across async boundaries.  
+FR5: Each execution flow has one required context initialization point (request, background job, admin/scripted), meaning the first moment a context object is established.  
+FR5a: Enforcement operates correctly with either explicit context passing or ambient propagation without weakening invariants. (Derived from PRD FR4/FR12)  
+FR6: Enforcement occurs at a small set of boundary helpers/middleware/interceptors, not a full framework.  
+FR6a: Invariant evaluation and tenant context initialization are idempotent and side-effect-free by default (no network calls, persistence writes, or background scheduling). (Derived from Architecture constraints)  
+FR7: Operations with missing or ambiguous tenant attribution are refused by default.  
+FR7a: Tenant attribution uses a declared set of allowed sources (e.g., route, header, host, token claims) with an explicit precedence order. (Derived from PRD FR6)  
+FR7b: If multiple allowed sources disagree, attribution is ambiguous and must refuse. (Derived from PRD FR6)  
+FR7c: If a source is not allowed for the given endpoint or execution kind, attribution must refuse. (Derived from PRD FR6)  
+FR8: Invariants are enumerated, named, finite, and defined in the trust contract.  
+FR9: Enforcement applies across defined execution paths; execution kind is captured in context.  
+FR10: Refusal reasons are explicit and developer-facing.  
+FR11: Privileged or cross-tenant operations require explicit intent; break-glass requires actor identity + reason and is auditable; it is never implicit or default.  
+FR11a: Break-glass emits a standard audit event containing actor, reason, scope, target_tenant_ref (or cross-tenant marker), trace_id, and invariant_code (or audit_code). (Derived from PRD FR10)  
+FR12: Verification artifacts are provided as a test helper package plus a reference test suite, runnable by adopters in CI without specialized tooling.  
+FR13: The trust contract defines invariants, allowed contexts, break-glass semantics, disclosure policy, and standardized refusal mappings (status + invariant_code + guidance link).  
+FR14: Documentation includes a concise conceptual model, an explicit trust contract, an integration guide, a verification guide, and an API reference.  
+FR15: The package provides shared types and conventions intended to serve as the canonical reference for tenancy.  
+FR16: Extension boundaries are explicit and named (e.g., ITenantResolver, ITenantContextAccessor, IInvariantEvaluator, IInvariantViolationMapper, ILogEnricher).  
+FR17: Sanctioned extensions can integrate without weakening invariants.  
+FR18: All refusals include invariant_code + trace_id; request_id is included for request execution. (Derived from Architecture constraints)  
+FR19: Tenant disclosure policy is explicit: tenant_ref is always logged using safe states; errors include tenant info only when safe to disclose. (Derived from PRD documentation requirements)  
 
 ### NonFunctional Requirements
 
-NFR1: The system shall reject 100% of operations with missing or ambiguous tenant attribution as measured by contract tests covering request, background, and admin paths.
-NFR2: Privileged or cross-scope actions shall require explicit scope declaration and justification fields, verified by contract tests for all privileged operations.
-NFR3: The system shall produce zero silent fallbacks when required context is missing, verified by negative tests in CI.
-NFR4: Security-relevant behavior shall be covered by contract tests with >=90% branch coverage in the enforcement module, measured in CI.
-NFR5: Invariant enforcement shall be deterministic across 10 repeated CI runs with identical inputs yielding identical outcomes (0 variance).
-NFR6: Failure modes shall return explicit error codes/messages for 100% of invariant violations, verified by contract tests.
-NFR7: Invariant check failures shall return within <=100ms at p95 in reference benchmarks.
-NFR8: Core guarantees shall pass the same contract tests across local and CI environments with 0 environment-specific skips.
-NFR9: All request paths shall pass through the single integration point in the reference project, verified by tracing tests with 100% coverage.
-NFR10: Integration shall require no changes to domain/business logic in the reference project (0 files under domain namespaces modified), verified by sample diff.
-NFR11: The integration guide shall include a full wiring example and complete successfully in <=30 minutes for a new service, measured in onboarding trials.
-NFR12: If the integration point is removed or bypassed, contract tests shall fail in CI with a specific error within a single test run.
-NFR13: Baseline overhead shall add <=1ms at p95 per request in a reference benchmark of 10,000 requests.
-NFR14: Enforcement checks shall add <=5% latency when tenant count scales from 1 to 10,000, measured by benchmark.
-NFR15: The baseline shall start zero background polling loops or timers by default, verified by runtime inspection tests.
-NFR16: Contract tests shall pass with tenant counts of 1, 100, and 10,000 in load simulations.
-NFR17: Reference architecture shall demonstrate multi-service and multi-database topology without special casing, verified by documented example and integration test.
-NFR18: All invariants shall remain enforced under 10x load compared to baseline, verified by load tests.
-NFR19: Not applicable. TenantSaas has no end-user UI surface.
+Note: Letter-suffixed items (e.g., NFR5a) are derived clarifications from the PRD/Architecture and do not add new scope beyond PRD intent.
+
+NFR1: The system rejects operations with missing or ambiguous tenant attribution.  
+NFR2: Privileged or cross-scope actions require explicit scope declaration and justification.  
+NFR3: No silent fallbacks when required context is missing.  
+NFR4: Enforcement is deterministic for identical inputs within the same environment.  
+NFR5: Invariant violations return explicit error codes/messages with stable invariant_code values.  
+NFR5a: invariant_code values and Problem Details type identifiers are stable within a major version; breaking changes require a major version bump and documented migration notes. (Derived from PRD NFR5)  
+NFR5b: Contract-test helper APIs follow the same major-version stability guarantees. (Derived from PRD NFR5)  
+NFR6: Contract tests demonstrate behavior across execution kinds supported by the reference sample; helpers allow adopters to map their own execution kinds to the same assertions.  
+NFR7: Integration is non-invasive to domain/business logic; changes are confined to boundary/configuration code.  
+NFR8: Bypassing initialization results in refusal with explicit diagnostics.  
+NFR9: Baseline overhead is low and benchmarked; published targets include machine specs and methodology.  
+NFR10: Enforcement scales with tenant count; benchmarks are published for reference loads.  
+NFR11: No default background polling loops or timers are started by the baseline.  
+NFR12: Reference load simulations include tenant counts of 1, 100, and 10,000 (for published benchmarks).  
+NFR13: Accessibility is not applicable (no end-user UI).  
+
+### PRD NFR Mapping (PRD NFR1–NFR19 → Epics/Stories)
+
+| PRD NFR | Requirement | Coverage |
+| ------- | ----------- | -------- |
+| NFR1 | Reject 100% of operations with missing or ambiguous tenant attribution. | Epic 2, Story 2.2; Epic 3, Story 3.2; Epic 5, Story 5.2 |
+| NFR2 | Privileged or cross-scope actions require explicit scope declaration and justification fields. | Epic 2, Story 2.4; Epic 3, Story 3.5; Epic 5, Story 5.4 |
+| NFR3 | Zero silent fallbacks when required context is missing. | Epic 3, Story 3.1; Epic 3, Story 3.2; Epic 3, Story 3.3; Epic 5, Story 5.2 |
+| NFR4 | Security behavior covered by contract tests with >=90% branch coverage in enforcement module. | UNMAPPED (needs explicit coverage/metrics story) |
+| NFR5 | Deterministic enforcement across 10 repeated CI runs (0 variance). | UNMAPPED (needs explicit determinism test story) |
+| NFR6 | Invariant violations return explicit error codes/messages. | Epic 3, Story 3.3; Epic 5, Story 5.5 |
+| NFR7 | Invariant check failures return within <=100ms p95. | UNMAPPED (needs explicit performance/benchmark story) |
+| NFR8 | Contract tests pass across local and CI with 0 environment-specific skips. | Epic 5, Story 5.1; Epic 5, Story 5.3 (needs explicit no-skip criterion) |
+| NFR9 | All request paths pass through the integration point in the reference project. | Epic 4, Story 4.1; Epic 5, Story 5.2; Epic 6, Story 6.2 (reference project must be named) |
+| NFR10 | Integration requires no changes to domain/business logic in the reference project. | Epic 6, Story 6.2 |
+| NFR11 | Integration guide includes a wiring example and completes in <=30 minutes. | Epic 6, Story 6.2; Epic 1, Story 1.1 (needs explicit <=30 min criterion) |
+| NFR12 | If integration point is removed/bypassed, contract tests fail in CI with a specific error. | Epic 5, Story 5.3; Epic 3, Story 3.1 |
+| NFR13 | Baseline overhead adds <=1ms at p95 in reference benchmark. | UNMAPPED (needs explicit benchmark story) |
+| NFR14 | Enforcement adds <=5% latency at scale (tenant count 1→10,000). | UNMAPPED (needs explicit scaling benchmark story) |
+| NFR15 | Baseline starts zero background polling loops or timers by default. | UNMAPPED (needs explicit runtime inspection story) |
+| NFR16 | Contract tests pass with tenant counts 1, 100, 10,000 in load simulations. | UNMAPPED (needs explicit load test story) |
+| NFR17 | Reference architecture demonstrates multi-service and multi-database topology. | UNMAPPED (needs explicit reference architecture story) |
+| NFR18 | Invariants remain enforced under 10x load vs baseline. | UNMAPPED (needs explicit load/invariance story) |
+| NFR19 | Accessibility not applicable (no UI). | N/A |
 
 ### Additional Requirements
 
-- Starter template required: .NET SDK default templates; first implementation story is initializing the monorepo via documented `dotnet new` commands.
-- .NET 10 target framework for all projects; monorepo with core, abstractions, EF Core adapter, contract tests, and sample host.
-- Core library must be storage-agnostic; EF Core adapter is reference-only.
-- REST Minimal APIs for sample host with Swagger docs; errors must be RFC 7807 Problem Details only.
-- BYO-auth stance; sample uses API key auth.
-- Structured logging required with specified fields; optional OpenTelemetry hooks in sample.
-- CI/CD via GitHub Actions build/test/pack; release on tags.
-- Dockerfile (and optional docker-compose) for sample host.
-- Naming, routing, error, logging, and date/time format conventions must be enforced and tested.
+- Baseline constraints:
+  - Core is storage-agnostic; EF Core adapter is reference-only.  
+  - Errors use RFC 7807 Problem Details with invariant_code + trace_id.  
+- Structured logging requires tenant_ref, trace_id, request_id, invariant_code, event_name, severity; tenant_ref follows disclosure policy.  
+- Definition: `tenant_ref` is the disclosure-safe tenant identifier used in logs/errors. It is either an opaque public tenant ID or a safe-state token (`unknown`, `sensitive`, `cross_tenant`) when disclosure is unsafe; it must not be a raw internal ID or reversible identifier.  
+  - Refuse-by-default enforcement with explicit break-glass path.  
+  - BYO-auth posture (sample auth is illustrative only).  
+  - Rate limiting is documented, not implemented in core.  
+- Verification strategy (separate from requirements, but required deliverables):
+  - Black-box contract tests cover refusal on missing/ambiguous context and cross-tenant access.  
+  - Break-glass path requires explicit declaration and is auditable.  
+  - Error shape/log enrichment/correlation rules are asserted.  
+  - Adopters can run the contract test helper package in their own CI.  
+- Reference implementation choices (non-binding):
+  - .NET-first sample; packaging and exact target frameworks are implementation decisions.  
+  - Minimal APIs + Swagger in the sample host.  
+  - SQLite for the sample datastore.  
+  - Repo layout and scaffolding commands are implementation plans, not product requirements.  
 
 ### FR Coverage Map
 
-FR1: Epic 1 - Establish the Trust Baseline in a New Service
-FR2: Epic 1 - Establish the Trust Baseline in a New Service
-FR3: Epic 1 - Establish the Trust Baseline in a New Service
-FR4: Epic 1 - Establish the Trust Baseline in a New Service
-FR5: Epic 1 - Establish the Trust Baseline in a New Service
-FR6: Epic 1 - Establish the Trust Baseline in a New Service
-FR7: Epic 1 - Establish the Trust Baseline in a New Service
-FR8: Epic 1 - Establish the Trust Baseline in a New Service
-FR9: Epic 1 - Establish the Trust Baseline in a New Service
-FR10: Epic 1 - Establish the Trust Baseline in a New Service
-FR11: Epic 1 - Establish the Trust Baseline in a New Service
-FR12: Epic 1 - Establish the Trust Baseline in a New Service
-FR13: Epic 1 - Establish the Trust Baseline in a New Service
-FR14: Epic 1 - Establish the Trust Baseline in a New Service
-FR15: Epic 2 - Contract Tests That Prove the Guarantees
-FR16: Epic 2 - Contract Tests That Prove the Guarantees
-FR17: Epic 2 - Contract Tests That Prove the Guarantees
-FR18: Epic 2 - Contract Tests That Prove the Guarantees
-FR19: Epic 3 - Documentation & Trust Contract That Make Adoption Fast
-FR20: Epic 3 - Documentation & Trust Contract That Make Adoption Fast
-FR21: Epic 3 - Documentation & Trust Contract That Make Adoption Fast
-FR22: Epic 3 - Documentation & Trust Contract That Make Adoption Fast
-FR23: Epic 3 - Documentation & Trust Contract That Make Adoption Fast
-FR24: Epic 4 - Extension Boundaries & Reference Adapter Patterns
-FR25: Epic 4 - Extension Boundaries & Reference Adapter Patterns
-FR26: Epic 4 - Extension Boundaries & Reference Adapter Patterns
-FR27: Epic 3 - Documentation & Trust Contract That Make Adoption Fast
-FR28: Epic 3 - Documentation & Trust Contract That Make Adoption Fast
+Note: FR2a/2b/5a/6a/7a/7b/7c/11a/18/19 are derived clarifications (non-PRD) mapped for internal traceability only.
+
+FR1: Epic 6 - Adoption & Portability Hardening
+FR2: Epic 2 - Trust Contract v1 Foundations
+FR2a: Epic 2 - Trust Contract v1 Foundations
+FR2b: Epic 2 - Trust Contract v1 Foundations
+FR3: Epic 4 - Context Initialization & Propagation
+FR4: Epic 4 - Context Initialization & Propagation
+FR5: Epic 4 - Context Initialization & Propagation
+FR5a: Epic 4 - Context Initialization & Propagation
+FR6: Epic 3 - Refuse-by-Default Enforcement
+FR6a: Epic 3 - Refuse-by-Default Enforcement
+FR7: Epic 3 - Refuse-by-Default Enforcement
+FR7a: Epic 2 - Trust Contract v1 Foundations
+FR7b: Epic 2 - Trust Contract v1 Foundations
+FR7c: Epic 2 - Trust Contract v1 Foundations
+FR8: Epic 2 - Trust Contract v1 Foundations
+FR9: Epic 2 - Trust Contract v1 Foundations
+FR10: Epic 3 - Refuse-by-Default Enforcement
+FR11: Epic 3 - Refuse-by-Default Enforcement
+FR11a: Epic 3 - Refuse-by-Default Enforcement
+FR12: Epic 5 - Contract Tests & Compliance Kit
+FR13: Epic 2 - Trust Contract v1 Foundations
+FR14: Epic 6 - Adoption & Portability Hardening
+FR15: Epic 6 - Adoption & Portability Hardening
+FR16: Epic 6 - Adoption & Portability Hardening
+FR17: Epic 6 - Adoption & Portability Hardening
+FR18: Epic 3 - Refuse-by-Default Enforcement
+FR19: Epic 2 - Trust Contract v1 Foundations
+
+### PRD FR Mapping (PRD FR1–FR28 → Epics/Stories)
+
+This mapping normalizes the PRD FR numbering (FR1–FR28) to specific epic and story IDs for implementation traceability.
+
+| PRD FR | Implementation Mapping |
+| ------ | ---------------------- |
+| FR1 | Epic 6, Story 6.1 |
+| FR2 | Epic 2, Story 2.1 |
+| FR3 | Epic 2, Story 2.1 |
+| FR4 | Epic 4, Story 4.1; Epic 4, Story 4.2 |
+| FR5 | Epic 6, Story 6.4 |
+| FR6 | Epic 3, Story 3.2; Epic 2, Story 2.2 |
+| FR7 | Epic 2, Story 2.3 |
+| FR8 | Epic 4, Story 4.4; Epic 4, Story 4.5 |
+| FR9 | Epic 3, Story 3.3; Epic 3, Story 3.4 |
+| FR10 | Epic 3, Story 3.5; Epic 2, Story 2.4; Epic 5, Story 5.4 |
+| FR11 | Epic 4, Story 4.1 |
+| FR12 | Epic 4, Story 4.3; Epic 4, Story 4.2 |
+| FR13 | Epic 3, Story 3.1 |
+| FR14 | Epic 6, Story 6.2; Epic 1, Story 1.1; Epic 6, Story 6.3 |
+| FR15 | Epic 5, Story 5.1; Epic 5, Story 5.3; Epic 5, Story 5.4; Epic 5, Story 5.5 |
+| FR16 | Epic 5, Story 5.1; Epic 5, Story 5.3 |
+| FR17 | Epic 5, Story 5.1 |
+| FR18 | Epic 5, Story 5.2 |
+| FR19 | Epic 6, Story 6.4 |
+| FR20 | Epic 2, Story 2.3; Epic 2, Story 2.4; Epic 2, Story 2.5; Epic 5, Story 5.5 |
+| FR21 | Epic 6, Story 6.2; Epic 1, Story 1.1; Epic 1, Story 1.2; Epic 1, Story 1.3 |
+| FR22 | Epic 6, Story 6.6 |
+| FR23 | Epic 6, Story 6.7 |
+| FR24 | Epic 6, Story 6.1; Epic 6, Story 6.3 |
+| FR25 | Epic 6, Story 6.1 |
+| FR26 | Epic 3, Story 3.1; Epic 5, Story 5.2 |
+| FR27 | Epic 5, Story 5.1; Epic 6, Story 6.5; Epic 6, Story 6.6 |
+| FR28 | Epic 3, Story 3.3; Epic 3, Story 3.4; Epic 2, Story 2.3; Epic 2, Story 2.5; Epic 5, Story 5.5 |
 
 ## Epic List
 
-### Epic 1: Establish the Trust Baseline in a New Service
-A platform engineer can initialize a new .NET service and enforce tenant context and refusal behavior in real request paths through a single, unavoidable integration point.
-**FRs covered:** FR1–FR14
+### Epic 1: Bootstrap a Runnable Baseline (Greenfield Setup)
+Enable a team to start from a supported template, run locally, and verify CI early so the first service can adopt the baseline without guesswork.
+**FRs covered:** FR14, FR21 (supports CI and integration NFRs)
+**Dependencies:** None
 
-### Epic 2: Contract Tests That Prove the Guarantees
-Teams can run verification tests in CI to prove invariants across request, background, admin, and scripted paths.
-**FRs covered:** FR15–FR18
+### Epic 2: Teams Can Understand and Trust the Contract
+Deliver a complete, readable trust contract that defines scopes, invariants, attribution rules, disclosure policy, and refusal mappings that adopters can rely on immediately.
+**FRs covered:** FR2, FR2a, FR2b, FR7a, FR7b, FR7c, FR8, FR9, FR13, FR19
+**Dependencies:** Epic 1
 
-### Epic 3: Documentation & Trust Contract That Make Adoption Fast
-Engineers can understand the model, integrate quickly, and troubleshoot using explicit guidance, trust contract, and complete API reference.
-**FRs covered:** FR19–FR23, FR27–FR28
+### Epic 3: Unsafe Operations Are Blocked by Default
+Give developers an unavoidable enforcement boundary with explicit refusals and auditable break-glass so tenant mistakes are impossible to ignore.
+**FRs covered:** FR6, FR6a, FR7, FR10, FR11, FR11a, FR18
+**Dependencies:** Epic 2
 
-### Epic 4: Extension Boundaries & Reference Adapter Patterns
-Contributors can build adapters and extensions without weakening invariants, with bypass paths blocked and tested.
-**FRs covered:** FR24–FR26
+### Epic 4: Tenancy Is Initialized and Propagated Reliably
+Make tenancy establishment obvious and consistent across request/background/admin/scripted flows so enforcement is deterministic.
+**FRs covered:** FR3, FR4, FR5, FR5a
+**Dependencies:** Epic 2
 
-<!-- Repeat for each epic in epics_list (N = 1, 2, 3...) -->
+### Epic 5: Teams Can Prove Compliance in CI
+Provide adopter-runnable contract tests and reference suites that prove invariants and disclosure rules without specialized tooling.
+**FRs covered:** FR12 (and exercises FR2/FR7/FR11/FR19 behaviors)
+**Dependencies:** Epic 2, Epic 3, Epic 4
 
-## Epic 1: Establish the Trust Baseline in a New Service
+### Epic 6: Adoption Is Fast and Portable
+Ship documentation and extension seams so a team can integrate quickly without rewriting domain logic or weakening invariants.
+**FRs covered:** FR1, FR14, FR15, FR16, FR17
+**Dependencies:** Epic 2, Epic 3, Epic 4, Epic 5
 
-A platform engineer can initialize a new .NET service and enforce tenant context and refusal behavior in real request paths through a single, unavoidable integration point.
+<!-- End story repeat -->
 
-### Story 1.1: Initialize the Monorepo Baseline
+## Epic 1: Bootstrap a Runnable Baseline (Greenfield Setup)
+
+Enable a team to start from a supported template, run locally, and verify CI early so the first service can adopt the baseline without guesswork.
+
+### Story 1.1: Initialize Project from the Approved .NET Template
+
+**Implements:** FR14, FR21
+**Related NFRs:** NFR7
+
+As a platform engineer,  
+I want a documented, repeatable project initialization step,  
+So that the baseline starts from a supported .NET SDK template with known structure.
+
+**Acceptance Criteria:**
+
+
+**Given** the approved .NET SDK templates  
+**When** I initialize the repo  
+**Then** the solution, core library, and reference host are created from the documented template  
+**And** the initialization steps are written in the setup guide
+**And** this is verified by a test  
+
+**Given** the project is initialized  
+**When** a required template or dependency is missing  
+**Then** the setup guide provides a clear failure message and resolution steps
+**And** this is verified by a test  
+
+### Story 1.2: Local Development Environment Setup
+
+**Implements:** FR21
+**Related NFRs:** NFR7
+
+As a developer,  
+I want a minimal local setup process,  
+So that I can build and run the reference host without tribal knowledge.
+
+**Acceptance Criteria:**
+
+
+**Given** a new machine with the documented prerequisites  
+**When** I follow the setup steps  
+**Then** I can build and run the reference host locally  
+**And** the reference host starts and responds to a basic health check
+**And** this is verified by a test  
+
+**Given** a missing prerequisite  
+**When** I run the setup steps  
+**Then** the failure is explicit and points to the missing dependency
+**And** this is verified by a test  
+
+### Story 1.3: CI Pipeline Skeleton (Build + Smoke Checks)
+
+**Implements:** FR21
+**Related NFRs:** NFR7
+
+As a team lead,  
+I want a CI workflow skeleton that builds and runs basic smoke checks,  
+So that the baseline can be validated on every pull request without waiting on later epics.
+
+**Acceptance Criteria:**
+
+
+**Given** the CI workflow definition  
+**When** I open a pull request  
+**Then** the build and smoke checks run automatically and fail the build on errors
+**And** this is verified by a test  
+
+**Given** a known failing test or build error is introduced  
+**When** the CI pipeline runs  
+**Then** the pipeline fails with a specific, documented error
+
+## Epic 2: Teams Can Understand and Trust the Contract
+
+Provide an explicit, readable trust contract (scopes, invariants, attribution rules, disclosure policy, refusal mapping, and break-glass semantics) that adopters can treat as the system’s source of truth.
+
+### Story 2.1: Define Context Taxonomy and Execution Kinds
+
+**Implements:** FR2, FR3
+**Related NFRs:** N/A
 
 As a platform engineer,
-I want a .NET 10 solution scaffolded from the approved starter template,
-So that the baseline has the correct structure from day one.
+I want a concrete context taxonomy and execution kind model,
+So that every enforcement decision has unambiguous inputs.
 
 **Acceptance Criteria:**
 
-**Given** the documented `dotnet new` commands
-**When** I execute them
-**Then** the solution and projects are created as specified in the architecture
-**And** all projects target `net10.0` in their `*.csproj` files
-**And** the solution builds successfully with `dotnet build`
-**And** the monorepo includes core, abstractions, EF Core adapter, contract tests, and sample host projects
 
-**FRs implemented:** FR14
+**Given** the Trust Contract v1 scope  
+**When** I review the core contracts  
+**Then** I can find explicit definitions for tenant scope, shared-system scope, and no-tenant context  
+**And** no-tenant context requires a reason/category from an allowed set
+**And** this is verified by a test  
 
-### Story 1.2: Define the Tenant Context Model & Scope Types
+**Given** the context model  
+**When** execution occurs in request, background, admin, or scripted flows  
+**Then** the execution kind is represented explicitly in the context  
+**And** it is available to enforcement, logging, and refusal mapping
+**And** this is verified by a test  
+
+**Given** the trust contract is missing a required scope or execution kind definition  
+**When** the contract is reviewed  
+**Then** the gap is explicitly documented as a blocking issue before implementation proceeds
+**And** this is verified by a test  
+
+### Story 2.2: Define Tenant Attribution Sources, Precedence, and Ambiguity Rules
+
+**Implements:** FR6, FR20
+**Related NFRs:** NFR1, NFR3
+
+As an adopter,
+I want a declared tenant attribution contract,
+So that tenant resolution is deterministic and disagreements are refused.
+
+**Acceptance Criteria:**
+
+
+**Given** tenant attribution is required  
+**When** I inspect the tenant resolution contract  
+**Then** I see an allowed set of attribution sources  
+**And** I see a clear precedence order across those sources
+**And** this is verified by a test  
+
+**Given** two allowed sources disagree on tenant identity  
+**When** tenant attribution is evaluated  
+**Then** the attribution is classified as ambiguous  
+**And** enforcement can refuse with a stable invariant_code
+**And** this is verified by a test  
+
+### Story 2.3: Define Invariant Registry and Refusal Mapping Schema
+
+**Implements:** FR7, FR20, FR28
+**Related NFRs:** N/A
+
+As a product owner,
+I want invariants and refusals defined as data,
+So that behavior is stable, testable, and versionable.
+
+**Acceptance Criteria:**
+
+
+**Given** Trust Contract v1 invariants  
+**When** I review the invariant registry shape  
+**Then** each invariant has a stable identifier and name  
+**And** invariants can be referenced by enforcement, tests, and documentation
+**And** this is verified by a test  
+
+**Given** an invariant violation  
+**When** refusal mapping is applied  
+**Then** there is a defined mapping to status, invariant_code, and guidance link  
+**And** the schema supports stable Problem Details type identifiers
+**And** this is verified by a test  
+
+### Story 2.4: Define Break-Glass Contract and Standard Audit Event Schema
+
+**Implements:** FR10, FR20
+**Related NFRs:** NFR2
+
+As a security reviewer,
+I want break-glass to be explicit and auditable by contract,
+So that escalations are safer than normal flows, not looser.
+
+**Acceptance Criteria:**
+
+
+**Given** a privileged or cross-tenant operation  
+**When** break-glass is used  
+**Then** the contract requires actor identity, reason, and declared scope  
+**And** the contract forbids implicit or default break-glass activation
+**And** this is verified by a test  
+
+**Given** break-glass is exercised  
+**When** the audit event is emitted  
+**Then** it includes actor, reason, scope, target_tenant_ref (or cross-tenant marker), trace_id, and invariant_code (or audit_code)  
+**And** the event schema is stable and documented
+
+### Story 2.5: Define Disclosure Policy and tenant_ref Safe States
+
+**Implements:** FR20, FR28
+**Related NFRs:** NFR1, NFR3
+
+As an adopter,
+I want a precise disclosure policy,
+So that logs and errors do not become tenant existence oracles.
+
+**Acceptance Criteria:**
+
+
+**Given** tenant disclosure is evaluated  
+**When** I review the disclosure policy contract  
+**Then** I see defined tenant_ref safe states (e.g., unknown, sensitive, cross_tenant, opaque id)  
+**And** the policy specifies when tenant information may appear in errors
+**And** this is verified by a test  
+
+**Given** a refusal occurs  
+**When** Problem Details are constructed  
+**Then** tenant information is included only when disclosure is safe  
+**And** the policy is available to refusal mapping and logging enrichment
+**And** this is verified by a test  
+
+## Epic 3: Unsafe Operations Are Blocked by Default
+
+Ensure unsafe or ambiguous operations are refused at clear enforcement boundaries with explicit errors and auditable break-glass.
+
+### Story 3.1: Enforce ContextInitialized at Boundary Helpers
+
+**Implements:** FR13, FR26
+**Related NFRs:** N/A
 
 As a platform engineer,
-I want explicit tenant context and scope types with accessors,
-So that operations attach tenant context consistently.
+I want boundary enforcement to refuse when context is not initialized,
+So that missing tenant context fails immediately and predictably.
 
 **Acceptance Criteria:**
 
-**Given** the abstractions project
-**When** I implement tenant context, scope types, and accessors
-**Then** the system can represent tenant scope, shared scope, and explicit “no tenant” states
-**And** the API surface is minimal and stable without framework coupling
-**And** attempts to create an invalid or ambiguous scope are rejected with a clear invariant code
 
-**FRs implemented:** FR1, FR2, FR3, FR4, FR5
+**Given** an operation enters a sanctioned enforcement boundary  
+**When** no context has been initialized for the execution flow  
+**Then** the operation is refused by default  
+**And** the refusal references the ContextInitialized invariant
+**And** this is verified by a test  
 
-### Story 1.3: Add the Unavoidable Integration Point (Request Middleware)
+**Given** a refusal due to missing context  
+**When** the error is produced  
+**Then** it uses the standardized refusal mapping schema  
+**And** it includes invariant_code and trace_id
+
+### Story 3.2: Enforce TenantAttributionUnambiguous at Boundaries
+
+**Implements:** FR6
+**Related NFRs:** N/A
+
+As an adopter,
+I want ambiguous tenant attribution to be refused consistently,
+So that conflicting signals cannot silently choose a tenant.
+
+**Acceptance Criteria:**
+
+
+**Given** tenant attribution is present but ambiguous per the trust contract  
+**When** enforcement is evaluated  
+**Then** the operation is refused  
+**And** the refusal references TenantAttributionUnambiguous
+**And** this is verified by a test  
+
+**Given** an ambiguous attribution refusal  
+**When** refusal details are produced  
+**Then** they do not leak tenant existence information  
+**And** they include actionable guidance via the contract mapping
+**And** this is verified by a test  
+
+
+**Given** tenant attribution is ambiguous per the trust contract  
+**When** enforcement runs at the boundary  
+**Then** the operation must refuse with a standardized error
+
+### Story 3.3: Standardize Problem Details Refusals for Invariant Violations
+
+**Implements:** FR9, FR28
+**Related NFRs:** N/A
+
+As a developer,
+I want invariant violations to return a stable, machine-meaningful refusal shape,
+So that clients, tests, and logs can rely on consistent semantics.
+
+**Acceptance Criteria:**
+
+
+**Given** any invariant violation occurs at an enforcement boundary  
+**When** a refusal is returned  
+**Then** it is expressed as RFC 7807 Problem Details  
+**And** it uses stable type identifiers and invariant_code values within the major version
+**And** this is verified by a test  
+
+**Given** a refusal is constructed  
+**When** correlation data is available  
+**Then** trace_id is always present  
+**And** request_id is included for request execution kinds
+**And** this is verified by a test  
+
+
+**Given** an invariant violation occurs  
+**When** the response is produced  
+**Then** the response must return an error with a stable invariant_code
+
+### Story 3.4: Enrich Structured Logs with tenant_ref and Invariant Context
+
+**Implements:** FR9, FR28
+**Related NFRs:** NFR5
+
+As a security reviewer,
+I want refusals and enforcement decisions to be visible in structured logs,
+So that tenant safety can be audited without exposing sensitive tenant data.
+
+**Acceptance Criteria:**
+
+
+**Given** enforcement decisions are logged  
+**When** logs are emitted  
+**Then** they include tenant_ref, trace_id, request_id (when applicable), invariant_code, event_name, and severity  
+**And** tenant_ref values follow the disclosure policy safe states
+**And** this is verified by a test  
+
+**Given** a refusal occurs  
+**When** logs are inspected  
+**Then** the refusal can be correlated with the returned Problem Details  
+**And** no sensitive tenant identifiers are exposed when disclosure is unsafe
+**And** this is verified by a test  
+
+### Story 3.5: Require Explicit Break-Glass with Audit Event Emission
+
+**Implements:** FR10
+**Related NFRs:** N/A
+
+As an on-call responder,
+I want break-glass to be explicit, constrained, and auditable,
+So that escalations are safer than normal flows, not looser.
+
+**Acceptance Criteria:**
+
+
+**Given** a privileged or cross-tenant operation is attempted  
+**When** break-glass is not explicitly declared with actor, reason, and scope  
+**Then** the operation is refused  
+**And** the refusal references BreakGlassExplicitAndAudited
+**And** this is verified by a test  
+
+**Given** break-glass is explicitly declared and allowed  
+**When** the operation proceeds  
+**Then** a standard audit event is emitted per the trust contract  
+**And** the audit event includes actor, reason, scope, target_tenant_ref (or cross-tenant marker), trace_id, and invariant_code (or audit_code)
+
+
+**Given** break-glass is attempted without required actor and reason  
+**When** the operation is evaluated  
+**Then** the operation must refuse with an error and be blocked
+
+## Epic 4: Tenancy Is Initialized and Propagated Reliably
+
+Provide a clear initialization primitive and deterministic propagation so tenancy context is consistent across all execution flows.
+
+
+### Story 4.1: Provide a Single Required Initialization Primitive per Flow
+
+**Implements:** FR4, FR11
+**Related NFRs:** N/A
+
+As an adopter,
+I want a clear initialization primitive,
+So that I know exactly where tenancy is established for each execution flow.
+
+**Acceptance Criteria:**
+
+
+**Given** a request, background job, admin task, or scripted flow  
+**When** I integrate the baseline  
+**Then** there is one required initialization primitive for that flow  
+**And** it produces a context object with scope, execution kind, and attribution inputs
+**And** this is verified by a test  
+
+**Given** initialization is attempted multiple times in the same flow  
+**When** initialization runs  
+**Then** it behaves idempotently  
+**And** it does not create conflicting context state
+**And** this is verified by a test  
+
+**Given** an execution flow without initialization  
+**When** a boundary is invoked  
+**Then** enforcement refuses with the ContextInitialized invariant  
+**And** the refusal is testable via contract tests
+**And** this is verified by a test  
+
+
+**Given** a flow attempts boundary execution without initialization  
+**When** enforcement evaluates the request  
+**Then** the operation must refuse with an error
+
+### Story 4.2: Support Explicit Context Passing Without Ambient Requirements
+
+**Implements:** FR4, FR12
+**Related NFRs:** NFR4
 
 As a platform engineer,
-I want a single request-path integration point that initializes tenant context,
-So that every request is guaranteed to pass through it.
+I want enforcement to work with explicit context passing,
+So that I can avoid hidden behavior and framework coupling.
 
 **Acceptance Criteria:**
 
-**Given** an HTTP request to the sample host
-**When** the tenant context middleware runs
-**Then** a tenant context is required and attached before downstream handlers execute
-**And** requests without valid tenant context are refused with Problem Details and a stable invariant code
 
-**FRs implemented:** FR11, FR12, FR13
+**Given** a valid context object  
+**When** it is passed explicitly to enforcement boundaries  
+**Then** invariants are evaluated correctly  
+**And** no ambient context is required for correctness
+**And** this is verified by a test  
 
-### Story 1.4: Implement Invariant Enforcement + Refusal Reasons
+**Given** explicit context passing is used  
+**When** context is missing or inconsistent  
+**Then** enforcement refuses with standardized Problem Details  
+**And** the refusal includes invariant_code and trace_id
+**And** this is verified by a test  
+
+### Story 4.3: Provide Ambient Context Propagation with Deterministic Async Behavior
+
+**Implements:** FR12
+**Related NFRs:** NFR4
+
+As a developer,
+I want ambient context propagation as an option,
+So that I can reduce plumbing without weakening guarantees.
+
+**Acceptance Criteria:**
+
+
+**Given** ambient propagation is enabled  
+**When** execution crosses async boundaries within the same flow  
+**Then** the tenant context remains available deterministically  
+**And** enforcement outcomes match the explicit passing model
+**And** this is verified by a test  
+
+**Given** ambient context is enabled  
+**When** a new execution flow begins  
+**Then** no prior context leaks into the new flow  
+**And** context must be explicitly initialized for the new flow
+**And** this is verified by a test  
+
+### Story 4.4: Provide Flow Wrappers for Background, Admin, and Scripted Execution
+
+**Implements:** FR8
+**Related NFRs:** NFR8
+
+As an adopter,
+I want clear wrappers for non-request execution kinds,
+So that tenancy is established consistently outside HTTP.
+
+**Acceptance Criteria:**
+
+
+**Given** a background, admin, or scripted operation  
+**When** I use the provided flow wrapper  
+**Then** the wrapper requires explicit initialization inputs  
+**And** it sets execution kind and scope in the context
+**And** this is verified by a test  
+
+**Given** a flow wrapper is bypassed  
+**When** enforcement is evaluated downstream  
+**Then** missing context is refused by default  
+**And** the refusal references the ContextInitialized invariant
+**And** this is verified by a test  
+
+
+**Given** a background/admin/scripted operation skips the flow wrapper  
+**When** enforcement evaluates the boundary  
+**Then** the operation must refuse with an error
+
+### Story 4.5: Capture Execution Kind and Scope in Context for Downstream Use
+
+**Implements:** FR8
+**Related NFRs:** NFR4
+
+As a security reviewer,
+I want execution kind and scope captured in context,
+So that enforcement, logging, and auditing use consistent semantics.
+
+**Acceptance Criteria:**
+
+
+**Given** any initialized context  
+**When** it is inspected by enforcement, logging, or audit mapping  
+**Then** execution kind and scope are available as first-class fields  
+**And** they align with the trust contract taxonomy
+**And** this is verified by a test  
+
+**Given** a context is initialized without execution kind or scope  
+**When** enforcement is evaluated  
+**Then** the operation is refused with a standardized Problem Details response  
+**And** the refusal includes invariant_code and trace_id
+
+
+**Given** execution kind or scope is missing in context  
+**When** enforcement runs  
+**Then** the operation must fail with an error
+
+## Epic 5: Teams Can Prove Compliance in CI
+
+Ship adopter-runnable contract tests and reference suites that prove invariants, refusals, disclosure policy, and auditing behavior.
+
+
+### Story 5.1: Ship an Adopter-Runnable Contract Test Helper Package
+
+**Implements:** FR15, FR16, FR17, FR27
+**Related NFRs:** NFR6
+
+As an adopter,
+I want contract test helpers I can run in my own CI,
+So that compliance is a binary signal rather than a review process.
+
+**Acceptance Criteria:**
+
+
+**Given** the contract test helper package  
+**When** I add it to my test suite  
+**Then** I can run black-box assertions without specialized tooling  
+**And** the helpers align with the trust contract invariants and refusal mappings
+
+**Given** helper APIs are used  
+**When** versions change within a major version  
+**Then** helper contracts remain stable  
+**And** breaking changes require a major version bump with migration notes
+**And** this is verified by a test  
+
+### Story 5.2: Provide Reference Compliance Tests for Refusal and Attribution Rules
+
+**Implements:** FR18, FR26
+**Related NFRs:** NFR1, NFR3
 
 As a platform engineer,
-I want invariant enforcement with explicit refusal reasons,
-So that ambiguous or cross-tenant operations are blocked and explainable.
+I want reference tests that prove the guardrails work,
+So that I can see failures when invariants are violated.
 
 **Acceptance Criteria:**
 
-**Given** an operation without required tenant attribution
-**When** the invariant enforcer runs
-**Then** the operation is refused
-**And** the refusal exposes a stable invariant code and clear reason
-**And** repeated runs with the same inputs yield identical outcomes
 
-**FRs implemented:** FR6, FR7, FR8, FR9, FR10
-**NFRs implemented:** NFR1, NFR3, NFR6
+**Given** reference compliance tests  
+**When** context is missing, ambiguous, or disallowed  
+**Then** operations are refused by default  
+**And** refusals reference the appropriate invariants
+**And** this is verified by a test  
 
-### Story 1.5: Add EF Core Reference Adapter (SaveChanges Guard)
+**Given** attribution sources disagree  
+**When** compliance tests run  
+**Then** attribution is treated as ambiguous  
+**And** refusal behavior is consistent with the trust contract
+**And** this is verified by a test  
 
-As a platform engineer using EF Core,
-I want a reference adapter that enforces tenant scope in persistence,
-So that cross-tenant writes are blocked.
+
+**Given** attribution sources disagree  
+**When** compliance tests execute  
+**Then** the test must fail and report an error refusal
+
+### Story 5.3: Integrate Contract Tests into CI
+
+**Implements:** FR16, FR15
+**Related NFRs:** NFR6
+
+As a team lead,
+I want contract tests wired into CI,
+So that baseline compliance is enforced before merges.
 
 **Acceptance Criteria:**
 
-**Given** a DbContext configured with the adapter
-**When** SaveChanges is called without valid tenant context
-**Then** the operation is refused
-**And** the refusal follows the same invariant codes as core enforcement
-**And** the core library remains storage-agnostic with no EF Core dependency
-**And** valid tenant-scoped operations succeed without additional configuration
 
-**FRs implemented:** FR6, FR8
+**Given** the CI workflow definition  
+**When** I open a pull request  
+**Then** contract tests run automatically and fail the build on invariant violations
+**And** this is verified by a test  
 
-### Story 1.6: Sample Host Wiring (Minimal API + Problem Details)
+**Given** the enforcement boundary is bypassed  
+**When** the CI pipeline runs  
+**Then** the contract test job fails with a specific, documented error
+
+### Story 5.4: Assert Break-Glass Constraints and Audit Event Emission
+
+**Implements:** FR10, FR15
+**Related NFRs:** NFR2
+
+As a security stakeholder,
+I want break-glass behavior proven by tests,
+So that escalations cannot bypass the contract silently.
+
+**Acceptance Criteria:**
+
+
+**Given** break-glass is not explicitly declared  
+**When** privileged or cross-tenant operations are attempted  
+**Then** compliance tests fail with a refusal  
+**And** the refusal references BreakGlassExplicitAndAudited
+**And** this is verified by a test  
+
+**Given** break-glass is explicitly declared and allowed  
+**When** the operation proceeds in reference tests  
+**Then** a standard audit event is emitted  
+**And** the audit event includes the contract-required fields
+
+### Story 5.5: Assert Disclosure Policy and Error/Log Correlation Rules
+
+**Implements:** FR20, FR28, FR15
+**Related NFRs:** NFR1, NFR3
+
+As an auditor,
+I want disclosure safety and correlation proven by contract tests,
+So that logs and errors are safe and diagnosable together.
+
+**Acceptance Criteria:**
+
+
+**Given** a refusal occurs under sensitive disclosure conditions  
+**When** compliance tests inspect Problem Details and logs  
+**Then** tenant information is withheld or redacted per policy  
+**And** tenant_ref uses safe-state values
+**And** this is verified by a test  
+
+**Given** any invariant refusal occurs  
+**When** compliance tests inspect output  
+**Then** invariant_code and trace_id appear in both errors and logs  
+**And** request_id appears for request execution kinds
+**And** this is verified by a test  
+
+
+**Given** disclosure is unsafe  
+**When** compliance tests validate outputs  
+**Then** an error must refuse to expose tenant identifiers
+
+## Epic 6: Adoption Is Fast and Portable
+
+Deliver complete docs and extension seams so teams can integrate quickly without rewriting domain logic or weakening invariants.
+
+
+### Story 6.1: Define and Document Named Extension Seams
+
+**Implements:** FR1, FR24, FR25
+**Related NFRs:** N/A
+
+As an adopter,
+I want explicit extension seams,
+So that I can integrate with my stack without weakening invariants.
+
+**Acceptance Criteria:**
+
+
+**Given** the extension model  
+**When** I review the contracts  
+**Then** I see named seams for tenant resolution, context access, invariant evaluation, refusal mapping, and log enrichment  
+**And** each seam states what is customizable versus invariant-protected
+
+**Given** extensions are implemented  
+**When** compliance tests are run  
+**Then** extensions can pass without bypassing enforcement boundaries
+**And** this is verified by a test  
+
+### Story 6.2: Provide a Boundary-Only Integration Guide
+
+**Implements:** FR14, FR21
+**Related NFRs:** NFR7
 
 As a platform engineer,
-I want a runnable sample host that demonstrates the baseline in practice,
-So that I can see the integration flow end-to-end.
+I want an integration guide that avoids domain rewrites,
+So that adoption cost stays low.
 
 **Acceptance Criteria:**
 
-**Given** the sample host
-**When** I run it and hit example endpoints
-**Then** tenant context enforcement is active
-**And** the host uses Minimal APIs
-**And** errors return RFC 7807 Problem Details only
-**And** Problem Details include `trace_id` and `invariant_code` extensions when applicable
 
-**FRs implemented:** FR9, FR14
+**Given** the integration guide  
+**When** I follow it end to end  
+**Then** integration steps are focused on boundaries and configuration  
+**And** the guide makes no requirement to rewrite domain logic
+**And** this is verified by a test  
 
-### Story 1.7: Sample Host Swagger Documentation
+**Given** integration is complete  
+**When** I run compliance tests  
+**Then** they exercise the configured boundaries successfully  
+**And** failures point back to specific contract rules
+**And** this is verified by a test  
 
-As a platform engineer,
-I want OpenAPI/Swagger documentation for the sample host,
-So that integration points are discoverable and consistent.
+**Given** a boundary is skipped or misconfigured  
+**When** I run the integration guide’s verification steps  
+**Then** the failure is explicit and references the missing boundary configuration
+**And** this is verified by a test  
 
-**Acceptance Criteria:**
+**Given** the integration guide is finalized  
+**When** documentation is published  
+**Then** the guide is available at `docs/integration-guide.md` and referenced by a documentation test
 
-**Given** the sample host running locally
-**When** I open the Swagger UI or OpenAPI JSON
-**Then** all sample endpoints are documented
-**And** the error responses are described as Problem Details
-**And** undocumented endpoints are treated as a test failure
-**And** missing Problem Details schemas in the OpenAPI spec fail contract tests
+### Story 6.3: Prove Storage-Agnostic Core with Reference-Only Adapters
 
-**Supporting requirements:** Additional Requirements - REST Minimal APIs with Swagger docs
+**Implements:** FR14, FR24
+**Related NFRs:** NFR7
 
-**FRs implemented:** FR21, FR23
-
-### Story 1.8: Sample Host API Key Authentication (BYO-Auth)
-
-As a platform engineer,
-I want the sample host to use a simple API key while documenting BYO-auth,
-So that auth is runnable without imposing a framework.
+As a technical lead,
+I want confidence that the core stays storage-agnostic,
+So that the baseline remains portable across data layers.
 
 **Acceptance Criteria:**
 
-**Given** a request without an API key
-**When** I call a sample endpoint
-**Then** the response is 401/403 using Problem Details
-**And** a valid API key allows the request to proceed
-**And** the docs state the BYO-auth stance and replacement guidance
-**And** invalid keys do not reveal whether a tenant exists
 
-**Supporting requirements:** Additional Requirements - BYO-auth stance; sample uses API key auth
+**Given** the core packages  
+**When** dependencies are reviewed  
+**Then** storage-specific dependencies are not required by the core  
+**And** reference adapters are isolated as optional components
+**And** this is verified by a test  
 
-**FRs implemented:** FR10, FR14
+**Given** the reference adapter is used  
+**When** it integrates with the core  
+**Then** it uses sanctioned seams and boundaries  
+**And** the core invariants remain enforced
+**And** this is verified by a test  
 
-### Story 1.9: Structured Logging + Optional OpenTelemetry Hooks
+### Story 6.4: Publish the Conceptual Model
 
-As a platform engineer,
-I want structured logging with required fields and optional OTel hooks,
-So that enforcement events are traceable without logging lock-in.
+**Implements:** FR5, FR19
+**Related NFRs:** N/A
 
-**Acceptance Criteria:**
-
-**Given** a request processed by the sample host
-**When** I inspect log entries emitted by the baseline
-**Then** each log line includes required fields: `tenant_ref`, `trace_id`, `request_id`, `invariant_code`, `event_name`, `severity`
-**And** the logging helper does not require a specific logging stack beyond `ILogger`
-**And** optional OpenTelemetry hooks are demonstrated in the sample host
-**And** missing required fields fail a contract test
-
-**Supporting requirements:** Additional Requirements - structured logging fields; optional OpenTelemetry hooks
-
-**FRs implemented:** FR9
-
-### Story 1.10: Docker Assets for Sample Host
-
-As a platform engineer,
-I want Docker assets for the sample host,
-So that I can run and verify the baseline in containers.
+As an adopter,
+I want a concise conceptual model,
+So that I can understand tenancy, scope, and shared-system context quickly.
 
 **Acceptance Criteria:**
 
-**Given** the repository root
-**When** I build the sample host container
-**Then** a Dockerfile produces a runnable image
-**And** docker-compose (if provided) starts the sample host successfully
-**And** containerized runs emit the same Problem Details format as local runs
-**And** container startup failures fail the CI validation step
 
-**Supporting requirements:** Additional Requirements - Dockerfile (optional docker-compose) for sample host
+**Given** the documentation set  
+**When** I review it as a new adopter  
+**Then** I can find the conceptual model document  
+**And** it is <=800 words or <=2 pages and links to the trust contract
+**And** this is verified by a test  
 
-**FRs implemented:** FR14
+**Given** the conceptual model exceeds the length constraint  
+**When** documentation is reviewed  
+**Then** the overage is flagged and corrected before release
+**And** this is verified by a test  
 
-### Story 1.11: CI Build/Test/Pack and Release on Tags
+### Story 6.5: Publish the Trust Contract
 
-As a platform engineer,
-I want GitHub Actions to build, test, and pack releases,
-So that distribution is consistent and automated.
+**Implements:** FR27
+**Related NFRs:** N/A
 
-**Acceptance Criteria:**
-
-**Given** a push to main
-**When** the CI workflow runs
-**Then** it builds and tests all projects
-**And** it produces NuGet packages via `dotnet pack`
-**And** tagged releases trigger a publish step
-**And** missing build artifacts fail the pipeline with a clear error
-
-**Supporting requirements:** Additional Requirements - CI/CD via GitHub Actions build/test/pack; release on tags
-
-**FRs implemented:** FR16, FR17
-
-## Epic 2: Contract Tests That Prove the Guarantees
-
-Teams can run verification tests in CI to prove invariants across request, background, admin, and scripted paths.
-
-### Story 2.1: Contract Test Harness & Fixtures
-
-As a platform engineer,
-I want a contract test harness with fixtures,
-So that invariants can be executed consistently across contexts.
+As an adopter,
+I want an explicit trust contract document,
+So that invariants, refusals, and disclosure rules are unambiguous.
 
 **Acceptance Criteria:**
 
-**Given** the contract tests project
-**When** I implement reusable fixtures for tenant context and test hosts
-**Then** contract tests can run deterministically across environments
-**And** fixtures cover request and non-request execution setup
-**And** fixture failures provide actionable diagnostics
 
-**FRs implemented:** FR15, FR17, FR18
-**NFRs implemented:** NFR5
+**Given** the documentation set  
+**When** I review it as a new adopter  
+**Then** I can find the trust contract document  
+**And** it defines invariants, refusal behavior, and disclosure policy with stable identifiers
+**And** this is verified by a test  
 
-### Story 2.2: Invariant Enforcement Tests (Request Path)
+**Given** the trust contract is missing a required invariant or refusal mapping  
+**When** documentation is reviewed  
+**Then** the issue is flagged as a release blocker  
+**And** the missing section is added before release
+**And** this is verified by a test  
 
-As a platform engineer,
-I want contract tests that assert refusal behavior on request paths,
-So that ambiguous or missing tenant context is always blocked.
+**Given** the trust contract is finalized  
+**When** documentation is published  
+**Then** the contract is available at `docs/trust-contract.md` and referenced by a documentation test
 
-**Acceptance Criteria:**
+### Story 6.6: Publish the Verification Guide
 
-**Given** an HTTP request without required tenant context
-**When** the request is processed through the integration point
-**Then** the invariant enforcement refuses the operation
-**And** the response returns a stable invariant code
-**And** ambiguous tenant attribution is refused with a distinct invariant code
+**Implements:** FR22, FR27
+**Related NFRs:** N/A
 
-**FRs implemented:** FR15, FR16
-**NFRs implemented:** NFR1, NFR2, NFR6
-
-### Story 2.3: Invariant Enforcement Tests (Background/Admin Paths)
-
-As a platform engineer,
-I want contract tests that validate background and admin execution paths,
-So that invariants are enforced outside HTTP requests.
+As an adopter,
+I want a verification guide,
+So that I can run and interpret contract tests quickly.
 
 **Acceptance Criteria:**
 
-**Given** a background or admin operation without valid tenant context
-**When** the operation is executed through the invariant enforcer
-**Then** the operation is refused consistently
-**And** the same invariant codes and refusal reasons are emitted
-**And** privileged operations require explicit scope declaration and justification
 
-**FRs implemented:** FR15, FR18
-**NFRs implemented:** NFR1, NFR2, NFR3
+**Given** the documentation set  
+**When** I review it as a new adopter  
+**Then** I can find the verification guide  
+**And** it explains how to run and interpret contract tests end to end
+**And** this is verified by a test  
 
-### Story 2.4: CI Execution of Contract Tests
+**Given** a verification step fails or is out of date  
+**When** the guide is followed  
+**Then** the failure is reproducible  
+**And** the guide is updated with the corrected steps
+**And** this is verified by a test  
 
-As a platform engineer,
-I want contract tests running in CI with clear pass/fail signals,
-So that adoption is verifiable.
+**Given** the verification guide is finalized  
+**When** documentation is published  
+**Then** the guide is available at `docs/verification-guide.md` and referenced by a documentation test
 
-**Acceptance Criteria:**
+### Story 6.7: Publish the API Reference
 
-**Given** a CI workflow
-**When** the contract test suite runs
-**Then** failures are reported clearly in CI output
-**And** the full suite completes within the target time budget
-**And** enforcement branch coverage meets the >=90% threshold
-**And** no environment-specific skips are permitted
-**And** failures include the invariant code or test name that triggered them
+**Implements:** FR23
+**Related NFRs:** N/A
 
-**FRs implemented:** FR16, FR17
-**NFRs implemented:** NFR4, NFR8
-
-
-### Story 2.5: Performance Benchmarks
-
-As a platform engineer,
-I want baseline performance and determinism benchmarks,
-So that overhead and timing guarantees are validated.
+As an adopter,
+I want a complete API reference,
+So that I can integrate with confidence and avoid hidden surface area.
 
 **Acceptance Criteria:**
 
-**Given** a reference benchmark suite
-**When** I run it locally or in CI
-**Then** invariant checks return within <=100ms at p95
-**And** baseline overhead adds <=1ms at p95 for 10,000 requests
-**And** enforcement checks add <=5% latency from 1 to 10,000 tenants
-**And** results are published as part of CI artifacts
 
-**NFRs implemented:** NFR7, NFR13, NFR14
+**Given** the API reference  
+**When** public surface area changes  
+**Then** the reference updates in the same change  
+**And** contract identifiers remain stable within a major version
+**And** this is verified by a test  
 
-**FRs implemented:** FR15
+**Given** a public type or endpoint is undocumented  
+**When** the API reference is reviewed  
+**Then** the gap is flagged before release  
+**And** the missing entry is added
+**And** this is verified by a test  
 
-### Story 2.6: Determinism and No Background Loops
+**Given** the API reference is finalized  
+**When** documentation is published  
+**Then** the reference is available at `docs/api-reference.md` and referenced by a documentation test
 
-As a platform engineer,
-I want determinism and no background polling by default,
-So that baseline behavior is predictable and low-overhead.
+## Post-MVP Backlog (Not in Scope for PRD FR1–FR28)
 
-**Acceptance Criteria:**
+### Epic 7: On-Call and Cross-Scope Scenarios Are Safe
 
-**Given** repeated CI runs with identical inputs
-**When** I execute the contract tests
-**Then** invariant enforcement outcomes are identical (0 variance)
-**And** no background polling loops or timers start by default
-**And** results are published as part of CI artifacts
+Define and test safe escalation paths for shared-system and cross-tenant operations with strong audit and disclosure guarantees.
 
-**NFRs implemented:** NFR5, NFR15
+### Story 7.1: Define Explicit Shared-System Operations and Allowed Invariants
 
-**FRs implemented:** FR15
+**Implements:** N/A (post-MVP backlog)
+**Related NFRs:** N/A
 
-### Story 2.7: Integration Path Enforcement Tests
-
-As a platform engineer,
-I want contract tests to enforce integration and pattern conventions,
-So that all request paths are guarded and formats are consistent.
+As an architect,
+I want shared-system scope to be explicit and bounded,
+So that it cannot become a hidden wildcard.
 
 **Acceptance Criteria:**
 
-**Given** the reference project
-**When** I run the contract test suite
-**Then** every request path is verified to pass through the integration point
-**And** bypassing the integration point causes contract tests to fail in CI
-**And** the sample integration requires no domain/business logic changes
-**And** any deviation reports the specific offending endpoint or log field
 
-**NFRs implemented:** NFR9, NFR10, NFR12
+**Given** shared-system scope is used  
+**When** its allowed operations are reviewed  
+**Then** the allowed operations are explicit  
+**And** they are mapped to specific invariants and refusal rules
+**And** this is verified by a test  
 
-**FRs implemented:** FR15, FR16
+**Given** a shared-system operation violates scope rules  
+**When** enforcement is evaluated  
+**Then** the operation is refused  
+**And** the refusal is standardized and auditable
+**And** this is verified by a test  
 
-### Story 2.8: Scalability Load Validation
 
-As a platform engineer,
-I want scalability load validation,
-So that invariants hold under 10x load and large tenant counts.
+**Given** shared-system operations violate allowed invariants  
+**When** enforcement runs  
+**Then** the operation must refuse with an error
 
-**Acceptance Criteria:**
+### Story 7.2: Support Safe Cross-Tenant Administrative Workflows
 
-**Given** load simulations with tenant counts of 1, 100, and 10,000
-**When** the contract tests run
-**Then** invariants remain enforced under 10x load
-**And** failed invariants include the tenant count and scenario in output
+**Implements:** N/A (post-MVP backlog)
+**Related NFRs:** N/A
 
-**NFRs implemented:** NFR16, NFR18
-
-**FRs implemented:** FR18
-
-### Story 2.9: Topology Validation (Multi-Service + Multi-Database)
-
-As a platform engineer,
-I want topology validation,
-So that the reference architecture demonstrates multi-service and multi-database layouts without special casing.
+As an on-call responder,
+I want cross-tenant workflows to be explicit and constrained,
+So that urgent fixes do not weaken tenant isolation guarantees.
 
 **Acceptance Criteria:**
 
-**Given** the reference architecture and integration tests
-**When** I run the topology validation suite
-**Then** the reference architecture demonstrates multi-service and multi-database topology
-**And** any topology-specific invariant failures identify the affected service and database
 
-**NFRs implemented:** NFR17
+**Given** a cross-tenant administrative operation is required  
+**When** it is executed without explicit break-glass and scope declaration  
+**Then** enforcement refuses the operation  
+**And** the refusal references the appropriate invariants
+**And** this is verified by a test  
 
-**FRs implemented:** FR18
+**Given** a cross-tenant operation is explicitly authorized  
+**When** it proceeds  
+**Then** audit events capture cross-tenant markers and scope details  
+**And** disclosure policy is enforced for errors and logs
+**And** this is verified by a test  
 
-### Story 2.10: Naming and Structure Convention Validation
 
-As a platform engineer,
-I want automated checks for naming and structure conventions,
-So that pattern violations are caught early.
+**Given** cross-tenant admin workflows are attempted without break-glass  
+**When** enforcement evaluates the operation  
+**Then** the operation must refuse with an error
 
-**Acceptance Criteria:**
+### Story 7.3: Provide an Optional Audit Sink Interface with Strong Defaults
 
-**Given** the reference solution and EF Core model
-**When** convention validation checks run
-**Then** API routes are plural and use explicit `{tenantId}` parameters
-**And** database tables and columns follow PascalCase without underscores
-**And** the project structure matches the flat root layout without `src/` or `tests/` folders
-**And** Problem Details responses match the documented shape
-**And** required log fields are present in enforcement logs
-**And** date/time format conventions are enforced
+**Implements:** N/A (post-MVP backlog)
+**Related NFRs:** N/A
 
-**Supporting requirements:** Additional Requirements - naming, routing, error, logging, and date/time format conventions
-
-**FRs implemented:** FR14, FR21
-## Epic 3: Documentation & Trust Contract That Make Adoption Fast
-
-Engineers can understand the model, integrate quickly, and troubleshoot using explicit guidance, trust contract, and complete API reference.
-
-### Story 3.1: Trust Contract Document
-
-As a platform engineer,
-I want an explicit trust contract document that defines invariants and refusal behavior,
-So that guarantees are clear and auditable.
+As a compliance stakeholder,
+I want a clear audit integration point,
+So that audit durability can be improved without coupling the core.
 
 **Acceptance Criteria:**
 
-**Given** the documentation set
-**When** I open the trust contract
-**Then** all invariants are enumerated with explicit refusal behavior
-**And** each invariant has a stable code referenced by errors
-**And** any missing invariant code is treated as a documentation defect
 
-**FRs implemented:** FR20
+**Given** the audit model  
+**When** I review extension seams  
+**Then** there is an optional audit sink interface  
+**And** the default behavior still emits contract-compliant structured events
+**And** this is verified by a test  
 
-### Story 3.2: Conceptual Model (<=2 pages)
+**Given** a custom audit sink is provided  
+**When** audit events are emitted  
+**Then** required audit fields are preserved  
+**And** compliance tests can assert the audit contract is still satisfied
+**And** this is verified by a test  
 
-As a platform engineer,
-I want a concise conceptual model of tenancy and scope,
-So that I can understand the baseline quickly.
+### Story 7.4: Add Compliance Tests for Enumeration Resistance and Tenant-Existence Oracle Protection
 
-**Acceptance Criteria:**
+**Implements:** N/A (post-MVP backlog)
+**Related NFRs:** N/A
 
-**Given** the conceptual model doc
-**When** I read it end-to-end
-**Then** it fits within two pages or 800 words
-**And** it explains tenant, shared, and no-tenant scopes clearly
-**And** examples avoid implementation detail beyond the defined model
-
-**FRs implemented:** FR19
-
-### Story 3.3: Integration Guide (<=6 steps, <=30 min)
-
-As a platform engineer,
-I want a minimal integration guide with clear steps,
-So that I can integrate the baseline quickly.
+As a security reviewer,
+I want the subtle leak cases covered,
+So that “safe by default” holds under adversarial usage.
 
 **Acceptance Criteria:**
 
-**Given** the integration guide
-**When** I follow the steps in a new service
-**Then** the integration completes in six steps or fewer
-**And** a new engineer can finish within 30 minutes
-**And** steps that are skipped or out of order fail the contract tests
 
-**FRs implemented:** FR21
-**NFRs implemented:** NFR11
+**Given** sensitive disclosure conditions  
+**When** compliance tests run against refusal behaviors  
+**Then** tenant existence cannot be inferred from error differences  
+**And** disclosure policy is consistently applied
 
-### Story 3.4: Verification Guide (Contract Tests)
-
-As a platform engineer,
-I want a verification guide that explains contract tests,
-So that I can run and interpret the guarantees.
-
-**Acceptance Criteria:**
-
-**Given** the verification guide
-**When** I follow the instructions
-**Then** I can run the contract tests successfully
-**And** I can interpret failures using referenced invariant codes
-**And** at least one failing example is documented with remediation guidance
-
-**FRs implemented:** FR22
-
-### Story 3.5: API Reference (100% Surface Area)
-
-As a platform engineer,
-I want a complete API reference for public types and entry points,
-So that I can integrate without guesswork.
-
-**Acceptance Criteria:**
-
-**Given** the public API surface
-**When** I compare it against the API reference
-**Then** all public types and entry points are documented
-**And** the reference matches current signatures
-**And** undocumented public members are treated as a release blocker
-
-**FRs implemented:** FR23
-
-### Story 3.6: Actionable Error Guidance
-
-As a platform engineer,
-I want refusal errors to include actionable guidance and links to contract rules,
-So that I can fix issues quickly.
-
-**Acceptance Criteria:**
-
-**Given** a refusal error response
-**When** I inspect the error details
-**Then** it includes a stable invariant code and guidance text
-**And** it links to the relevant trust contract rule
-**And** missing links are reported in documentation validation
-
-**FRs implemented:** FR27, FR28
-
-## Epic 4: Extension Boundaries & Reference Adapter Patterns
-
-Contributors can build adapters and extensions without weakening invariants, with bypass paths blocked and tested.
-
-### Story 4.1: Define Extension Boundaries & Contracts
-
-As a contributor,
-I want explicit extension boundaries and contracts,
-So that I can build adapters without weakening invariants.
-
-**Acceptance Criteria:**
-
-**Given** the architecture and documentation
-**When** I review extension boundaries
-**Then** sanctioned extension points are explicitly defined
-**And** bypass paths are explicitly prohibited
-**And** prohibited extension attempts are documented with examples
-
-**FRs implemented:** FR24, FR26
-
-### Story 4.2: Adapter Guidance + Examples
-
-As a contributor,
-I want guidance and examples for building adapters,
-So that I can integrate new stacks safely.
-
-**Acceptance Criteria:**
-
-**Given** the adapter guidance
-**When** I follow the example
-**Then** the adapter preserves invariant enforcement
-**And** it integrates through sanctioned boundaries only
-**And** a bypass attempt triggers a documented failure mode
-
-**FRs implemented:** FR25
-
-### Story 4.3: Bypass Prevention Validation
-
-As a platform engineer,
-I want validation that bypass paths are blocked,
-So that extensions cannot weaken the baseline.
-
-**Acceptance Criteria:**
-
-**Given** a public entry point
-**When** I attempt to bypass invariants
-**Then** contract tests fail
-**And** the failure references the violated invariant code
-**And** the failure indicates the exact bypass mechanism used
-**FRs implemented:** FR26
+**Given** attribution and scope rules are stressed across execution kinds  
+**When** compliance tests run  
+**Then** refusals remain standardized and correlated  
+**And** invariant identifiers remain stable and machine-meaningful
+**And** this is verified by a test  

@@ -1,6 +1,6 @@
 ---
 name: 'step-05-epic-quality-review'
-description: 'Validate epics and stories against create-epics-and-stories best practices'
+description: 'Validate epics and stories against deterministic IR rubric sections C/D/E/G'
 
 # Path Definitions
 workflow_path: '{project-root}/_bmad/bmm/workflows/3-solutioning/implementation-readiness'
@@ -11,13 +11,15 @@ nextStepFile: './step-06-final-assessment.md'
 workflowFile: '{workflow_path}/workflow.md'
 outputFile: '{planning_artifacts}/implementation-readiness-report-{{date}}.md'
 epicsBestPractices: '{project-root}/_bmad/bmm/workflows/3-solutioning/create-epics-and-stories'
+rubricFile: '{project-root}/_bmad/bmm/workflows/3-solutioning/check-implementation-readiness/rubric.md'
 ---
 
 # Step 5: Epic Quality Review
 
 ## STEP GOAL:
 
-To validate epics and stories against the best practices defined in create-epics-and-stories workflow, focusing on user value, independence, dependencies, and implementation readiness.
+Validate epics and stories against the **deterministic** IR rubric only:
+sections **C (Epic Independence), D (Story Testability), E (Dependency Hygiene), G (Documentation Requirements)**.
 
 ## MANDATORY EXECUTION RULES (READ FIRST):
 
@@ -39,10 +41,9 @@ To validate epics and stories against the best practices defined in create-epics
 
 ### Step-Specific Rules:
 
-- 🎯 Apply create-epics-and-stories standards rigorously
-- 🚫 Don't accept "technical milestones" as epics
-- 💬 Challenge every dependency on future work
-- 🚪 Verify proper story sizing and structure
+- 🎯 Apply only rubric sections C/D/E/G (no other standards)
+- 🚫 Do not introduce subjective judgments
+- 💬 Every issue must cite the exact rubric rule
 
 ## EXECUTION PROTOCOLS:
 
@@ -51,178 +52,52 @@ To validate epics and stories against the best practices defined in create-epics
 - 📖 Check every dependency relationship
 - 🚫 FORBIDDEN to accept structural problems
 
-## EPIC QUALITY REVIEW PROCESS:
+## EPIC QUALITY REVIEW PROCESS (RUBRIC-ONLY):
 
-### 1. Initialize Best Practices Validation
+### 1. Initialize Rubric Validation
 
-"Beginning **Epic Quality Review** against create-epics-and-stories standards.
+"Beginning **Epic Quality Review** using the deterministic IR rubric (C/D/E/G).
+Only findings that match the rubric are valid issues."
 
-I will rigorously validate:
+### 2. Epic Independence (Rubric C - Critical)
 
-- Epics deliver user value (not technical milestones)
-- Epic independence (Epic 2 doesn't need Epic 3)
-- Story dependencies (no forward references)
-- Proper story sizing and completeness
+- Verify no epic depends on a higher-numbered epic.
+- Verify no story depends on a story in a higher-numbered epic.
+- Record any violations as **Critical** with exact references.
 
-Any deviation from best practices will be flagged as a defect."
+### 3. Story Testability (Rubric D - Major)
 
-### 2. Epic Structure Validation
+For each story:
+- Confirm >=2 Given/When/Then acceptance criteria.
+- Each AC must include one measurable artifact keyword:
+  `test`, `log`, `response`, `error`, `event`, or `metric`.
+- If story is enforcement/guard related, confirm >=1 negative AC
+  containing `refuse`, `error`, `fail`, or `block`.
 
-#### A. User Value Focus Check
+Record violations as **Major** with story IDs.
 
-For each epic:
+### 4. Dependency Hygiene (Rubric E - Major)
 
-- **Epic Title:** Is it user-centric (what user can do)?
-- **Epic Goal:** Does it describe user outcome?
-- **Value Proposition:** Can users benefit from this epic alone?
+- Each epic must explicitly declare dependencies (list or `None`).
+- Check for circular dependencies across epics.
 
-**Red flags (violations):**
+Record violations as **Major** with epic IDs.
 
-- "Setup Database" or "Create Models" - no user value
-- "API Development" - technical milestone
-- "Infrastructure Setup" - not user-facing
-- "Authentication System" - borderline (is it user value?)
+### 5. Documentation Requirements (Rubric G - Major)
 
-#### B. Epic Independence Validation
+- Verify stories exist for: Trust Contract, Integration Guide,
+  Verification Guide, API Reference.
+- Each doc story must include an AC with an explicit location path
+  (e.g., `docs/trust-contract.md`).
 
-Test epic independence:
-
-- **Epic 1:** Must stand alone completely
-- **Epic 2:** Can function using only Epic 1 output
-- **Epic 3:** Can function using Epic 1 & 2 outputs
-- **Rule:** Epic N cannot require Epic N+1 to work
-
-**Document failures:**
-
-- "Epic 2 requires Epic 3 features to function"
-- Stories in Epic 2 referencing Epic 3 components
-- Circular dependencies between epics
-
-### 3. Story Quality Assessment
-
-#### A. Story Sizing Validation
-
-Check each story:
-
-- **Clear User Value:** Does the story deliver something meaningful?
-- **Independent:** Can it be completed without future stories?
-
-**Common violations:**
-
-- "Setup all models" - not a USER story
-- "Create login UI (depends on Story 1.3)" - forward dependency
-
-#### B. Acceptance Criteria Review
-
-For each story's ACs:
-
-- **Given/When/Then Format:** Proper BDD structure?
-- **Testable:** Each AC can be verified independently?
-- **Complete:** Covers all scenarios including errors?
-- **Specific:** Clear expected outcomes?
-
-**Issues to find:**
-
-- Vague criteria like "user can login"
-- Missing error conditions
-- Incomplete happy path
-- Non-measurable outcomes
-
-### 4. Dependency Analysis
-
-#### A. Within-Epic Dependencies
-
-Map story dependencies within each epic:
-
-- Story 1.1 must be completable alone
-- Story 1.2 can use Story 1.1 output
-- Story 1.3 can use Story 1.1 & 1.2 outputs
-
-**Critical violations:**
-
-- "This story depends on Story 1.4"
-- "Wait for future story to work"
-- Stories referencing features not yet implemented
-
-#### B. Database/Entity Creation Timing
-
-Validate database creation approach:
-
-- **Wrong:** Epic 1 Story 1 creates all tables upfront
-- **Right:** Each story creates tables it needs
-- **Check:** Are tables created only when first needed?
-
-### 5. Special Implementation Checks
-
-#### A. Starter Template Requirement
-
-Check if Architecture specifies starter template:
-
-- If YES: Epic 1 Story 1 must be "Set up initial project from starter template"
-- Verify story includes cloning, dependencies, initial configuration
-
-#### B. Greenfield vs Brownfield Indicators
-
-Greenfield projects should have:
-
-- Initial project setup story
-- Development environment configuration
-- CI/CD pipeline setup early
-
-Brownfield projects should have:
-
-- Integration points with existing systems
-- Migration or compatibility stories
-
-### 6. Best Practices Compliance Checklist
-
-For each epic, verify:
-
-- [ ] Epic delivers user value
-- [ ] Epic can function independently
-- [ ] Stories appropriately sized
-- [ ] No forward dependencies
-- [ ] Database tables created when needed
-- [ ] Clear acceptance criteria
-- [ ] Traceability to FRs maintained
-
-### 7. Quality Assessment Documentation
-
-Document all findings by severity:
-
-#### 🔴 Critical Violations
-
-- Technical epics with no user value
-- Forward dependencies breaking independence
-- Epic-sized stories that cannot be completed
-
-#### 🟠 Major Issues
-
-- Vague acceptance criteria
-- Stories requiring future stories
-- Database creation violations
-
-#### 🟡 Minor Concerns
-
-- Formatting inconsistencies
-- Minor structure deviations
-- Documentation gaps
-
-### 8. Autonomous Review Execution
-
-This review runs autonomously to maintain standards:
-
-- Apply best practices without compromise
-- Document every violation with specific examples
-- Provide clear remediation guidance
-- Prepare recommendations for each issue
+Record violations as **Major** with story IDs.
 
 ## REVIEW COMPLETION:
 
 After completing epic quality review:
 
-- Update {outputFile} with all quality findings
-- Document specific best practices violations
+- Update {outputFile} with all rubric-based findings
+- Document specific rule violations with references
 - Provide actionable recommendations
 - Load {nextStepFile} for final readiness assessment
 
