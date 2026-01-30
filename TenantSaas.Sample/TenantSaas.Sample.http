@@ -1,0 +1,6 @@
+@TenantSaas.Sample_HostAddress = http://localhost:0
+
+GET {{TenantSaas.Sample_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
