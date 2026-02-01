@@ -1,6 +1,6 @@
 # Story 1.3: CI Pipeline Skeleton (Build + Smoke Checks)
 
-Status: done
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -474,7 +474,6 @@ GPT-5 (Codex CLI)
 ### Change Log
 
 - 2026-02-01: Implemented CI workflow, contract tests, and README documentation.
-- 2026-02-01: Code review fixes: added --configuration Release to CI, fixed Program.cs indentation, changed SDK to 10.0.x pattern, added AC #2 failure scenario test.
 
 ### File List
 

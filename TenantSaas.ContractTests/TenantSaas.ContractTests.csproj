@@ -26,6 +26,7 @@
   <ItemGroup>
     <ProjectReference Include="..\TenantSaas.Sample\TenantSaas.Sample.csproj" />
     <ProjectReference Include="..\TenantSaas.Abstractions\TenantSaas.Abstractions.csproj" />
+    <ProjectReference Include="..\TenantSaas.Core\TenantSaas.Core.csproj" />
   </ItemGroup>
 
 </Project>

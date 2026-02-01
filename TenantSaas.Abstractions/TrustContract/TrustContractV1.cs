@@ -1,7 +1,9 @@
+using TenantSaas.Abstractions.Invariants;
+
 namespace TenantSaas.Abstractions.TrustContract;
 
 /// <summary>
-/// Trust Contract v1 definitions for tenant scope and execution kinds.
+/// Trust Contract v1 definitions for tenant scope, execution kinds, and attribution sources.
 /// </summary>
 public static class TrustContractV1
 {
@@ -46,6 +48,42 @@ public static class TrustContractV1
     public const string ExecutionScripted = "scripted";
 
     /// <summary>
+    /// Tenant attribution from a URL route parameter.
+    /// </summary>
+    public const string AttributionSourceRouteParameter = "route-parameter";
+
+    /// <summary>
+    /// Tenant attribution from a header value.
+    /// </summary>
+    public const string AttributionSourceHeaderValue = "header-value";
+
+    /// <summary>
+    /// Tenant attribution from the host or domain name.
+    /// </summary>
+    public const string AttributionSourceHostHeader = "host-header";
+
+    /// <summary>
+    /// Tenant attribution from token claims.
+    /// </summary>
+    public const string AttributionSourceTokenClaim = "token-claim";
+
+    /// <summary>
+    /// Tenant attribution explicitly set during context initialization.
+    /// </summary>
+    public const string AttributionSourceExplicitContext = "explicit-context";
+
+    /// <summary>
+    /// Invariant code for unambiguous tenant attribution.
+    /// </summary>
+    public const string InvariantTenantAttributionUnambiguous = InvariantCode.TenantAttributionUnambiguous;
+
+    /// <summary>
+    /// Problem Details type identifier for ambiguous tenant attribution refusals.
+    /// </summary>
+    public const string ProblemTypeTenantAttributionUnambiguous =
+        "urn:tenant-saas:trust-contract:tenant-attribution-unambiguous";
+
+    /// <summary>
     /// Gets the required tenant scopes for the contract.
     /// </summary>
     public static IReadOnlyCollection<string> RequiredScopes { get; } =
@@ -64,6 +102,18 @@ public static class TrustContractV1
         ExecutionBackground,
         ExecutionAdmin,
         ExecutionScripted
+    ];
+
+    /// <summary>
+    /// Gets the required attribution source identifiers for the contract.
+    /// </summary>
+    public static IReadOnlyCollection<string> RequiredAttributionSources { get; } =
+    [
+        AttributionSourceRouteParameter,
+        AttributionSourceHeaderValue,
+        AttributionSourceHostHeader,
+        AttributionSourceTokenClaim,
+        AttributionSourceExplicitContext
     ];
 
     /// <summary>
