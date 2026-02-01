@@ -15845,3 +15845,539 @@
 +/// Trust Contract v1 definitions for tenant scope, execution kinds, and attribution sources.
 *** End Patch
 2026-02-01T09:52:01.245789Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"git status -sb","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T22:27:49.610951Z  INFO codex_core::codex::handlers: Shutting down Codex instance
+2026-02-01T22:27:54.955167Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/_bmad/bmm/agents/dev.md","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T22:27:57.058029Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/_bmad/bmm/config.yaml","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T22:43:33.502220Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/_bmad/core/tasks/workflow.xml","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T22:43:35.460724Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/_bmad/bmm/workflows/4-implementation/dev-story/workflow.yaml","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T22:43:37.310660Z  INFO codex_core::codex: interrupt received: abort current task, if any
+2026-02-01T22:43:54.027282Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/_bmad/bmm/workflows/4-implementation/dev-story/instructions.xml","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T22:43:57.272993Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts/2-3-define-invariant-registry-and-refusal-mapping-schema.md","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T22:43:59.583485Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/_bmad-output/project-context.md","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T22:44:02.422210Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts/sprint-status.yaml","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T22:44:05.276298Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"ls","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T22:44:08.316403Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"rg --files /home/vlad/Source/TenantSaas/TenantSaas.Abstractions","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T22:44:10.592048Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/Invariants/InvariantCode.cs","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T22:44:14.520269Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"rg \"TenantAttributionUnambiguous\" -n /home/vlad/Source/TenantSaas","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T22:44:17.729411Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/TrustContract/TrustContractV1.cs","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T22:44:20.846912Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/TenantSaas.ContractTests/AttributionRulesTests.cs","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T22:44:26.618381Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/docs/trust-contract.md","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T22:44:30.224800Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/TenantSaas.ContractTests/TenantSaas.ContractTests.csproj","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T22:44:53.702626Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"rg \"ProblemTypeTenantAttributionUnambiguous\" -n /home/vlad/Source/TenantSaas","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T22:45:05.516880Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/Tenancy/TenantAttributionRules.cs","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T22:45:34.806648Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat <<'EOF' > /home/vlad/Source/TenantSaas/TenantSaas.ContractTests/InvariantRegistryTests.cs\nusing FluentAssertions;\nusing TenantSaas.Abstractions.Invariants;\nusing TenantSaas.Abstractions.TrustContract;\n\nnamespace TenantSaas.ContractTests;\n\npublic sealed class InvariantRegistryTests\n{\n    [Theory]\n    [InlineData(InvariantCode.ContextInitialized)]\n    [InlineData(InvariantCode.TenantAttributionUnambiguous)]\n    [InlineData(InvariantCode.TenantScopeRequired)]\n    [InlineData(InvariantCode.BreakGlassExplicitAndAudited)]\n    [InlineData(InvariantCode.DisclosureSafe)]\n    public void InvariantRegistry_Contains_All_Invariants(string code)\n    {\n        var definition = TrustContractV1.GetInvariant(code);\n\n        definition.Should().NotBeNull();\n        definition.InvariantCode.Should().Be(code);\n        definition.Name.Should().NotBeNullOrWhiteSpace();\n        definition.Description.Should().NotBeNullOrWhiteSpace();\n        definition.Category.Should().NotBeNullOrWhiteSpace();\n    }\n\n    [Fact]\n    public void InvariantCode_Uses_Stable_Strings()\n    {\n        var allCodes = new[]\n        {\n            InvariantCode.ContextInitialized,\n            InvariantCode.TenantAttributionUnambiguous,\n            InvariantCode.TenantScopeRequired,\n            InvariantCode.BreakGlassExplicitAndAudited,\n            InvariantCode.DisclosureSafe\n        };\n\n        foreach (var code in allCodes)\n        {\n            code.Should().NotBeNullOrWhiteSpace();\n            code.Should().NotContain(\"{\");\n            code.Should().MatchRegex(\"^[A-Z][a-zA-Z]*$\");\n        }\n    }\n\n    [Fact]\n    public void InvariantRegistry_Throws_For_Unknown_Code()\n    {\n        Action act = () => TrustContractV1.GetInvariant(\"UnknownCode\");\n\n        act.Should().Throw<KeyNotFoundException>()\n            .WithMessage(\"*UnknownCode*\");\n    }\n\n    [Fact]\n    public void InvariantRegistry_TryGet_Returns_False_For_Unknown_Code()\n    {\n        var found = TrustContractV1.TryGetInvariant(\"UnknownCode\", out var definition);\n\n        found.Should().BeFalse();\n        definition.Should().BeNull();\n    }\n\n    [Theory]\n    [InlineData(InvariantCode.ContextInitialized)]\n    [InlineData(InvariantCode.TenantAttributionUnambiguous)]\n    [InlineData(InvariantCode.TenantScopeRequired)]\n    [InlineData(InvariantCode.BreakGlassExplicitAndAudited)]\n    [InlineData(InvariantCode.DisclosureSafe)]\n    public void RefusalMappingRegistry_Contains_All_Mappings(string invariantCode)\n    {\n        var mapping = TrustContractV1.GetRefusalMapping(invariantCode);\n\n        mapping.Should().NotBeNull();\n        mapping.InvariantCode.Should().Be(invariantCode);\n        mapping.HttpStatusCode.Should().BeInRange(400, 599);\n        mapping.ProblemType.Should().NotBeNullOrWhiteSpace();\n        mapping.Title.Should().NotBeNullOrWhiteSpace();\n        mapping.GuidanceUri.Should().NotBeNullOrWhiteSpace();\n    }\n\n    [Fact]\n    public void RefusalMapping_ProblemType_Is_Stable_Urn()\n    {\n        foreach (var mapping in TrustContractV1.RefusalMappings.Values)\n        {\n            mapping.ProblemType.Should().StartWith(\"urn:tenantsaas:error:\");\n            mapping.ProblemType.Should().MatchRegex(\"^urn:tenantsaas:error:[a-z-]+$\");\n        }\n    }\n\n    [Fact]\n    public void RefusalMapping_HttpStatusCodes_Are_Appropriate()\n    {\n        TrustContractV1.GetRefusalMapping(InvariantCode.ContextInitialized).HttpStatusCode.Should().Be(400);\n        TrustContractV1.GetRefusalMapping(InvariantCode.TenantAttributionUnambiguous).HttpStatusCode.Should().Be(422);\n        TrustContractV1.GetRefusalMapping(InvariantCode.TenantScopeRequired).HttpStatusCode.Should().Be(403);\n        TrustContractV1.GetRefusalMapping(InvariantCode.BreakGlassExplicitAndAudited).HttpStatusCode.Should().Be(403);\n        TrustContractV1.GetRefusalMapping(InvariantCode.DisclosureSafe).HttpStatusCode.Should().Be(500);\n    }\n\n    [Fact]\n    public void RefusalMapping_GuidanceUri_Is_WellFormed()\n    {\n        foreach (var mapping in TrustContractV1.RefusalMappings.Values)\n        {\n            Uri.IsWellFormedUriString(mapping.GuidanceUri, UriKind.Absolute).Should().BeTrue();\n        }\n    }\n\n    [Fact]\n    public void InvariantDefinition_Is_Immutable()\n    {\n        var definition = new InvariantDefinition(\n            \"TestCode\",\n            \"Test Name\",\n            \"Test description\",\n            \"Test\");\n\n        definition.InvariantCode.Should().Be(\"TestCode\");\n        definition.Name.Should().Be(\"Test Name\");\n        definition.Should().BeAssignableTo<IEquatable<InvariantDefinition>>();\n    }\n\n    [Fact]\n    public void RefusalMapping_Is_Immutable()\n    {\n        var mapping = new RefusalMapping(\n            \"TestCode\",\n            400,\n            \"urn:test:error\",\n            \"Test Title\",\n            \"https://docs.test.com/errors/test\");\n\n        mapping.InvariantCode.Should().Be(\"TestCode\");\n        mapping.HttpStatusCode.Should().Be(400);\n        mapping.Should().BeAssignableTo<IEquatable<RefusalMapping>>();\n    }\n}\nEOF","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T22:45:41.714272Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: /home/vlad/Source/TenantSaas/TenantSaas.ContractTests/AttributionRulesTests.cs
+@@
+     [Fact]
+     public void InvariantCode_Should_Be_Stable_And_Mapped()
+     {
+-        InvariantCode.TenantAttributionUnambiguous.Should().Be("tenant-attribution-unambiguous");
++        InvariantCode.TenantAttributionUnambiguous.Should().Be("TenantAttributionUnambiguous");
+         TrustContractV1.InvariantTenantAttributionUnambiguous.Should().Be(InvariantCode.TenantAttributionUnambiguous);
+     }
+@@
+     public void ProblemDetails_Type_Should_Be_Valid_URN()
+     {
+         var problemType = TrustContractV1.ProblemTypeTenantAttributionUnambiguous;
+         
+         problemType.Should().StartWith("urn:");
+         problemType.Should().Contain("tenant-attribution-unambiguous");
+-        problemType.Should().Be("urn:tenant-saas:trust-contract:tenant-attribution-unambiguous");
++        problemType.Should().Be("urn:tenantsaas:error:tenant-attribution-unambiguous");
+     }
+*** End Patch
+2026-02-01T22:45:44.930592Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"dotnet test /home/vlad/Source/TenantSaas/TenantSaas.sln --filter FullyQualifiedName~InvariantRegistryTests","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T22:45:58.544399Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/Invariants/InvariantCode.cs
+@@
+-/// <summary>
+-/// Stable invariant codes for trust contract enforcement.
+-/// </summary>
++/// <summary>
++/// Stable invariant codes for trust contract enforcement.
++/// </summary>
+ public static class InvariantCode
+ {
+     /// <summary>
+-    /// Tenant attribution must be unambiguous across enabled sources.
++    /// Tenant context must be initialized before operations.
+     /// </summary>
+-    public const string TenantAttributionUnambiguous = "tenant-attribution-unambiguous";
++    public const string ContextInitialized = "ContextInitialized";
++
++    /// <summary>
++    /// Tenant attribution must be unambiguous across enabled sources.
++    /// </summary>
++    public const string TenantAttributionUnambiguous = "TenantAttributionUnambiguous";
++
++    /// <summary>
++    /// Operation requires explicit tenant scope.
++    /// </summary>
++    public const string TenantScopeRequired = "TenantScopeRequired";
++
++    /// <summary>
++    /// Break-glass must be explicit with actor identity and reason.
++    /// </summary>
++    public const string BreakGlassExplicitAndAudited = "BreakGlassExplicitAndAudited";
++
++    /// <summary>
++    /// Tenant information disclosure must be safe.
++    /// </summary>
++    public const string DisclosureSafe = "DisclosureSafe";
+ }
+*** End Patch
+2026-02-01T22:46:09.166692Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat <<'EOF' > /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/Invariants/InvariantDefinition.cs\nnamespace TenantSaas.Abstractions.Invariants;\n\n/// <summary>\n/// Represents an invariant definition in the trust contract.\n/// </summary>\npublic sealed record InvariantDefinition\n{\n    /// <summary>\n    /// Gets the stable invariant code identifier.\n    /// </summary>\n    public string InvariantCode { get; }\n\n    /// <summary>\n    /// Gets the display name.\n    /// </summary>\n    public string Name { get; }\n\n    /// <summary>\n    /// Gets the semantic description.\n    /// </summary>\n    public string Description { get; }\n\n    /// <summary>\n    /// Gets the invariant category.\n    /// </summary>\n    public string Category { get; }\n\n    /// <summary>\n    /// Creates a new invariant definition.\n    /// </summary>\n    /// <param name=\"invariantCode\">Stable invariant code identifier.</param>\n    /// <param name=\"name\">Display name.</param>\n    /// <param name=\"description\">Semantic description.</param>\n    /// <param name=\"category\">Invariant category.</param>\n    /// <exception cref=\"ArgumentException\">Thrown when any argument is null or whitespace.</exception>\n    public InvariantDefinition(\n        string invariantCode,\n        string name,\n        string description,\n        string category)\n    {\n        if (string.IsNullOrWhiteSpace(invariantCode))\n        {\n            throw new ArgumentException(\"InvariantCode cannot be null or empty.\", nameof(invariantCode));\n        }\n\n        if (string.IsNullOrWhiteSpace(name))\n        {\n            throw new ArgumentException(\"Name cannot be null or empty.\", nameof(name));\n        }\n\n        if (string.IsNullOrWhiteSpace(description))\n        {\n            throw new ArgumentException(\"Description cannot be null or empty.\", nameof(description));\n        }\n\n        if (string.IsNullOrWhiteSpace(category))\n        {\n            throw new ArgumentException(\"Category cannot be null or empty.\", nameof(category));\n        }\n\n        InvariantCode = invariantCode;\n        Name = name;\n        Description = description;\n        Category = category;\n    }\n}\nEOF","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T22:46:35.492156Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat <<'EOF' > /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/Invariants/RefusalMapping.cs\nusing System.Text;\n\nnamespace TenantSaas.Abstractions.Invariants;\n\n/// <summary>\n/// Represents the refusal mapping for an invariant violation.\n/// </summary>\npublic sealed record RefusalMapping\n{\n    /// <summary>\n    /// Gets the invariant code.\n    /// </summary>\n    public string InvariantCode { get; }\n\n    /// <summary>\n    /// Gets the HTTP status code for refusal.\n    /// </summary>\n    public int HttpStatusCode { get; }\n\n    /// <summary>\n    /// Gets the RFC 7807 Problem Details type identifier.\n    /// </summary>\n    public string ProblemType { get; }\n\n    /// <summary>\n    /// Gets the Problem Details title.\n    /// </summary>\n    public string Title { get; }\n\n    /// <summary>\n    /// Gets the guidance URI for remediation.\n    /// </summary>\n    public string GuidanceUri { get; }\n\n    /// <summary>\n    /// Creates a new refusal mapping.\n    /// </summary>\n    /// <param name=\"invariantCode\">Stable invariant code identifier.</param>\n    /// <param name=\"httpStatusCode\">HTTP status code (400-599).</param>\n    /// <param name=\"problemType\">RFC 7807 Problem Details type identifier.</param>\n    /// <param name=\"title\">Problem Details title.</param>\n    /// <param name=\"guidanceUri\">Guidance URI for remediation.</param>\n    /// <exception cref=\"ArgumentException\">Thrown when any argument is invalid.</exception>\n    public RefusalMapping(\n        string invariantCode,\n        int httpStatusCode,\n        string problemType,\n        string title,\n        string guidanceUri)\n    {\n        if (string.IsNullOrWhiteSpace(invariantCode))\n        {\n            throw new ArgumentException(\"InvariantCode cannot be null or empty.\", nameof(invariantCode));\n        }\n\n        if (httpStatusCode is < 400 or >= 600)\n        {\n            throw new ArgumentException(\"HttpStatusCode must be in range 400-599.\", nameof(httpStatusCode));\n        }\n\n        if (string.IsNullOrWhiteSpace(problemType))\n        {\n            throw new ArgumentException(\"ProblemType cannot be null or empty.\", nameof(problemType));\n        }\n\n        if (string.IsNullOrWhiteSpace(title))\n        {\n            throw new ArgumentException(\"Title cannot be null or empty.\", nameof(title));\n        }\n\n        if (string.IsNullOrWhiteSpace(guidanceUri))\n        {\n            throw new ArgumentException(\"GuidanceUri cannot be null or empty.\", nameof(guidanceUri));\n        }\n\n        InvariantCode = invariantCode;\n        HttpStatusCode = httpStatusCode;\n        ProblemType = problemType;\n        Title = title;\n        GuidanceUri = guidanceUri;\n    }\n\n    /// <summary>\n    /// Creates a refusal mapping for bad request scenarios.\n    /// </summary>\n    public static RefusalMapping ForBadRequest(\n        string invariantCode,\n        string title,\n        string guidanceUri)\n        => new(\n            invariantCode,\n            httpStatusCode: 400,\n            problemType: BuildProblemType(invariantCode),\n            title,\n            guidanceUri);\n\n    /// <summary>\n    /// Creates a refusal mapping for forbidden scenarios.\n    /// </summary>\n    public static RefusalMapping ForForbidden(\n        string invariantCode,\n        string title,\n        string guidanceUri)\n        => new(\n            invariantCode,\n            httpStatusCode: 403,\n            problemType: BuildProblemType(invariantCode),\n            title,\n            guidanceUri);\n\n    /// <summary>\n    /// Creates a refusal mapping for unprocessable entity scenarios.\n    /// </summary>\n    public static RefusalMapping ForUnprocessableEntity(\n        string invariantCode,\n        string title,\n        string guidanceUri)\n        => new(\n            invariantCode,\n            httpStatusCode: 422,\n            problemType: BuildProblemType(invariantCode),\n            title,\n            guidanceUri);\n\n    private static string BuildProblemType(string invariantCode)\n        => $\"urn:tenantsaas:error:{ToKebabCase(invariantCode)}\";\n\n    private static string ToKebabCase(string value)\n    {\n        if (string.IsNullOrWhiteSpace(value))\n        {\n            return string.Empty;\n        }\n\n        var builder = new StringBuilder(value.Length + 8);\n\n        for (var index = 0; index < value.Length; index++)\n        {\n            var character = value[index];\n\n            if (char.IsUpper(character))\n            {\n                if (index > 0)\n                {\n                    builder.Append('-');\n                }\n\n                builder.Append(char.ToLowerInvariant(character));\n            }\n            else\n            {\n                builder.Append(character);\n            }\n        }\n\n        return builder.ToString();\n    }\n}\nEOF","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T22:47:03.030642Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/TrustContract/TrustContractV1.cs
+@@
+-using TenantSaas.Abstractions.Invariants;
++using System.Collections.Frozen;
++using TenantSaas.Abstractions.Invariants;
+@@
+     /// <summary>
+     /// Invariant code for unambiguous tenant attribution.
+     /// </summary>
+     public const string InvariantTenantAttributionUnambiguous = InvariantCode.TenantAttributionUnambiguous;
+ 
+     /// <summary>
+     /// Problem Details type identifier for ambiguous tenant attribution refusals.
+     /// </summary>
+     public const string ProblemTypeTenantAttributionUnambiguous =
+-        "urn:tenant-saas:trust-contract:tenant-attribution-unambiguous";
++        "urn:tenantsaas:error:tenant-attribution-unambiguous";
++
++    /// <summary>
++    /// Gets the invariant registry.
++    /// </summary>
++    public static readonly FrozenDictionary<string, InvariantDefinition> Invariants =
++        new Dictionary<string, InvariantDefinition>(StringComparer.Ordinal)
++        {
++            [InvariantCode.ContextInitialized] = new InvariantDefinition(
++                InvariantCode.ContextInitialized,
++                name: "Context Initialized",
++                description: "Tenant context must be initialized before operations can proceed.",
++                category: "Initialization"),
++            [InvariantCode.TenantAttributionUnambiguous] = new InvariantDefinition(
++                InvariantCode.TenantAttributionUnambiguous,
++                name: "Tenant Attribution Unambiguous",
++                description: "Tenant attribution from available sources must be unambiguous.",
++                category: "Attribution"),
++            [InvariantCode.TenantScopeRequired] = new InvariantDefinition(
++                InvariantCode.TenantScopeRequired,
++                name: "Tenant Scope Required",
++                description: "Operation requires an explicit tenant scope.",
++                category: "Scope"),
++            [InvariantCode.BreakGlassExplicitAndAudited] = new InvariantDefinition(
++                InvariantCode.BreakGlassExplicitAndAudited,
++                name: "Break-Glass Explicit and Audited",
++                description: "Break-glass must be explicitly declared with actor identity and reason.",
++                category: "Authorization"),
++            [InvariantCode.DisclosureSafe] = new InvariantDefinition(
++                InvariantCode.DisclosureSafe,
++                name: "Disclosure Safe",
++                description: "Tenant information disclosure must follow safe disclosure policy.",
++                category: "Disclosure")
++        }.ToFrozenDictionary(StringComparer.Ordinal);
++
++    /// <summary>
++    /// Gets the refusal mapping registry.
++    /// </summary>
++    public static readonly FrozenDictionary<string, RefusalMapping> RefusalMappings =
++        new Dictionary<string, RefusalMapping>(StringComparer.Ordinal)
++        {
++            [InvariantCode.ContextInitialized] = RefusalMapping.ForBadRequest(
++                InvariantCode.ContextInitialized,
++                title: "Tenant context not initialized",
++                guidanceUri: "https://docs.tenantsaas.dev/errors/context-not-initialized"),
++            [InvariantCode.TenantAttributionUnambiguous] = RefusalMapping.ForUnprocessableEntity(
++                InvariantCode.TenantAttributionUnambiguous,
++                title: "Tenant attribution is ambiguous",
++                guidanceUri: "https://docs.tenantsaas.dev/errors/attribution-ambiguous"),
++            [InvariantCode.TenantScopeRequired] = RefusalMapping.ForForbidden(
++                InvariantCode.TenantScopeRequired,
++                title: "Tenant scope required",
++                guidanceUri: "https://docs.tenantsaas.dev/errors/tenant-scope-required"),
++            [InvariantCode.BreakGlassExplicitAndAudited] = RefusalMapping.ForForbidden(
++                InvariantCode.BreakGlassExplicitAndAudited,
++                title: "Break-glass must be explicit",
++                guidanceUri: "https://docs.tenantsaas.dev/errors/break-glass-required"),
++            [InvariantCode.DisclosureSafe] = new RefusalMapping(
++                InvariantCode.DisclosureSafe,
++                httpStatusCode: 500,
++                problemType: "urn:tenantsaas:error:disclosure-unsafe",
++                title: "Tenant disclosure policy violation",
++                guidanceUri: "https://docs.tenantsaas.dev/errors/disclosure-unsafe")
++        }.ToFrozenDictionary(StringComparer.Ordinal);
+*** End Patch
+2026-02-01T22:47:13.523993Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/TrustContract/TrustContractV1.cs
+@@
+     /// <summary>
+     /// Gets the required tenant scopes for the contract.
+     /// </summary>
+     public static IReadOnlyCollection<string> RequiredScopes { get; } =
+@@
+     /// <summary>
+     /// Validates that a contract definition includes all required scopes and execution kinds.
+     /// </summary>
+@@
+         return new TrustContractValidationResult(missingScopes, missingExecutionKinds);
+     }
++
++    /// <summary>
++    /// Gets an invariant definition by code.
++    /// </summary>
++    /// <exception cref="KeyNotFoundException">Thrown when the invariant code is not registered.</exception>
++    public static InvariantDefinition GetInvariant(string code)
++    {
++        if (!Invariants.TryGetValue(code, out var definition))
++        {
++            throw new KeyNotFoundException(
++                $"Invariant code '{code}' is not registered in Trust Contract {Version}.");
++        }
++
++        return definition;
++    }
++
++    /// <summary>
++    /// Tries to get an invariant definition by code.
++    /// </summary>
++    public static bool TryGetInvariant(string code, out InvariantDefinition? definition)
++        => Invariants.TryGetValue(code, out definition);
++
++    /// <summary>
++    /// Gets a refusal mapping by invariant code.
++    /// </summary>
++    /// <exception cref="KeyNotFoundException">Thrown when the refusal mapping is not registered.</exception>
++    public static RefusalMapping GetRefusalMapping(string invariantCode)
++    {
++        if (!RefusalMappings.TryGetValue(invariantCode, out var mapping))
++        {
++            throw new KeyNotFoundException(
++                $"Refusal mapping for invariant '{invariantCode}' is not registered in Trust Contract {Version}.");
++        }
++
++        return mapping;
++    }
++
++    /// <summary>
++    /// Tries to get a refusal mapping by invariant code.
++    /// </summary>
++    public static bool TryGetRefusalMapping(string invariantCode, out RefusalMapping? mapping)
++        => RefusalMappings.TryGetValue(invariantCode, out mapping);
+ }
+*** End Patch
+2026-02-01T22:47:34.680575Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: /home/vlad/Source/TenantSaas/docs/trust-contract.md
+@@
+ ## Tenant Attribution Precedence
+ 
+ Attribution rules define which sources are enabled and how conflicts are resolved:
+@@
+ Precedence order is explicit and deterministic; rules must reject duplicate or ambiguous precedence definitions.
+ 
++## Invariant Registry
++
++Invariant definitions are stable, named, and versioned in the trust contract. Each invariant includes:
++
++- **InvariantCode**: stable identifier (PascalCase string).
++- **Name**: display name.
++- **Description**: semantic meaning.
++- **Category**: grouping for documentation and reporting.
++
++Defined invariants for v1:
++
++- **ContextInitialized**: Tenant context must be initialized before operations can proceed. (Category: Initialization)
++- **TenantAttributionUnambiguous**: Tenant attribution from available sources must be unambiguous. (Category: Attribution)
++- **TenantScopeRequired**: Operation requires an explicit tenant scope. (Category: Scope)
++- **BreakGlassExplicitAndAudited**: Break-glass must be explicit with actor identity and reason. (Category: Authorization)
++- **DisclosureSafe**: Tenant information disclosure must follow safe disclosure policy. (Category: Disclosure)
++
++Lookups:
++
++- `TrustContractV1.GetInvariant(code)` returns the registered definition or throws.
++- `TrustContractV1.TryGetInvariant(code, out definition)` returns false if missing.
++
++## Refusal Mapping Schema
++
++Refusal mappings define how invariant violations become Problem Details responses:
++
++- **invariant_code**: stable invariant identifier (string).
++- **status**: HTTP status code (400-599).
++- **type**: stable RFC 7807 type identifier (URN or URL).
++- **title**: developer-facing summary.
++- **guidance_uri**: remediation link.
++
++Lookup:
++
++- `TrustContractV1.GetRefusalMapping(invariantCode)` returns the mapping or throws.
++- `TrustContractV1.TryGetRefusalMapping(invariantCode, out mapping)` returns false if missing.
++
++### HTTP Status → Invariant Mapping
++
++| Invariant | Status | Problem Type |
++| --- | --- | --- |
++| ContextInitialized | 400 | `urn:tenantsaas:error:context-initialized` |
++| TenantAttributionUnambiguous | 422 | `urn:tenantsaas:error:tenant-attribution-unambiguous` |
++| TenantScopeRequired | 403 | `urn:tenantsaas:error:tenant-scope-required` |
++| BreakGlassExplicitAndAudited | 403 | `urn:tenantsaas:error:break-glass-explicit-and-audited` |
++| DisclosureSafe | 500 | `urn:tenantsaas:error:disclosure-safe` |
++
++### Problem Details Type Identifier Format
++
++`urn:tenantsaas:error:{kebab-case-invariant-code}`
++
+ ## Ambiguity and Refusal
+ 
+ If two or more allowed sources provide different tenant identifiers, attribution is **ambiguous** and must be refused.
+ Refusals include a stable invariant code and Problem Details type identifier:
+ 
+ - **Invariant code**: `InvariantCode.TenantAttributionUnambiguous`
+-- **Problem Details type**: `TrustContractV1.ProblemTypeTenantAttributionUnambiguous`
++- **Problem Details type**: `TrustContractV1.GetRefusalMapping(InvariantCode.TenantAttributionUnambiguous).ProblemType`
++
++### Example Refusal Response
++
++```json
++{
++  "type": "urn:tenantsaas:error:context-initialized",
++  "title": "Tenant context not initialized",
++  "status": 400,
++  "detail": "Tenant context must be initialized before operations can proceed.",
++  "instance": "/api/tenants/123",
++  "invariant_code": "ContextInitialized",
++  "trace_id": "trace-abc-123",
++  "guidance_uri": "https://docs.tenantsaas.dev/errors/context-not-initialized"
++}
++```
+*** End Patch
+2026-02-01T22:47:40.124761Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"rg \"tenant-attribution-unambiguous\" -n /home/vlad/Source/TenantSaas","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T22:47:46.397496Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"dotnet test /home/vlad/Source/TenantSaas/TenantSaas.sln","workdir":"/home/vlad/Source/TenantSaas","timeout_ms":120000}
+2026-02-01T22:47:54.592912Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts/sprint-status.yaml
+@@
+-  2-3-define-invariant-registry-and-refusal-mapping-schema: ready-for-dev
++  2-3-define-invariant-registry-and-refusal-mapping-schema: in-progress
+*** End Patch
+2026-02-01T22:48:04.638004Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts/2-2-define-tenant-attribution-sources-precedence-and-ambiguity-rules.md","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T22:48:48.223178Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts/2-3-define-invariant-registry-and-refusal-mapping-schema.md
+@@
+-Status: ready-for-dev
++Status: review
+@@
+-- [ ] Task 1: Define InvariantCode constants (AC: #1)
+-  - [ ] Create `TenantSaas.Abstractions/Invariants/InvariantCode.cs`
+-  - [ ] Define stable string constants for each invariant:
++- [x] Task 1: Define InvariantCode constants (AC: #1)
++  - [x] Create `TenantSaas.Abstractions/Invariants/InvariantCode.cs`
++  - [x] Define stable string constants for each invariant:
+     - `ContextInitialized` - tenant context must be initialized
+     - `TenantAttributionUnambiguous` - attribution from sources must be unambiguous
+     - `TenantScopeRequired` - operation requires explicit tenant scope
+     - `BreakGlassExplicitAndAudited` - break-glass must be explicit with actor/reason
+     - `DisclosureSafe` - tenant information disclosure must be safe
+-  - [ ] Use string literals (not GUIDs) for stable, human-readable codes
+-  - [ ] Include XML documentation for each invariant
++  - [x] Use string literals (not GUIDs) for stable, human-readable codes
++  - [x] Include XML documentation for each invariant
+ 
+-- [ ] Task 2: Define InvariantDefinition type (AC: #1)
+-  - [ ] Create `TenantSaas.Abstractions/Invariants/InvariantDefinition.cs`
+-  - [ ] Define immutable record with properties:
++- [x] Task 2: Define InvariantDefinition type (AC: #1)
++  - [x] Create `TenantSaas.Abstractions/Invariants/InvariantDefinition.cs`
++  - [x] Define immutable record with properties:
+     - `string InvariantCode` - stable identifier (e.g., "ContextInitialized")
+     - `string Name` - display name (e.g., "Context Initialized")
+     - `string Description` - semantic meaning
+     - `string Category` - grouping (e.g., "Initialization", "Attribution", "Disclosure")
+-  - [ ] Add validation on construction
+-  - [ ] Implement equality and GetHashCode
++  - [x] Add validation on construction
++  - [x] Implement equality and GetHashCode
+ 
+-- [ ] Task 3: Define RefusalMapping type (AC: #2)
+-  - [ ] Create `TenantSaas.Abstractions/Invariants/RefusalMapping.cs`
+-  - [ ] Define immutable record with properties:
++- [x] Task 3: Define RefusalMapping type (AC: #2)
++  - [x] Create `TenantSaas.Abstractions/Invariants/RefusalMapping.cs`
++  - [x] Define immutable record with properties:
+     - `string InvariantCode` - links to invariant
+     - `int HttpStatusCode` - HTTP status for refusal (e.g., 400, 403, 422)
+     - `string ProblemType` - RFC 7807 type identifier (URN or URL)
+     - `string Title` - Problem Details title
+     - `string GuidanceUri` - link to documentation/remediation
+-  - [ ] Add factory methods for common mappings
+-  - [ ] Validate status code is in valid range (400-599)
++  - [x] Add factory methods for common mappings
++  - [x] Validate status code is in valid range (400-599)
+ 
+-- [ ] Task 4: Create InvariantRegistry in TrustContractV1 (AC: #1)
+-  - [ ] Update `TenantSaas.Abstractions/TrustContract/TrustContractV1.cs`
+-  - [ ] Add static readonly registry of InvariantDefinition instances
+-  - [ ] Define all baseline invariants (5 from Task 1)
+-  - [ ] Provide lookup methods:
++- [x] Task 4: Create InvariantRegistry in TrustContractV1 (AC: #1)
++  - [x] Update `TenantSaas.Abstractions/TrustContract/TrustContractV1.cs`
++  - [x] Add static readonly registry of InvariantDefinition instances
++  - [x] Define all baseline invariants (5 from Task 1)
++  - [x] Provide lookup methods:
+     - `GetInvariant(string code)` - returns InvariantDefinition or throws
+     - `TryGetInvariant(string code, out InvariantDefinition)` - safe lookup
+-  - [ ] Make registry immutable and frozen
++  - [x] Make registry immutable and frozen
+ 
+-- [ ] Task 5: Create RefusalMappingRegistry in TrustContractV1 (AC: #2)
+-  - [ ] Update `TenantSaas.Abstractions/TrustContract/TrustContractV1.cs`
+-  - [ ] Add static readonly registry of RefusalMapping instances
+-  - [ ] Define mappings for all invariants:
++- [x] Task 5: Create RefusalMappingRegistry in TrustContractV1 (AC: #2)
++  - [x] Update `TenantSaas.Abstractions/TrustContract/TrustContractV1.cs`
++  - [x] Add static readonly registry of RefusalMapping instances
++  - [x] Define mappings for all invariants:
+     - ContextInitialized → 400 Bad Request
+     - TenantAttributionUnambiguous → 400 Bad Request (or 422 Unprocessable Entity)
+     - TenantScopeRequired → 403 Forbidden
+     - BreakGlassExplicitAndAudited → 403 Forbidden
+     - DisclosureSafe → 500 Internal Server Error
+-  - [ ] Provide lookup methods similar to invariant registry
+-  - [ ] Define stable Problem Details type URNs (e.g., `urn:tenantsaas:error:context-not-initialized`)
++  - [x] Provide lookup methods similar to invariant registry
++  - [x] Define stable Problem Details type URNs (e.g., `urn:tenantsaas:error:context-not-initialized`)
+ 
+-- [ ] Task 6: Write contract tests for invariant registry (AC: #1)
+-  - [ ] Create `TenantSaas.ContractTests/InvariantRegistryTests.cs`
+-  - [ ] Test all invariants are registered
+-  - [ ] Test invariant codes are stable strings (not GUIDs)
+-  - [ ] Test invariant lookup succeeds for valid codes
+-  - [ ] Test invariant lookup fails for invalid codes
+-  - [ ] Test invariant definitions are immutable
+-  - [ ] Test invariant categories are consistent
++- [x] Task 6: Write contract tests for invariant registry (AC: #1)
++  - [x] Create `TenantSaas.ContractTests/InvariantRegistryTests.cs`
++  - [x] Test all invariants are registered
++  - [x] Test invariant codes are stable strings (not GUIDs)
++  - [x] Test invariant lookup succeeds for valid codes
++  - [x] Test invariant lookup fails for invalid codes
++  - [x] Test invariant definitions are immutable
++  - [x] Test invariant categories are consistent
+ 
+-- [ ] Task 7: Write contract tests for refusal mapping (AC: #2)
+-  - [ ] Update `TenantSaas.ContractTests/InvariantRegistryTests.cs` or create separate file
+-  - [ ] Test refusal mappings exist for all invariants
+-  - [ ] Test Problem Details type identifiers are stable
+-  - [ ] Test HTTP status codes are in valid range
+-  - [ ] Test guidance URIs are well-formed
+-  - [ ] Test refusal mapping lookup succeeds for all invariants
+-  - [ ] Test refusal mapping includes required fields
++- [x] Task 7: Write contract tests for refusal mapping (AC: #2)
++  - [x] Update `TenantSaas.ContractTests/InvariantRegistryTests.cs` or create separate file
++  - [x] Test refusal mappings exist for all invariants
++  - [x] Test Problem Details type identifiers are stable
++  - [x] Test HTTP status codes are in valid range
++  - [x] Test guidance URIs are well-formed
++  - [x] Test refusal mapping lookup succeeds for all invariants
++  - [x] Test refusal mapping includes required fields
+ 
+-- [ ] Task 8: Update docs/trust-contract.md (AC: #1, #2)
+-  - [ ] Document invariant registry structure
+-  - [ ] List all defined invariants with codes, names, and descriptions
+-  - [ ] Document refusal mapping schema
+-  - [ ] Provide HTTP status code → invariant mapping table
+-  - [ ] Document Problem Details type identifier format
+-  - [ ] Include examples of refusal responses
+-  - [ ] Reference TrustContractV1 version and stability guarantees
++- [x] Task 8: Update docs/trust-contract.md (AC: #1, #2)
++  - [x] Document invariant registry structure
++  - [x] List all defined invariants with codes, names, and descriptions
++  - [x] Document refusal mapping schema
++  - [x] Provide HTTP status code → invariant mapping table
++  - [x] Document Problem Details type identifier format
++  - [x] Include examples of refusal responses
++  - [x] Reference TrustContractV1 version and stability guarantees
+@@
+ ### Agent Model Used
+ 
+-(To be filled by dev agent)
++GPT-5 (Codex CLI)
+@@
+ ### Debug Log References
+ 
+-(To be filled by dev agent)
++- `dotnet test TenantSaas.sln` (2026-02-01)
+@@
+ ### Completion Notes List
+ 
+-(To be filled by dev agent)
++- Added invariant codes, invariant definitions, and refusal mappings with validation.
++- Added frozen registries and lookup helpers in TrustContractV1.
++- Added contract tests for invariants and refusal mappings and updated attribution invariant expectations.
++- Updated trust contract documentation with registry and refusal schema details.
+@@
+ ### File List
+ 
+-(To be filled by dev agent)
++- TenantSaas.Abstractions/Invariants/InvariantCode.cs
++- TenantSaas.Abstractions/Invariants/InvariantDefinition.cs
++- TenantSaas.Abstractions/Invariants/RefusalMapping.cs
++- TenantSaas.Abstractions/TrustContract/TrustContractV1.cs
++- TenantSaas.ContractTests/InvariantRegistryTests.cs
++- TenantSaas.ContractTests/AttributionRulesTests.cs
++- docs/trust-contract.md
++- _bmad-output/implementation-artifacts/2-3-define-invariant-registry-and-refusal-mapping-schema.md
++- _bmad-output/implementation-artifacts/sprint-status.yaml
++
++### Change Log
++
++- 2026-02-01: Added invariant registry, refusal mappings, contract tests, and documentation updates for Trust Contract v1.
+*** End Patch
+2026-02-01T22:48:52.020382Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts/sprint-status.yaml
+@@
+-  2-3-define-invariant-registry-and-refusal-mapping-schema: in-progress
++  2-3-define-invariant-registry-and-refusal-mapping-schema: review
+*** End Patch
+2026-02-01T22:49:15.509653Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: /home/vlad/Source/TenantSaas/TenantSaas.ContractTests/InvariantRegistryTests.cs
+@@
+     public void InvariantRegistry_Contains_All_Invariants(string code)
+     {
+         var definition = TrustContractV1.GetInvariant(code);
+@@
+         definition.Name.Should().NotBeNullOrWhiteSpace();
+         definition.Description.Should().NotBeNullOrWhiteSpace();
+         definition.Category.Should().NotBeNullOrWhiteSpace();
+     }
+ 
++    [Theory]
++    [InlineData(InvariantCode.ContextInitialized, "Initialization")]
++    [InlineData(InvariantCode.TenantAttributionUnambiguous, "Attribution")]
++    [InlineData(InvariantCode.TenantScopeRequired, "Scope")]
++    [InlineData(InvariantCode.BreakGlassExplicitAndAudited, "Authorization")]
++    [InlineData(InvariantCode.DisclosureSafe, "Disclosure")]
++    public void InvariantRegistry_Categories_Are_Consistent(string code, string expectedCategory)
++    {
++        var definition = TrustContractV1.GetInvariant(code);
++
++        definition.Category.Should().Be(expectedCategory);
++    }
++
+*** End Patch
+2026-02-01T22:49:18.509490Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"dotnet test /home/vlad/Source/TenantSaas/TenantSaas.sln","workdir":"/home/vlad/Source/TenantSaas","timeout_ms":120000}
+2026-02-01T22:49:50.293887Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/TrustContract/TrustContractV1.cs
+@@
+             [InvariantCode.DisclosureSafe] = new RefusalMapping(
+                 InvariantCode.DisclosureSafe,
+                 httpStatusCode: 500,
+-                problemType: "urn:tenantsaas:error:disclosure-unsafe",
++                problemType: "urn:tenantsaas:error:disclosure-safe",
+                 title: "Tenant disclosure policy violation",
+                 guidanceUri: "https://docs.tenantsaas.dev/errors/disclosure-unsafe")
+         }.ToFrozenDictionary(StringComparer.Ordinal);
+*** End Patch
+2026-02-01T22:49:55.738359Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"dotnet test /home/vlad/Source/TenantSaas/TenantSaas.sln","workdir":"/home/vlad/Source/TenantSaas","timeout_ms":120000}
+2026-02-01T22:50:08.391160Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"git -C /home/vlad/Source/TenantSaas status -sb","workdir":"/home/vlad/Source/TenantSaas"}

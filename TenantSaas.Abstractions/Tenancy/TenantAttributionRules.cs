@@ -70,13 +70,14 @@ public sealed class TenantAttributionRuleSet
         string parameterName)
     {
         var normalized = sources.ToArray();
+        var unique = normalized.ToHashSet();
 
         if (normalized.Any(source => !Enum.IsDefined(source)))
         {
             throw new ArgumentException("Unknown attribution source provided.", parameterName);
         }
 
-        if (normalized.Length != normalized.Distinct().Count())
+        if (unique.Count != normalized.Length)
         {
             throw new ArgumentException("Duplicate attribution sources are not allowed.", parameterName);
         }
@@ -101,21 +102,10 @@ public sealed class TenantAttributionRules
         ArgumentNullException.ThrowIfNull(defaultRuleSet);
 
         DefaultRuleSet = defaultRuleSet;
-        ExecutionKindOverrides = executionKindOverrides is null
-            ? new Dictionary<ExecutionKind, TenantAttributionRuleSet>()
-            : new Dictionary<ExecutionKind, TenantAttributionRuleSet>(executionKindOverrides);
-
-        if (endpointOverrides is null)
-        {
-            EndpointOverrides = new Dictionary<string, TenantAttributionRuleSet>(
-                StringComparer.OrdinalIgnoreCase);
-        }
-        else
-        {
-            EndpointOverrides = new Dictionary<string, TenantAttributionRuleSet>(
-                endpointOverrides,
-                StringComparer.OrdinalIgnoreCase);
-        }
+        ExecutionKindOverrides = executionKindOverrides ?? new Dictionary<ExecutionKind, TenantAttributionRuleSet>();
+        EndpointOverrides = endpointOverrides is null
+            ? new Dictionary<string, TenantAttributionRuleSet>(StringComparer.OrdinalIgnoreCase)
+            : new Dictionary<string, TenantAttributionRuleSet>(endpointOverrides, StringComparer.OrdinalIgnoreCase);
     }
 
     /// <summary>

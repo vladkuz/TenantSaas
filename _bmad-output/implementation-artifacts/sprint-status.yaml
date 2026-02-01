@@ -57,10 +57,10 @@ development_status:
   1-2-local-development-environment-setup: done
   1-3-ci-pipeline-skeleton-build-smoke-checks: done
   epic-1-retrospective: optional
-  epic-2: backlog
-  2-1-define-context-taxonomy-and-execution-kinds: backlog
+  epic-2: in-progress
+  2-1-define-context-taxonomy-and-execution-kinds: done
   2-2-define-tenant-attribution-sources-precedence-and-ambiguity-rules: done
-  2-3-define-invariant-registry-and-refusal-mapping-schema: backlog
+  2-3-define-invariant-registry-and-refusal-mapping-schema: review
   2-4-define-break-glass-contract-and-standard-audit-event-schema: backlog
   2-5-define-disclosure-policy-and-tenant-ref-safe-states: backlog
   epic-2-retrospective: optional

@@ -32,7 +32,7 @@ public sealed class AttributionRulesTests
     [Fact]
     public void InvariantCode_Should_Be_Stable_And_Mapped()
     {
-        InvariantCode.TenantAttributionUnambiguous.Should().Be("tenant-attribution-unambiguous");
+        InvariantCode.TenantAttributionUnambiguous.Should().Be("TenantAttributionUnambiguous");
         TrustContractV1.InvariantTenantAttributionUnambiguous.Should().Be(InvariantCode.TenantAttributionUnambiguous);
     }
 
@@ -43,7 +43,7 @@ public sealed class AttributionRulesTests
         
         problemType.Should().StartWith("urn:");
         problemType.Should().Contain("tenant-attribution-unambiguous");
-        problemType.Should().Be("urn:tenant-saas:trust-contract:tenant-attribution-unambiguous");
+        problemType.Should().Be("urn:tenantsaas:error:tenant-attribution-unambiguous");
     }
 
     [Fact]

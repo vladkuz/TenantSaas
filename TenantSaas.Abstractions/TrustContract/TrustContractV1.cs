@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using TenantSaas.Abstractions.Invariants;
 
 namespace TenantSaas.Abstractions.TrustContract;
@@ -81,7 +82,70 @@ public static class TrustContractV1
     /// Problem Details type identifier for ambiguous tenant attribution refusals.
     /// </summary>
     public const string ProblemTypeTenantAttributionUnambiguous =
-        "urn:tenant-saas:trust-contract:tenant-attribution-unambiguous";
+        "urn:tenantsaas:error:tenant-attribution-unambiguous";
+
+    /// <summary>
+    /// Gets the invariant registry.
+    /// </summary>
+    public static readonly FrozenDictionary<string, InvariantDefinition> Invariants =
+        new Dictionary<string, InvariantDefinition>(StringComparer.Ordinal)
+        {
+            [InvariantCode.ContextInitialized] = new InvariantDefinition(
+                InvariantCode.ContextInitialized,
+                name: "Context Initialized",
+                description: "Tenant context must be initialized before operations can proceed.",
+                category: "Initialization"),
+            [InvariantCode.TenantAttributionUnambiguous] = new InvariantDefinition(
+                InvariantCode.TenantAttributionUnambiguous,
+                name: "Tenant Attribution Unambiguous",
+                description: "Tenant attribution from available sources must be unambiguous.",
+                category: "Attribution"),
+            [InvariantCode.TenantScopeRequired] = new InvariantDefinition(
+                InvariantCode.TenantScopeRequired,
+                name: "Tenant Scope Required",
+                description: "Operation requires an explicit tenant scope.",
+                category: "Scope"),
+            [InvariantCode.BreakGlassExplicitAndAudited] = new InvariantDefinition(
+                InvariantCode.BreakGlassExplicitAndAudited,
+                name: "Break-Glass Explicit and Audited",
+                description: "Break-glass must be explicitly declared with actor identity and reason.",
+                category: "Authorization"),
+            [InvariantCode.DisclosureSafe] = new InvariantDefinition(
+                InvariantCode.DisclosureSafe,
+                name: "Disclosure Safe",
+                description: "Tenant information disclosure must follow safe disclosure policy.",
+                category: "Disclosure")
+        }.ToFrozenDictionary(StringComparer.Ordinal);
+
+    /// <summary>
+    /// Gets the refusal mapping registry.
+    /// </summary>
+    public static readonly FrozenDictionary<string, RefusalMapping> RefusalMappings =
+        new Dictionary<string, RefusalMapping>(StringComparer.Ordinal)
+        {
+            [InvariantCode.ContextInitialized] = RefusalMapping.ForBadRequest(
+                InvariantCode.ContextInitialized,
+                title: "Tenant context not initialized",
+                guidanceUri: "https://docs.tenantsaas.dev/errors/context-not-initialized"),
+            [InvariantCode.TenantAttributionUnambiguous] = RefusalMapping.ForUnprocessableEntity(
+                InvariantCode.TenantAttributionUnambiguous,
+                title: "Tenant attribution is ambiguous",
+                guidanceUri: "https://docs.tenantsaas.dev/errors/attribution-ambiguous"),
+            [InvariantCode.TenantScopeRequired] = RefusalMapping.ForForbidden(
+                InvariantCode.TenantScopeRequired,
+                title: "Tenant scope required",
+                guidanceUri: "https://docs.tenantsaas.dev/errors/tenant-scope-required"),
+            [InvariantCode.BreakGlassExplicitAndAudited] = RefusalMapping.ForForbidden(
+                InvariantCode.BreakGlassExplicitAndAudited,
+                title: "Break-glass must be explicit",
+                guidanceUri: "https://docs.tenantsaas.dev/errors/break-glass-required"),
+            [InvariantCode.DisclosureSafe] = new RefusalMapping(
+                InvariantCode.DisclosureSafe,
+                httpStatusCode: 500,
+                problemType: "urn:tenantsaas:error:disclosure-safe",
+                title: "Tenant disclosure policy violation",
+                guidanceUri: "https://docs.tenantsaas.dev/errors/disclosure-unsafe")
+        }.ToFrozenDictionary(StringComparer.Ordinal);
 
     /// <summary>
     /// Gets the required tenant scopes for the contract.
@@ -138,6 +202,48 @@ public static class TrustContractV1
 
         return new TrustContractValidationResult(missingScopes, missingExecutionKinds);
     }
+
+    /// <summary>
+    /// Gets an invariant definition by code.
+    /// </summary>
+    /// <exception cref="KeyNotFoundException">Thrown when the invariant code is not registered.</exception>
+    public static InvariantDefinition GetInvariant(string code)
+    {
+        if (!Invariants.TryGetValue(code, out var definition))
+        {
+            throw new KeyNotFoundException(
+                $"Invariant code '{code}' is not registered in Trust Contract {Version}.");
+        }
+
+        return definition;
+    }
+
+    /// <summary>
+    /// Tries to get an invariant definition by code.
+    /// </summary>
+    public static bool TryGetInvariant(string code, out InvariantDefinition? definition)
+        => Invariants.TryGetValue(code, out definition);
+
+    /// <summary>
+    /// Gets a refusal mapping by invariant code.
+    /// </summary>
+    /// <exception cref="KeyNotFoundException">Thrown when the refusal mapping is not registered.</exception>
+    public static RefusalMapping GetRefusalMapping(string invariantCode)
+    {
+        if (!RefusalMappings.TryGetValue(invariantCode, out var mapping))
+        {
+            throw new KeyNotFoundException(
+                $"Refusal mapping for invariant '{invariantCode}' is not registered in Trust Contract {Version}.");
+        }
+
+        return mapping;
+    }
+
+    /// <summary>
+    /// Tries to get a refusal mapping by invariant code.
+    /// </summary>
+    public static bool TryGetRefusalMapping(string invariantCode, out RefusalMapping? mapping)
+        => RefusalMappings.TryGetValue(invariantCode, out mapping);
 }
 
 /// <summary>
