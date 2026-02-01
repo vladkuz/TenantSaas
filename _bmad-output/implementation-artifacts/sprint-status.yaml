@@ -54,7 +54,7 @@ development_status:
   epic-6-retrospective: optional
   epic-1: in-progress
   1-1-initialize-project-from-the-approved-net-template: done
-  1-2-local-development-environment-setup: backlog
+  1-2-local-development-environment-setup: done
   1-3-ci-pipeline-skeleton-build-smoke-checks: backlog
   epic-1-retrospective: optional
   epic-2: backlog

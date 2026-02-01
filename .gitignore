@@ -42,3 +42,4 @@ out/
 *.tmp
 *.temp
 .cache/
+.codex/
