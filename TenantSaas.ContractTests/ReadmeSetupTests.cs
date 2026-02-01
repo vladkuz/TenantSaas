@@ -46,6 +46,29 @@ public sealed class ReadmeSetupTests
         readme.Should().Contain("Unable to load the service index for source https://api.nuget.org/v3/index.json");
     }
 
+    [Fact]
+    public void ReadmeContainsCiCdSection()
+    {
+        var readme = ReadReadme();
+
+        readme.Should().Contain("## CI/CD");
+        readme.Should().Contain("GitHub Actions");
+        readme.Should().Contain("pull request");
+        readme.Should().Contain("pushes to `main`");
+    }
+
+    [Fact]
+    public void ReadmeDocumentsCiFailureScenarios()
+    {
+        var readme = ReadReadme();
+
+        // AC #2: Documented failure scenarios
+        readme.Should().Contain("SDK version mismatch");
+        readme.Should().Contain("Build errors");
+        readme.Should().Contain("Test failures");
+        readme.Should().Contain("Restore failures");
+    }
+
     private static string ReadReadme()
     {
         var root = FindRepoRoot();

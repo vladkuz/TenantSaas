@@ -24,10 +24,10 @@ public static class SampleApp
             app.UseSwaggerUI();
         }
 
-    if (!app.Environment.IsEnvironment("Test"))
-    {
-        app.UseHttpsRedirection();
-    }
+        if (!app.Environment.IsEnvironment("Test"))
+        {
+            app.UseHttpsRedirection();
+        }
 
         app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
 
@@ -50,7 +50,7 @@ public static class SampleApp
         })
         .WithName("GetWeatherForecast");
 
-        if (enableOpenApi)
+        if (enableOpenApi && !app.Environment.IsEnvironment("Test"))
         {
             weatherEndpoint.WithOpenApi();
         }

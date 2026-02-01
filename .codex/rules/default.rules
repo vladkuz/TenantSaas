@@ -1,2 +1,4 @@
 prefix_rule(pattern=["dotnet", "test", "TenantSaas.sln", "-v", "minimal", "-m:1"], decision="allow")
 prefix_rule(pattern=["dotnet", "test", "TenantSaas.sln", "--verbosity", "minimal"], decision="allow")
+prefix_rule(pattern=["dotnet", "test", "/home/vlad/Source/TenantSaas/TenantSaas.ContractTests/TenantSaas.ContractTests.csproj"], decision="allow")
+prefix_rule(pattern=["dotnet", "test", "/home/vlad/Source/TenantSaas/TenantSaas.sln"], decision="allow")

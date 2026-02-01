@@ -57,6 +57,20 @@ dotnet build TenantSaas.sln
 dotnet test TenantSaas.sln
 ```
 
+## CI/CD
+
+GitHub Actions runs a CI workflow on every pull request and on pushes to `main`. The workflow restores dependencies, builds the solution, and runs the test suite. CI will fail if any step exits with a non-zero code.
+
+Common CI failure scenarios:
+
+- SDK version mismatch (global.json vs. installed SDK)
+- Build errors (compilation failures)
+- Test failures (failing contract or integration tests)
+- Restore failures (NuGet connectivity or package issues)
+- Workflow misconfiguration (missing steps or invalid YAML)
+
+View results in the GitHub Actions tab for the repository.
+
 ## Verification
 
 With the sample host running, call the health endpoint:
@@ -80,6 +94,8 @@ dotnet dev-certs https --trust
 ## Troubleshooting
 
 Common failures and fixes:
+
+### Troubleshooting missing templates or dependencies
 
 - Missing .NET SDK 10.0.102
   - Symptom: `The specified SDK version [10.0.102] could not be found.`
