@@ -42,7 +42,7 @@ story_location: /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifac
 development_status:
   epic-1: in-progress
   epic-1-retrospective: optional
-  epic-2: backlog
+  epic-2: in-progress
   epic-2-retrospective: optional
   epic-3: backlog
   epic-3-retrospective: optional
@@ -57,8 +57,8 @@ development_status:
   1-2-local-development-environment-setup: done
   1-3-ci-pipeline-skeleton-build-smoke-checks: done
   epic-1-retrospective: optional
-  epic-2: backlog
-  2-1-define-context-taxonomy-and-execution-kinds: backlog
+  epic-2: in-progress
+  2-1-define-context-taxonomy-and-execution-kinds: done
   2-2-define-tenant-attribution-sources-precedence-and-ambiguity-rules: backlog
   2-3-define-invariant-registry-and-refusal-mapping-schema: backlog
   2-4-define-break-glass-contract-and-standard-audit-event-schema: backlog

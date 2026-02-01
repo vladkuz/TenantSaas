@@ -15176,3 +15176,314 @@
 +
  ### Completion Notes List
 *** End Patch
+2026-02-01T09:15:56.093821Z  INFO codex_core::codex::handlers: Shutting down Codex instance
+2026-02-01T09:16:08.159357Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"ls","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:16:09.798137Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/_bmad/bmm/agents/dev.md","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:16:11.741761Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/_bmad/bmm/config.yaml","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:16:29.394233Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/_bmad/core/tasks/workflow.xml","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:16:32.019259Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/_bmad/bmm/workflows/4-implementation/dev-story/workflow.yaml","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:16:35.602578Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/_bmad/bmm/workflows/4-implementation/dev-story/instructions.xml","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:16:38.280709Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts/2-1-define-context-taxonomy-and-execution-kinds.md","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:16:40.497818Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"rg --files -g 'project-context.md' /home/vlad/Source/TenantSaas","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:16:42.362352Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/_bmad-output/project-context.md","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:17:28.648051Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/Directory.Build.props","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:17:31.923630Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/TenantSaas.Core/TenantSaas.Core.csproj","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:17:37.488007Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"rg -n \"Project\\(\" /home/vlad/Source/TenantSaas/TenantSaas.sln","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:17:41.856809Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/TenantSaas.ContractTests/TenantSaas.ContractTests.csproj","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:17:56.910113Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"rg -n \"ExecutionKind|TenantScope|NoTenantReason|TenantContext|TenantId\" /home/vlad/Source/TenantSaas","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:18:25.173934Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"rg -n \"FluentAssertions|AssertionOptions|ProblemDetails|invariant_code\" /home/vlad/Source/TenantSaas/TenantSaas.ContractTests","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:18:27.940323Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/TenantSaas.ContractTests/HealthEndpointTests.cs","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:18:31.112934Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts/sprint-status.yaml","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:19:54.773770Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"mkdir -p /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/Tenancy /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/Contexts /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/Invariants /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/TrustContract","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:19:58.359392Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat <<'EOF' > /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/TenantSaas.Abstractions.csproj\n<Project Sdk=\"Microsoft.NET.Sdk\">\n  <PropertyGroup>\n    <TargetFramework>net10.0</TargetFramework>\n    <ImplicitUsings>enable</ImplicitUsings>\n    <Nullable>enable</Nullable>\n    <GenerateDocumentationFile>true</GenerateDocumentationFile>\n    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>\n  </PropertyGroup>\n</Project>\nEOF","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:20:00.918321Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat <<'EOF' > /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/Invariants/.gitkeep\nEOF","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:20:03.375369Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"dotnet sln /home/vlad/Source/TenantSaas/TenantSaas.sln add /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/TenantSaas.Abstractions.csproj","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:20:07.412896Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"dotnet test /home/vlad/Source/TenantSaas/TenantSaas.sln","workdir":"/home/vlad/Source/TenantSaas","timeout_ms":120000}
+2026-02-01T09:20:25.260121Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat <<'EOF' > /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/Tenancy/TenantId.cs\nnamespace TenantSaas.Abstractions.Tenancy;\n\n/// <summary>\n/// Strongly-typed tenant identifier to avoid stringly-typed mistakes.\n/// </summary>\npublic readonly record struct TenantId\n{\n    /// <summary>\n    /// Creates a new tenant identifier.\n    /// </summary>\n    /// <param name=\"value\">Tenant identifier value.</param>\n    /// <exception cref=\"ArgumentException\">Thrown when <paramref name=\"value\"/> is null or whitespace.</exception>\n    public TenantId(string value)\n    {\n        ArgumentException.ThrowIfNullOrWhiteSpace(value);\n        Value = value;\n    }\n\n    /// <summary>\n    /// Gets the tenant identifier value.\n    /// </summary>\n    public string Value { get; }\n\n    /// <inheritdoc />\n    public override string ToString() => Value;\n}\nEOF","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:20:35.070357Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat <<'EOF' > /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/Tenancy/TenantScope.cs\nnamespace TenantSaas.Abstractions.Tenancy;\n\n/// <summary>\n/// Represents the tenant scoping of an execution context.\n/// </summary>\npublic abstract record TenantScope\n{\n    private TenantScope()\n    {\n    }\n\n    /// <summary>\n    /// Scoped to a specific tenant identifier.\n    /// </summary>\n    /// <param name=\"Id\">Tenant identifier.</param>\n    public sealed record Tenant(TenantId Id) : TenantScope;\n\n    /// <summary>\n    /// Shared or cross-tenant system operations.\n    /// </summary>\n    public sealed record SharedSystem : TenantScope;\n\n    /// <summary>\n    /// Explicit no-tenant context with an allowed reason.\n    /// </summary>\n    /// <param name=\"Reason\">Reason for operating without tenant scope.</param>\n    public sealed record NoTenant(NoTenantReason Reason) : TenantScope;\n\n    /// <summary>\n    /// Creates a tenant-scoped instance.\n    /// </summary>\n    /// <param name=\"id\">Tenant identifier.</param>\n    public static TenantScope ForTenant(TenantId id)\n    {\n        ArgumentException.ThrowIfNullOrWhiteSpace(id.Value);\n        return new Tenant(id);\n    }\n\n    /// <summary>\n    /// Creates a shared-system scope.\n    /// </summary>\n    public static TenantScope ForSharedSystem() => new SharedSystem();\n\n    /// <summary>\n    /// Creates a no-tenant scope with an allowed reason.\n    /// </summary>\n    /// <param name=\"reason\">Reason for operating without tenant scope.</param>\n    public static TenantScope ForNoTenant(NoTenantReason reason)\n    {\n        ArgumentNullException.ThrowIfNull(reason);\n        return new NoTenant(reason);\n    }\n}\nEOF","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:21:02.497599Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat <<'EOF' > /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/Tenancy/NoTenantReason.cs\nnamespace TenantSaas.Abstractions.Tenancy;\n\n/// <summary>\n/// Allowed categories for operating without tenant scope.\n/// </summary>\npublic sealed record NoTenantReason\n{\n    private static readonly List<NoTenantReason> Registry = new();\n    private static readonly StringComparer ValueComparer = StringComparer.OrdinalIgnoreCase;\n    private static readonly object Sync = new();\n\n    static NoTenantReason()\n    {\n        Registry.AddRange(\n        [\n            new NoTenantReason(\"public\", \"Public\", \"Public or unauthenticated operations.\"),\n            new NoTenantReason(\"bootstrap\", \"Bootstrap\", \"System initialization and bootstrap workflows.\"),\n            new NoTenantReason(\"health-check\", \"HealthCheck\", \"Health and readiness probes.\"),\n            new NoTenantReason(\"system-maintenance\", \"SystemMaintenance\", \"Maintenance operations.\")\n        ]);\n    }\n\n    private NoTenantReason(string value, string displayName, string description)\n    {\n        ArgumentException.ThrowIfNullOrWhiteSpace(value);\n        ArgumentException.ThrowIfNullOrWhiteSpace(displayName);\n        ArgumentException.ThrowIfNullOrWhiteSpace(description);\n\n        Value = value;\n        DisplayName = displayName;\n        Description = description;\n    }\n\n    /// <summary>\n    /// Gets the canonical value for the reason.\n    /// </summary>\n    public string Value { get; }\n\n    /// <summary>\n    /// Gets the display name for the reason.\n    /// </summary>\n    public string DisplayName { get; }\n\n    /// <summary>\n    /// Gets the description for the reason.\n    /// </summary>\n    public string Description { get; }\n\n    /// <summary>\n    /// Public or unauthenticated operations.\n    /// </summary>\n    public static NoTenantReason Public => FindByValue(\"public\");\n\n    /// <summary>\n    /// System initialization and bootstrap workflows.\n    /// </summary>\n    public static NoTenantReason Bootstrap => FindByValue(\"bootstrap\");\n\n    /// <summary>\n    /// Health and readiness probes.\n    /// </summary>\n    public static NoTenantReason HealthCheck => FindByValue(\"health-check\");\n\n    /// <summary>\n    /// Maintenance operations.\n    /// </summary>\n    public static NoTenantReason SystemMaintenance => FindByValue(\"system-maintenance\");\n\n    /// <summary>\n    /// Gets the full list of allowed reasons.\n    /// </summary>\n    public static IReadOnlyList<NoTenantReason> All\n    {\n        get\n        {\n            lock (Sync)\n            {\n                return Registry.ToArray();\n            }\n        }\n    }\n\n    /// <summary>\n    /// Adds an explicit extension reason to the allowed set.\n    /// </summary>\n    /// <param name=\"value\">Canonical value for the extension.</param>\n    /// <param name=\"displayName\">Display name for the extension.</param>\n    /// <param name=\"description\">Description of the extension.</param>\n    /// <exception cref=\"InvalidOperationException\">Thrown when a reason with the same value already exists.</exception>\n    public static NoTenantReason RegisterExtension(string value, string displayName, string description)\n    {\n        ArgumentException.ThrowIfNullOrWhiteSpace(value);\n        ArgumentException.ThrowIfNullOrWhiteSpace(displayName);\n        ArgumentException.ThrowIfNullOrWhiteSpace(description);\n\n        lock (Sync)\n        {\n            if (Registry.Any(reason => ValueComparer.Equals(reason.Value, value)))\n            {\n                throw new InvalidOperationException($\"No-tenant reason '{value}' is already registered.\");\n            }\n\n            var extension = new NoTenantReason(value, displayName, description);\n            Registry.Add(extension);\n            return extension;\n        }\n    }\n\n    private static NoTenantReason FindByValue(string value)\n    {\n        lock (Sync)\n        {\n            return Registry.First(reason => ValueComparer.Equals(reason.Value, value));\n        }\n    }\n\n    /// <inheritdoc />\n    public override string ToString() => Value;\n}\nEOF","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:21:06.353220Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"dotnet test /home/vlad/Source/TenantSaas/TenantSaas.sln","workdir":"/home/vlad/Source/TenantSaas","timeout_ms":120000}
+2026-02-01T09:21:24.581336Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat <<'EOF' > /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/Contexts/ExecutionKind.cs\nnamespace TenantSaas.Abstractions.Contexts;\n\n/// <summary>\n/// Represents how execution was initiated for a tenant context.\n/// </summary>\npublic sealed record ExecutionKind\n{\n    private static readonly List<ExecutionKind> Registry = new();\n    private static readonly StringComparer ValueComparer = StringComparer.OrdinalIgnoreCase;\n    private static readonly object Sync = new();\n\n    static ExecutionKind()\n    {\n        Registry.AddRange(\n        [\n            new ExecutionKind(\"request\", \"Request\", \"HTTP or API request flow.\"),\n            new ExecutionKind(\"background\", \"Background\", \"Background job or worker flow.\"),\n            new ExecutionKind(\"admin\", \"Admin\", \"Administrative operation flow.\"),\n            new ExecutionKind(\"scripted\", \"Scripted\", \"CLI or script execution flow.\")\n        ]);\n    }\n\n    private ExecutionKind(string value, string displayName, string description)\n    {\n        ArgumentException.ThrowIfNullOrWhiteSpace(value);\n        ArgumentException.ThrowIfNullOrWhiteSpace(displayName);\n        ArgumentException.ThrowIfNullOrWhiteSpace(description);\n\n        Value = value;\n        DisplayName = displayName;\n        Description = description;\n    }\n\n    /// <summary>\n    /// Gets the canonical value for the execution kind.\n    /// </summary>\n    public string Value { get; }\n\n    /// <summary>\n    /// Gets the display name for the execution kind.\n    /// </summary>\n    public string DisplayName { get; }\n\n    /// <summary>\n    /// Gets the description for the execution kind.\n    /// </summary>\n    public string Description { get; }\n\n    /// <summary>\n    /// HTTP or API request flow.\n    /// </summary>\n    public static ExecutionKind Request => FindByValue(\"request\");\n\n    /// <summary>\n    /// Background job or worker flow.\n    /// </summary>\n    public static ExecutionKind Background => FindByValue(\"background\");\n\n    /// <summary>\n    /// Administrative operation flow.\n    /// </summary>\n    public static ExecutionKind Admin => FindByValue(\"admin\");\n\n    /// <summary>\n    /// CLI or script execution flow.\n    /// </summary>\n    public static ExecutionKind Scripted => FindByValue(\"scripted\");\n\n    /// <summary>\n    /// Gets the full list of execution kinds.\n    /// </summary>\n    public static IReadOnlyList<ExecutionKind> All\n    {\n        get\n        {\n            lock (Sync)\n            {\n                return Registry.ToArray();\n            }\n        }\n    }\n\n    private static ExecutionKind FindByValue(string value)\n    {\n        lock (Sync)\n        {\n            return Registry.First(kind => ValueComparer.Equals(kind.Value, value));\n        }\n    }\n\n    /// <inheritdoc />\n    public override string ToString() => Value;\n}\nEOF","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:21:26.935964Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"dotnet test /home/vlad/Source/TenantSaas/TenantSaas.sln","workdir":"/home/vlad/Source/TenantSaas","timeout_ms":120000}
+2026-02-01T09:21:48.439699Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat <<'EOF' > /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/Tenancy/TenantContext.cs\nusing TenantSaas.Abstractions.Contexts;\n\nnamespace TenantSaas.Abstractions.Tenancy;\n\n/// <summary>\n/// Captures tenant scope and execution metadata for enforcement decisions.\n/// </summary>\npublic sealed record TenantContext\n{\n    private TenantContext(\n        TenantScope scope,\n        ExecutionKind executionKind,\n        string traceId,\n        string? requestId,\n        DateTimeOffset initializedAt)\n    {\n        ArgumentNullException.ThrowIfNull(scope);\n        ArgumentNullException.ThrowIfNull(executionKind);\n        ArgumentException.ThrowIfNullOrWhiteSpace(traceId);\n\n        if (executionKind == ExecutionKind.Request)\n        {\n            ArgumentException.ThrowIfNullOrWhiteSpace(requestId);\n        }\n\n        Scope = scope;\n        ExecutionKind = executionKind;\n        TraceId = traceId;\n        RequestId = requestId;\n        InitializedAt = EnsureUtc(initializedAt);\n    }\n\n    /// <summary>\n    /// Gets the tenant scope for the execution.\n    /// </summary>\n    public TenantScope Scope { get; }\n\n    /// <summary>\n    /// Gets the execution kind for the flow.\n    /// </summary>\n    public ExecutionKind ExecutionKind { get; }\n\n    /// <summary>\n    /// Gets the correlation trace identifier.\n    /// </summary>\n    public string TraceId { get; }\n\n    /// <summary>\n    /// Gets the request identifier when execution was initiated by a request.\n    /// </summary>\n    public string? RequestId { get; }\n\n    /// <summary>\n    /// Gets the UTC timestamp when the context was initialized.\n    /// </summary>\n    public DateTimeOffset InitializedAt { get; }\n\n    /// <summary>\n    /// Creates a context for an HTTP or API request flow.\n    /// </summary>\n    public static TenantContext ForRequest(TenantScope scope, string traceId, string requestId)\n        => new(scope, ExecutionKind.Request, traceId, requestId, DateTimeOffset.UtcNow);\n\n    /// <summary>\n    /// Creates a context for a background job or worker flow.\n    /// </summary>\n    public static TenantContext ForBackground(TenantScope scope, string traceId)\n        => new(scope, ExecutionKind.Background, traceId, requestId: null, DateTimeOffset.UtcNow);\n\n    /// <summary>\n    /// Creates a context for an administrative operation flow.\n    /// </summary>\n    public static TenantContext ForAdmin(TenantScope scope, string traceId)\n        => new(scope, ExecutionKind.Admin, traceId, requestId: null, DateTimeOffset.UtcNow);\n\n    /// <summary>\n    /// Creates a context for a CLI or script execution flow.\n    /// </summary>\n    public static TenantContext ForScripted(TenantScope scope, string traceId)\n        => new(scope, ExecutionKind.Scripted, traceId, requestId: null, DateTimeOffset.UtcNow);\n\n    private static DateTimeOffset EnsureUtc(DateTimeOffset timestamp)\n    {\n        if (timestamp.Offset != TimeSpan.Zero)\n        {\n            return timestamp.ToUniversalTime();\n        }\n\n        return timestamp;\n    }\n}\nEOF","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:21:51.007641Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"dotnet test /home/vlad/Source/TenantSaas/TenantSaas.sln","workdir":"/home/vlad/Source/TenantSaas","timeout_ms":120000}
+2026-02-01T09:22:01.307894Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat <<'EOF' > /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/Tenancy/ITenantContextAccessor.cs\nnamespace TenantSaas.Abstractions.Tenancy;\n\n/// <summary>\n/// Provides access to the current tenant context for the executing flow.\n/// </summary>\npublic interface ITenantContextAccessor\n{\n    /// <summary>\n    /// Gets the current tenant context, or <see langword=\"null\"/> when uninitialized.\n    /// </summary>\n    /// <remarks>\n    /// A null value indicates an invariant violation where context initialization has not occurred.\n    /// Implementations must be thread-safe for concurrent reads.\n    /// </remarks>\n    TenantContext? Current { get; }\n\n    /// <summary>\n    /// Gets a value indicating whether the context has been initialized for the current flow.\n    /// </summary>\n    bool IsInitialized { get; }\n}\nEOF","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:22:04.108626Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"dotnet test /home/vlad/Source/TenantSaas/TenantSaas.sln","workdir":"/home/vlad/Source/TenantSaas","timeout_ms":120000}
+2026-02-01T09:22:27.660974Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat <<'EOF' > /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/TrustContract/TrustContractV1.cs\nnamespace TenantSaas.Abstractions.TrustContract;\n\n/// <summary>\n/// Trust Contract v1 definitions for tenant scope and execution kinds.\n/// </summary>\npublic static class TrustContractV1\n{\n    /// <summary>\n    /// Contract version identifier.\n    /// </summary>\n    public const string Version = \"v1\";\n\n    /// <summary>\n    /// Tenant-scoped operations.\n    /// </summary>\n    public const string ScopeTenant = \"tenant\";\n\n    /// <summary>\n    /// Shared system or cross-tenant operations.\n    /// </summary>\n    public const string ScopeSharedSystem = \"shared-system\";\n\n    /// <summary>\n    /// Explicit no-tenant operations.\n    /// </summary>\n    public const string ScopeNoTenant = \"no-tenant\";\n\n    /// <summary>\n    /// HTTP or API request flow.\n    /// </summary>\n    public const string ExecutionRequest = \"request\";\n\n    /// <summary>\n    /// Background job or worker flow.\n    /// </summary>\n    public const string ExecutionBackground = \"background\";\n\n    /// <summary>\n    /// Administrative operation flow.\n    /// </summary>\n    public const string ExecutionAdmin = \"admin\";\n\n    /// <summary>\n    /// CLI or script execution flow.\n    /// </summary>\n    public const string ExecutionScripted = \"scripted\";\n\n    /// <summary>\n    /// Gets the required tenant scopes for the contract.\n    /// </summary>\n    public static IReadOnlyCollection<string> RequiredScopes { get; } =\n    [\n        ScopeTenant,\n        ScopeSharedSystem,\n        ScopeNoTenant\n    ];\n\n    /// <summary>\n    /// Gets the required execution kinds for the contract.\n    /// </summary>\n    public static IReadOnlyCollection<string> RequiredExecutionKinds { get; } =\n    [\n        ExecutionRequest,\n        ExecutionBackground,\n        ExecutionAdmin,\n        ExecutionScripted\n    ];\n\n    /// <summary>\n    /// Validates that a contract definition includes all required scopes and execution kinds.\n    /// </summary>\n    /// <param name=\"scopes\">Defined scopes for a contract.</param>\n    /// <param name=\"executionKinds\">Defined execution kinds for a contract.</param>\n    public static TrustContractValidationResult Validate(\n        IReadOnlyCollection<string> scopes,\n        IReadOnlyCollection<string> executionKinds)\n    {\n        ArgumentNullException.ThrowIfNull(scopes);\n        ArgumentNullException.ThrowIfNull(executionKinds);\n\n        var scopeSet = new HashSet<string>(scopes, StringComparer.OrdinalIgnoreCase);\n        var executionSet = new HashSet<string>(executionKinds, StringComparer.OrdinalIgnoreCase);\n\n        var missingScopes = RequiredScopes.Where(scope => !scopeSet.Contains(scope)).ToArray();\n        var missingExecutionKinds = RequiredExecutionKinds\n            .Where(kind => !executionSet.Contains(kind))\n            .ToArray();\n\n        return new TrustContractValidationResult(missingScopes, missingExecutionKinds);\n    }\n}\n\n/// <summary>\n/// Represents missing definitions in a trust contract review.\n/// </summary>\npublic sealed record TrustContractValidationResult(\n    IReadOnlyCollection<string> MissingScopes,\n    IReadOnlyCollection<string> MissingExecutionKinds)\n{\n    /// <summary>\n    /// Gets a value indicating whether the contract is complete.\n    /// </summary>\n    public bool IsValid => MissingScopes.Count == 0 && MissingExecutionKinds.Count == 0;\n}\nEOF","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:22:30.560789Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"dotnet test /home/vlad/Source/TenantSaas/TenantSaas.sln","workdir":"/home/vlad/Source/TenantSaas","timeout_ms":120000}
+2026-02-01T09:22:39.619404Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: /home/vlad/Source/TenantSaas/TenantSaas.Core/TenantSaas.Core.csproj
+@@
+   <PropertyGroup>
+     <TargetFramework>net10.0</TargetFramework>
+     <ImplicitUsings>enable</ImplicitUsings>
+     <Nullable>enable</Nullable>
+   </PropertyGroup>
+ 
++  <ItemGroup>
++    <ProjectReference Include="..\TenantSaas.Abstractions\TenantSaas.Abstractions.csproj" />
++  </ItemGroup>
++
+ </Project>
+*** End Patch
+2026-02-01T09:22:42.775123Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: /home/vlad/Source/TenantSaas/TenantSaas.ContractTests/TenantSaas.ContractTests.csproj
+@@
+   <ItemGroup>
+     <ProjectReference Include="..\TenantSaas.Sample\TenantSaas.Sample.csproj" />
++    <ProjectReference Include="..\TenantSaas.Abstractions\TenantSaas.Abstractions.csproj" />
+   </ItemGroup>
+ 
+ </Project>
+*** End Patch
+2026-02-01T09:23:10.054675Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat <<'EOF' > /home/vlad/Source/TenantSaas/TenantSaas.ContractTests/ContextTaxonomyTests.cs\nusing FluentAssertions;\nusing TenantSaas.Abstractions.Contexts;\nusing TenantSaas.Abstractions.Tenancy;\nusing TenantSaas.Abstractions.TrustContract;\nusing Xunit;\n\nnamespace TenantSaas.ContractTests;\n\npublic sealed class ContextTaxonomyTests\n{\n    [Fact]\n    public void TenantScope_Should_Have_Three_Variants()\n    {\n        var tenant = TenantScope.ForTenant(new TenantId(\"tenant-1\"));\n        var shared = TenantScope.ForSharedSystem();\n        var noTenant = TenantScope.ForNoTenant(NoTenantReason.Public);\n\n        tenant.Should().BeOfType<TenantScope.Tenant>();\n        shared.Should().BeOfType<TenantScope.SharedSystem>();\n        noTenant.Should().BeOfType<TenantScope.NoTenant>();\n    }\n\n    [Fact]\n    public void NoTenantReason_Should_Include_Required_Categories()\n    {\n        var values = NoTenantReason.All.Select(reason => reason.Value).ToArray();\n\n        values.Should().BeEquivalentTo(\n            new[] { \"public\", \"bootstrap\", \"health-check\", \"system-maintenance\" },\n            options => options.WithStrictOrdering());\n\n        NoTenantReason.All.Should().OnlyContain(reason => !string.IsNullOrWhiteSpace(reason.Description));\n    }\n\n    [Fact]\n    public void ExecutionKind_Should_Include_All_Flow_Types()\n    {\n        var values = ExecutionKind.All.Select(kind => kind.Value).ToArray();\n\n        values.Should().BeEquivalentTo(\n            new[] { \"request\", \"background\", \"admin\", \"scripted\" },\n            options => options.WithStrictOrdering());\n\n        ExecutionKind.All.Should().OnlyContain(kind => !string.IsNullOrWhiteSpace(kind.Description));\n    }\n\n    [Fact]\n    public void TenantContext_Should_Require_Scope_And_ExecutionKind()\n    {\n        var act = () => TenantContext.ForBackground(null!, \"trace-1\");\n\n        act.Should().Throw<ArgumentNullException>();\n    }\n\n    [Fact]\n    public void TenantContext_Factories_Should_Produce_Valid_Contexts()\n    {\n        var scope = TenantScope.ForTenant(new TenantId(\"tenant-1\"));\n\n        var request = TenantContext.ForRequest(scope, \"trace-1\", \"request-1\");\n        request.ExecutionKind.Should().Be(ExecutionKind.Request);\n        request.RequestId.Should().Be(\"request-1\");\n\n        var background = TenantContext.ForBackground(scope, \"trace-2\");\n        background.ExecutionKind.Should().Be(ExecutionKind.Background);\n        background.RequestId.Should().BeNull();\n    }\n\n    [Fact]\n    public void TrustContractV1_Validation_Should_Detect_Missing_Definitions()\n    {\n        var result = TrustContractV1.Validate(\n            scopes: new[] { TrustContractV1.ScopeTenant },\n            executionKinds: new[] { TrustContractV1.ExecutionRequest });\n\n        result.IsValid.Should().BeFalse();\n        result.MissingScopes.Should().Contain(TrustContractV1.ScopeSharedSystem);\n        result.MissingExecutionKinds.Should().Contain(TrustContractV1.ExecutionBackground);\n    }\n}\nEOF","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:23:13.842041Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"dotnet test /home/vlad/Source/TenantSaas/TenantSaas.sln","workdir":"/home/vlad/Source/TenantSaas","timeout_ms":120000}
+2026-02-01T09:23:20.074370Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"ls /home/vlad/Source/TenantSaas/docs","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:23:25.722314Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"mkdir -p /home/vlad/Source/TenantSaas/docs","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:23:32.582297Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat <<'EOF' > /home/vlad/Source/TenantSaas/docs/trust-contract.md\n# Trust Contract v1\n\n## Version and Stability\n\n- Version: v1\n- Stability: additive changes only; existing identifiers and semantics are stable within v1\n- Source of truth: code contracts in `TenantSaas.Abstractions`\n\n## TenantScope\n\nTenant scope describes which tenant boundary applies to an execution.\n\n- **Tenant**: scoped to a specific tenant identifier.\n- **SharedSystem**: shared or cross-tenant system operations.\n- **NoTenant**: explicit no-tenant context with a required reason.\n\n## NoTenantReason\n\nAllowed reasons for operating without tenant scope:\n\n- **Public**: public or unauthenticated operations.\n- **Bootstrap**: system initialization and bootstrap workflows.\n- **HealthCheck**: health and readiness probes.\n- **SystemMaintenance**: maintenance operations.\n\n## ExecutionKind\n\nExecution kind describes how the context was initiated:\n\n- **Request**: HTTP or API request flow.\n- **Background**: background job or worker flow.\n- **Admin**: administrative operation flow.\n- **Scripted**: CLI or script execution flow.\n\n## References\n\n- Code contracts: `TenantSaas.Abstractions.Tenancy` and `TenantSaas.Abstractions.Contexts`\n- Validation: `TenantSaas.Abstractions.TrustContract.TrustContractV1`\nEOF","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:23:35.142242Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"dotnet test /home/vlad/Source/TenantSaas/TenantSaas.sln","workdir":"/home/vlad/Source/TenantSaas","timeout_ms":120000}
+2026-02-01T09:23:48.453741Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts/sprint-status.yaml
+@@
+-  2-1-define-context-taxonomy-and-execution-kinds: ready-for-dev
++  2-1-define-context-taxonomy-and-execution-kinds: review
+*** End Patch
+2026-02-01T09:23:56.304036Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"rg -n \"Tasks / Subtasks|Dev Agent Record|Change Log|Status\" -n /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts/2-1-define-context-taxonomy-and-execution-kinds.md","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:23:58.900390Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"sed -n '1,180p' /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts/2-1-define-context-taxonomy-and-execution-kinds.md","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:24:02.008988Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"sed -n '430,520p' /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts/2-1-define-context-taxonomy-and-execution-kinds.md","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:24:08.115235Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"rg -n \"Change Log|File List|Dev Agent Record\" /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts -g \"*.md\"","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:24:11.188369Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"sed -n '260,320p' /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts/1-2-local-development-environment-setup.md","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:24:49.625083Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts/2-1-define-context-taxonomy-and-execution-kinds.md
+@@
+-Status: ready-for-dev
++Status: review
+@@
+-- [ ] Task 1: Create TenantSaas.Abstractions project (AC: #1, #2)
+-  - [ ] Create new classlib project `TenantSaas.Abstractions`
+-  - [ ] Add project reference to solution
+-  - [ ] Configure net10.0 target (via Directory.Build.props)
+-  - [ ] Add XML documentation generation
+-  - [ ] Create project structure (Tenancy/, Invariants/, Contexts/ folders)
+-
+-- [ ] Task 2: Implement TenantScope type (AC: #1)
+-  - [ ] Create `TenantSaas.Abstractions/Tenancy/TenantScope.cs`
+-  - [ ] Define `TenantScope` as a discriminated union or sealed hierarchy:
++- [x] Task 1: Create TenantSaas.Abstractions project (AC: #1, #2)
++  - [x] Create new classlib project `TenantSaas.Abstractions`
++  - [x] Add project reference to solution
++  - [x] Configure net10.0 target (via Directory.Build.props)
++  - [x] Add XML documentation generation
++  - [x] Create project structure (Tenancy/, Invariants/, Contexts/ folders)
++
++- [x] Task 2: Implement TenantScope type (AC: #1)
++  - [x] Create `TenantSaas.Abstractions/Tenancy/TenantScope.cs`
++  - [x] Define `TenantScope` as a discriminated union or sealed hierarchy:
+     - `Tenant(TenantId)` - scoped to a specific tenant
+     - `SharedSystem` - shared/cross-tenant operations
+     - `NoTenant(NoTenantReason)` - explicit no-tenant context
+-  - [ ] Make `TenantScope` immutable with proper equality
+-  - [ ] Document each variant with XML comments
+-
+-- [ ] Task 3: Implement NoTenantReason type (AC: #1)
+-  - [ ] Create `TenantSaas.Abstractions/Tenancy/NoTenantReason.cs`
+-  - [ ] Define allowed reasons as a closed set:
++  - [x] Make `TenantScope` immutable with proper equality
++  - [x] Document each variant with XML comments
++
++- [x] Task 3: Implement NoTenantReason type (AC: #1)
++  - [x] Create `TenantSaas.Abstractions/Tenancy/NoTenantReason.cs`
++  - [x] Define allowed reasons as a closed set:
+     - `Public` - public/unauthenticated operations
+     - `Bootstrap` - system initialization
+     - `HealthCheck` - health/readiness probes
+     - `SystemMaintenance` - maintenance operations
+-  - [ ] Make it extensible only through explicit extension point
+-  - [ ] Document the semantic meaning of each reason
+-
+-- [ ] Task 4: Implement ExecutionKind type (AC: #2)
+-  - [ ] Create `TenantSaas.Abstractions/Contexts/ExecutionKind.cs`
+-  - [ ] Define execution kinds:
++  - [x] Make it extensible only through explicit extension point
++  - [x] Document the semantic meaning of each reason
++
++- [x] Task 4: Implement ExecutionKind type (AC: #2)
++  - [x] Create `TenantSaas.Abstractions/Contexts/ExecutionKind.cs`
++  - [x] Define execution kinds:
+     - `Request` - HTTP/API request flow
+     - `Background` - background job/worker flow
+     - `Admin` - administrative operation flow
+     - `Scripted` - CLI/script execution flow
+-  - [ ] Include display name and description properties
+-  - [ ] Document when each kind applies
+-
+-- [ ] Task 5: Implement TenantContext type (AC: #1, #2)
+-  - [ ] Create `TenantSaas.Abstractions/Tenancy/TenantContext.cs`
+-  - [ ] Define `TenantContext` with:
++  - [x] Include display name and description properties
++  - [x] Document when each kind applies
++
++- [x] Task 5: Implement TenantContext type (AC: #1, #2)
++  - [x] Create `TenantSaas.Abstractions/Tenancy/TenantContext.cs`
++  - [x] Define `TenantContext` with:
+     - `Scope` (TenantScope) - required
+     - `ExecutionKind` (ExecutionKind) - required
+     - `TraceId` (string) - required correlation ID
+     - `RequestId` (string?) - optional, present for Request kind
+     - `InitializedAt` (DateTimeOffset) - UTC timestamp
+-  - [ ] Factory methods for creating contexts per execution kind
+-  - [ ] Make immutable; no mutation after creation
+-  - [ ] Validate required fields on construction
+-
+-- [ ] Task 6: Implement ITenantContextAccessor interface (AC: #2)
+-  - [ ] Create `TenantSaas.Abstractions/Tenancy/ITenantContextAccessor.cs`
+-  - [ ] Define interface for accessing current context:
++  - [x] Factory methods for creating contexts per execution kind
++  - [x] Make immutable; no mutation after creation
++  - [x] Validate required fields on construction
++
++- [x] Task 6: Implement ITenantContextAccessor interface (AC: #2)
++  - [x] Create `TenantSaas.Abstractions/Tenancy/ITenantContextAccessor.cs`
++  - [x] Define interface for accessing current context:
+     - `TenantContext? Current { get; }`
+     - `bool IsInitialized { get; }`
+-  - [ ] Document thread-safety expectations
+-  - [ ] Document that null indicates uninitialized (invariant violation)
+-
+-- [ ] Task 7: Create TrustContract documentation type (AC: #1, #3)
+-  - [ ] Create `TenantSaas.Abstractions/TrustContract/TrustContractV1.cs`
+-  - [ ] Define constants for all scope and execution kind values
+-  - [ ] Include contract version identifier
+-  - [ ] Add static validation method to check contract completeness
+-  - [ ] Document the trust contract version semantics
+-
+-- [ ] Task 8: Write contract tests for context taxonomy (AC: #1, #2, #3)
+-  - [ ] Create `TenantSaas.ContractTests/ContextTaxonomyTests.cs`
+-  - [ ] Test TenantScope variants are complete and documented
+-  - [ ] Test NoTenantReason covers allowed categories
+-  - [ ] Test ExecutionKind covers all flow types
+-  - [ ] Test TenantContext requires scope and execution kind
+-  - [ ] Test TenantContext factory methods produce valid contexts
+-  - [ ] Test trust contract validation identifies gaps
+-
+-- [ ] Task 9: Create docs/trust-contract.md foundation (AC: #1, #3)
+-  - [ ] Create `docs/trust-contract.md` with initial structure
+-  - [ ] Document TenantScope definitions and semantics
+-  - [ ] Document NoTenantReason allowed values
+-  - [ ] Document ExecutionKind definitions
+-  - [ ] Include version identifier and stability guarantees
+-  - [ ] Reference the code contracts as authoritative
++  - [x] Document thread-safety expectations
++  - [x] Document that null indicates uninitialized (invariant violation)
++
++- [x] Task 7: Create TrustContract documentation type (AC: #1, #3)
++  - [x] Create `TenantSaas.Abstractions/TrustContract/TrustContractV1.cs`
++  - [x] Define constants for all scope and execution kind values
++  - [x] Include contract version identifier
++  - [x] Add static validation method to check contract completeness
++  - [x] Document the trust contract version semantics
++
++- [x] Task 8: Write contract tests for context taxonomy (AC: #1, #2, #3)
++  - [x] Create `TenantSaas.ContractTests/ContextTaxonomyTests.cs`
++  - [x] Test TenantScope variants are complete and documented
++  - [x] Test NoTenantReason covers allowed categories
++  - [x] Test ExecutionKind covers all flow types
++  - [x] Test TenantContext requires scope and execution kind
++  - [x] Test TenantContext factory methods produce valid contexts
++  - [x] Test trust contract validation identifies gaps
++
++- [x] Task 9: Create docs/trust-contract.md foundation (AC: #1, #3)
++  - [x] Create `docs/trust-contract.md` with initial structure
++  - [x] Document TenantScope definitions and semantics
++  - [x] Document NoTenantReason allowed values
++  - [x] Document ExecutionKind definitions
++  - [x] Include version identifier and stability guarantees
++  - [x] Reference the code contracts as authoritative
+*** End Patch
+2026-02-01T09:25:05.153470Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts/2-1-define-context-taxonomy-and-execution-kinds.md
+@@
+ ### Agent Model Used
+ 
+-{{agent_model_name_version}}
++GPT-5 (Codex CLI)
+ 
+ ### Debug Log References
+ 
++- dotnet test TenantSaas.sln
+ 
+ ### Completion Notes List
+ 
++- ✅ Created `TenantSaas.Abstractions` project with contract-only types and XML documentation output.
++- ✅ Implemented tenant scope taxonomy, no-tenant reasons, execution kinds, and tenant context factories with validation.
++- ✅ Added trust contract constants and validation for missing scope/execution kind definitions.
++- ✅ Added contract tests covering taxonomy completeness and validation gaps.
++- ✅ Authored `docs/trust-contract.md` with scope, reason, and execution kind definitions.
+ 
+ ### File List
+ 
++- TenantSaas.Abstractions/TenantSaas.Abstractions.csproj
++- TenantSaas.Abstractions/Invariants/.gitkeep
++- TenantSaas.Abstractions/Tenancy/TenantId.cs
++- TenantSaas.Abstractions/Tenancy/TenantScope.cs
++- TenantSaas.Abstractions/Tenancy/NoTenantReason.cs
++- TenantSaas.Abstractions/Contexts/ExecutionKind.cs
++- TenantSaas.Abstractions/Tenancy/TenantContext.cs
++- TenantSaas.Abstractions/Tenancy/ITenantContextAccessor.cs
++- TenantSaas.Abstractions/TrustContract/TrustContractV1.cs
++- TenantSaas.sln
++- TenantSaas.Core/TenantSaas.Core.csproj
++- TenantSaas.ContractTests/TenantSaas.ContractTests.csproj
++- TenantSaas.ContractTests/ContextTaxonomyTests.cs
++- docs/trust-contract.md
++- _bmad-output/implementation-artifacts/2-1-define-context-taxonomy-and-execution-kinds.md
++- _bmad-output/implementation-artifacts/sprint-status.yaml
++
++### Change Log
++
++- 2026-02-01: Added Abstractions contracts, trust contract validation, context taxonomy tests, and trust contract documentation.
+*** End Patch
+2026-02-01T09:25:08.225113Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"sed -n '440,500p' /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts/2-1-define-context-taxonomy-and-execution-kinds.md","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T09:25:17.413132Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts/2-1-define-context-taxonomy-and-execution-kinds.md
+@@
+ ### Agent Model Used
+ 
+-{{agent_model_name_version}}
++GPT-5 (Codex CLI)
+@@
+ ### Debug Log References
+ 
++- dotnet test TenantSaas.sln
+@@
+ ### Completion Notes List
+ 
++- ✅ Created `TenantSaas.Abstractions` project with contract-only types and XML documentation output.
++- ✅ Implemented tenant scope taxonomy, no-tenant reasons, execution kinds, and tenant context factories with validation.
++- ✅ Added trust contract constants and validation for missing scope/execution kind definitions.
++- ✅ Added contract tests covering taxonomy completeness and validation gaps.
++- ✅ Authored `docs/trust-contract.md` with scope, reason, and execution kind definitions.
+@@
+ ### File List
+ 
++- TenantSaas.Abstractions/TenantSaas.Abstractions.csproj
++- TenantSaas.Abstractions/Invariants/.gitkeep
++- TenantSaas.Abstractions/Tenancy/TenantId.cs
++- TenantSaas.Abstractions/Tenancy/TenantScope.cs
++- TenantSaas.Abstractions/Tenancy/NoTenantReason.cs
++- TenantSaas.Abstractions/Contexts/ExecutionKind.cs
++- TenantSaas.Abstractions/Tenancy/TenantContext.cs
++- TenantSaas.Abstractions/Tenancy/ITenantContextAccessor.cs
++- TenantSaas.Abstractions/TrustContract/TrustContractV1.cs
++- TenantSaas.sln
++- TenantSaas.Core/TenantSaas.Core.csproj
++- TenantSaas.ContractTests/TenantSaas.ContractTests.csproj
++- TenantSaas.ContractTests/ContextTaxonomyTests.cs
++- docs/trust-contract.md
++- _bmad-output/implementation-artifacts/2-1-define-context-taxonomy-and-execution-kinds.md
++- _bmad-output/implementation-artifacts/sprint-status.yaml
++
++### Change Log
++
++- 2026-02-01: Added Abstractions contracts, trust contract validation, context taxonomy tests, and trust contract documentation.
+*** End Patch
