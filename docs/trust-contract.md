@@ -32,6 +32,58 @@ Execution kind describes how the context was initiated:
 - **Admin**: administrative operation flow.
 - **Scripted**: CLI or script execution flow.
 
+## Break-Glass Contract
+
+Break-glass declarations are explicit and never implicit or default. Privileged or cross-tenant operations require a declaration with:
+
+- **actorId**: identity of the actor invoking break-glass (required).
+- **reason**: justification for the escalation (required).
+- **declaredScope**: scope being claimed, e.g., `tenant`, `cross-tenant`, `shared-system` (required).
+- **targetTenantRef**: target tenant reference; `null` indicates cross-tenant.
+- **timestamp**: UTC timestamp for the declaration.
+
+Markers:
+
+- **cross_tenant**: marker for cross-tenant audit events (`TrustContractV1.BreakGlassMarkerCrossTenant`).
+- **privileged**: marker for privileged operations (`TrustContractV1.BreakGlassMarkerPrivileged`).
+
+## Break-Glass Audit Event Schema
+
+Break-glass audit events are stable and include the following fields:
+
+- **actor**: actor identity from declaration.
+- **reason**: reason from declaration.
+- **scope**: declared scope.
+- **tenantRef**: target tenant reference or `cross_tenant` marker.
+- **traceId**: correlation trace identifier.
+- **auditCode**: stable audit event type code.
+- **invariantCode**: invariant being bypassed (optional).
+- **timestamp**: UTC timestamp for the event.
+- **operationName**: operation being performed (optional).
+
+Audit codes:
+
+- **BreakGlassInvoked**
+- **BreakGlassAttemptDenied**
+- **CrossTenantAccess**
+- **PrivilegedEscalation**
+
+### Example Break-Glass Audit Event
+
+```json
+{
+  "actor": "admin@example.com",
+  "reason": "Emergency data correction for incident INC-12345",
+  "scope": "cross-tenant",
+  "tenantRef": "cross_tenant",
+  "traceId": "abc123-def456-ghi789",
+  "auditCode": "BreakGlassInvoked",
+  "invariantCode": "TenantScopeRequired",
+  "timestamp": "2026-02-01T10:30:00Z",
+  "operationName": "UpdateUserData"
+}
+```
+
 ## Tenant Attribution Sources
 
 Allowed sources for tenant attribution:
@@ -132,5 +184,5 @@ Refusals include a stable invariant code and Problem Details type identifier:
 
 ## References
 
-- Code contracts: `TenantSaas.Abstractions.Tenancy` and `TenantSaas.Abstractions.Contexts`
+- Code contracts: `TenantSaas.Abstractions.Tenancy`, `TenantSaas.Abstractions.Contexts`, `TenantSaas.Abstractions.BreakGlass`
 - Validation: `TenantSaas.Abstractions.TrustContract.TrustContractV1`

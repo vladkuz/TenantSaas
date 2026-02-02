@@ -40,30 +40,23 @@ tracking_system: file-system
 story_location: /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts
 
 development_status:
+  # Epic 1: Project Bootstrap (DONE - all stories complete)
   epic-1: done
-  epic-1-retrospective: optional
-  epic-2: backlog
-  epic-2-retrospective: optional
-  epic-3: backlog
-  epic-3-retrospective: optional
-  epic-4: backlog
-  epic-4-retrospective: optional
-  epic-5: backlog
-  epic-5-retrospective: optional
-  epic-6: backlog
-  epic-6-retrospective: optional
-  epic-1: in-progress
   1-1-initialize-project-from-the-approved-net-template: done
   1-2-local-development-environment-setup: done
   1-3-ci-pipeline-skeleton-build-smoke-checks: done
   epic-1-retrospective: optional
+
+  # Epic 2: Trust Contract v1 Foundations (IN-PROGRESS)
   epic-2: in-progress
   2-1-define-context-taxonomy-and-execution-kinds: done
   2-2-define-tenant-attribution-sources-precedence-and-ambiguity-rules: done
   2-3-define-invariant-registry-and-refusal-mapping-schema: review
-  2-4-define-break-glass-contract-and-standard-audit-event-schema: backlog
+  2-4-define-break-glass-contract-and-standard-audit-event-schema: done
   2-5-define-disclosure-policy-and-tenant-ref-safe-states: backlog
   epic-2-retrospective: optional
+
+  # Epic 3: Invariant Enforcement (BACKLOG)
   epic-3: backlog
   3-1-enforce-contextinitialized-at-boundary-helpers: backlog
   3-2-enforce-tenantattributionunambiguous-at-boundaries: backlog
@@ -71,6 +64,8 @@ development_status:
   3-4-enrich-structured-logs-with-tenant-ref-and-invariant-context: backlog
   3-5-require-explicit-break-glass-with-audit-event-emission: backlog
   epic-3-retrospective: optional
+
+  # Epic 4: Context Initialization & Propagation (BACKLOG)
   epic-4: backlog
   4-1-provide-a-single-required-initialization-primitive-per-flow: backlog
   4-2-support-explicit-context-passing-without-ambient-requirements: backlog
@@ -78,6 +73,8 @@ development_status:
   4-4-provide-flow-wrappers-for-background-admin-and-scripted-execution: backlog
   4-5-capture-execution-kind-and-scope-in-context-for-downstream-use: backlog
   epic-4-retrospective: optional
+
+  # Epic 5: Contract Test Suite (BACKLOG)
   epic-5: backlog
   5-1-ship-an-adopter-runnable-contract-test-helper-package: backlog
   5-2-provide-reference-compliance-tests-for-refusal-and-attribution-rules: backlog
@@ -85,6 +82,8 @@ development_status:
   5-4-assert-break-glass-constraints-and-audit-event-emission: backlog
   5-5-assert-disclosure-policy-and-error-log-correlation-rules: backlog
   epic-5-retrospective: optional
+
+  # Epic 6: Documentation & Extension Seams (BACKLOG)
   epic-6: backlog
   6-1-define-and-document-named-extension-seams: backlog
   6-2-provide-a-boundary-only-integration-guide: backlog
@@ -94,6 +93,8 @@ development_status:
   6-6-publish-the-verification-guide: backlog
   6-7-publish-the-api-reference: backlog
   epic-6-retrospective: optional
+
+  # Epic 7: Advanced Scenarios (BACKLOG)
   epic-7: backlog
   7-1-define-explicit-shared-system-operations-and-allowed-invariants: backlog
   7-2-support-safe-cross-tenant-administrative-workflows: backlog

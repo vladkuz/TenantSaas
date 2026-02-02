@@ -16381,3 +16381,1039 @@
 *** End Patch
 2026-02-01T22:49:55.738359Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"dotnet test /home/vlad/Source/TenantSaas/TenantSaas.sln","workdir":"/home/vlad/Source/TenantSaas","timeout_ms":120000}
 2026-02-01T22:50:08.391160Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"git -C /home/vlad/Source/TenantSaas status -sb","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:12:09.884583Z  INFO codex_core::codex::handlers: Shutting down Codex instance
+2026-02-01T23:12:20.936166Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"ls","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:12:23.599435Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat _bmad/bmm/agents/dev.md","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:12:26.730568Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat _bmad/bmm/config.yaml","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:12:35.682367Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat _bmad/core/tasks/workflow.xml","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:12:38.961239Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat _bmad/bmm/workflows/4-implementation/dev-story/workflow.yaml","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:12:40.781592Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat _bmad/bmm/workflows/4-implementation/dev-story/instructions.xml","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:12:50.211286Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat _bmad-output/implementation-artifacts/2-4-define-break-glass-contract-and-standard-audit-event-schema.md","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:12:52.540160Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"rg --files -g 'project-context.md'","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:12:54.737390Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat _bmad-output/project-context.md","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:12:57.768387Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat _bmad-output/implementation-artifacts/sprint-status.yaml","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:13:02.510979Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"rg --files -g '*.cs' TenantSaas.Abstractions | head -n 50","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:13:06.729112Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat TenantSaas.Abstractions/Invariants/InvariantCode.cs","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:13:10.269866Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat TenantSaas.Abstractions/Tenancy/TenantAttributionResult.cs","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:13:18.198687Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat TenantSaas.Abstractions/TrustContract/TrustContractV1.cs","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:13:21.415774Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"ls TenantSaas.ContractTests","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:13:24.608049Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat TenantSaas.ContractTests/InvariantRegistryTests.cs","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:14:07.899579Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat TenantSaas.Abstractions/TenantSaas.Abstractions.csproj","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:14:43.379959Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat docs/trust-contract.md","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:14:53.421220Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"rg \"JsonPropertyName\" -n","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:15:14.008737Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: _bmad-output/implementation-artifacts/sprint-status.yaml
+@@
+-  2-4-define-break-glass-contract-and-standard-audit-event-schema: ready-for-dev
++  2-4-define-break-glass-contract-and-standard-audit-event-schema: in-progress
+*** End Patch
+2026-02-01T23:16:15.814805Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat <<'EOF' > TenantSaas.ContractTests/BreakGlassContractTests.cs\nusing System.Reflection;\nusing FluentAssertions;\nusing TenantSaas.Abstractions.BreakGlass;\nusing TenantSaas.Abstractions.Invariants;\nusing TenantSaas.Abstractions.TrustContract;\n\nnamespace TenantSaas.ContractTests;\n\npublic sealed class BreakGlassContractTests\n{\n    [Theory]\n    [InlineData(null)]\n    [InlineData(\"\")]\n    [InlineData(\"   \")]\n    public void Declaration_Requires_ActorId(string? actorId)\n    {\n        Action act = () => new BreakGlassDeclaration(\n            actorId!,\n            reason: \"Emergency access\",\n            declaredScope: TrustContractV1.ScopeSharedSystem,\n            targetTenantRef: null,\n            timestamp: DateTimeOffset.UtcNow);\n\n        act.Should().Throw<ArgumentException>()\n            .WithParameterName(\"actorId\");\n    }\n\n    [Theory]\n    [InlineData(null)]\n    [InlineData(\"\")]\n    [InlineData(\"   \")]\n    public void Declaration_Requires_Reason(string? reason)\n    {\n        Action act = () => new BreakGlassDeclaration(\n            actorId: \"admin@example.com\",\n            reason: reason!,\n            declaredScope: TrustContractV1.ScopeSharedSystem,\n            targetTenantRef: null,\n            timestamp: DateTimeOffset.UtcNow);\n\n        act.Should().Throw<ArgumentException>()\n            .WithParameterName(\"reason\");\n    }\n\n    [Theory]\n    [InlineData(null)]\n    [InlineData(\"\")]\n    [InlineData(\"   \")]\n    public void Declaration_Requires_DeclaredScope(string? declaredScope)\n    {\n        Action act = () => new BreakGlassDeclaration(\n            actorId: \"admin@example.com\",\n            reason: \"Emergency access\",\n            declaredScope: declaredScope!,\n            targetTenantRef: null,\n            timestamp: DateTimeOffset.UtcNow);\n\n        act.Should().Throw<ArgumentException>()\n            .WithParameterName(\"declaredScope\");\n    }\n\n    [Fact]\n    public void Validator_NullDeclaration_Returns_Invalid()\n    {\n        var result = BreakGlassValidator.Validate(null);\n\n        result.IsValid.Should().BeFalse();\n        result.InvariantCode.Should().Be(InvariantCode.BreakGlassExplicitAndAudited);\n        result.Reason.Should().NotBeNullOrWhiteSpace();\n    }\n\n    [Fact]\n    public void Validator_ValidDeclaration_Returns_Valid()\n    {\n        var declaration = new BreakGlassDeclaration(\n            actorId: \"admin@example.com\",\n            reason: \"Emergency access\",\n            declaredScope: TrustContractV1.ScopeSharedSystem,\n            targetTenantRef: null,\n            timestamp: DateTimeOffset.UtcNow);\n\n        var result = BreakGlassValidator.Validate(declaration);\n\n        result.IsValid.Should().BeTrue();\n        result.InvariantCode.Should().BeNull();\n        result.Reason.Should().BeNull();\n    }\n\n    [Fact]\n    public void AuditEvent_Includes_Actor_From_Declaration()\n    {\n        var declaration = CreateDeclaration(\"tenant-123\");\n\n        var auditEvent = BreakGlassAuditEvent.Create(declaration, traceId: \"trace-123\");\n\n        auditEvent.Actor.Should().Be(declaration.ActorId);\n    }\n\n    [Fact]\n    public void AuditEvent_Includes_Reason_From_Declaration()\n    {\n        var declaration = CreateDeclaration(\"tenant-123\");\n\n        var auditEvent = BreakGlassAuditEvent.Create(declaration, traceId: \"trace-123\");\n\n        auditEvent.Reason.Should().Be(declaration.Reason);\n    }\n\n    [Fact]\n    public void AuditEvent_Includes_Scope_From_Declaration()\n    {\n        var declaration = CreateDeclaration(\"tenant-123\");\n\n        var auditEvent = BreakGlassAuditEvent.Create(declaration, traceId: \"trace-123\");\n\n        auditEvent.Scope.Should().Be(declaration.DeclaredScope);\n    }\n\n    [Fact]\n    public void AuditEvent_Uses_CrossTenant_Marker_When_TargetTenantRef_Is_Null()\n    {\n        var declaration = CreateDeclaration(targetTenantRef: null);\n\n        var auditEvent = BreakGlassAuditEvent.Create(declaration, traceId: \"trace-123\");\n\n        auditEvent.TenantRef.Should().Be(TrustContractV1.BreakGlassMarkerCrossTenant);\n    }\n\n    [Fact]\n    public void AuditEvent_Uses_TargetTenantRef_When_Provided()\n    {\n        var declaration = CreateDeclaration(targetTenantRef: \"tenant-456\");\n\n        var auditEvent = BreakGlassAuditEvent.Create(declaration, traceId: \"trace-123\");\n\n        auditEvent.TenantRef.Should().Be(\"tenant-456\");\n    }\n\n    [Fact]\n    public void AuditEvent_Includes_TraceId()\n    {\n        var declaration = CreateDeclaration(\"tenant-123\");\n\n        var auditEvent = BreakGlassAuditEvent.Create(declaration, traceId: \"trace-123\");\n\n        auditEvent.TraceId.Should().Be(\"trace-123\");\n    }\n\n    [Fact]\n    public void AuditEvent_Includes_AuditCode()\n    {\n        var declaration = CreateDeclaration(\"tenant-123\");\n\n        var auditEvent = BreakGlassAuditEvent.Create(declaration, traceId: \"trace-123\");\n\n        auditEvent.AuditCode.Should().Be(AuditCode.BreakGlassInvoked);\n    }\n\n    [Fact]\n    public void AuditEvent_Timestamp_Is_Utc()\n    {\n        var declaration = CreateDeclaration(\"tenant-123\");\n\n        var auditEvent = BreakGlassAuditEvent.Create(declaration, traceId: \"trace-123\");\n\n        auditEvent.Timestamp.Offset.Should().Be(TimeSpan.Zero);\n    }\n\n    [Fact]\n    public void AuditEvent_Schema_Is_Stable()\n    {\n        var properties = typeof(BreakGlassAuditEvent)\n            .GetProperties(BindingFlags.Instance | BindingFlags.Public)\n            .Select(property => property.Name)\n            .OrderBy(name => name)\n            .ToArray();\n\n        properties.Should().Equal(\n            \"Actor\",\n            \"AuditCode\",\n            \"InvariantCode\",\n            \"OperationName\",\n            \"Reason\",\n            \"Scope\",\n            \"TenantRef\",\n            \"Timestamp\",\n            \"TraceId\");\n    }\n\n    [Fact]\n    public void AuditEvent_Create_FromDeclaration_Sets_All_Fields()\n    {\n        var declaration = CreateDeclaration(\"tenant-123\");\n\n        var auditEvent = BreakGlassAuditEvent.Create(declaration, traceId: \"trace-123\");\n\n        auditEvent.Actor.Should().Be(declaration.ActorId);\n        auditEvent.Reason.Should().Be(declaration.Reason);\n        auditEvent.Scope.Should().Be(declaration.DeclaredScope);\n        auditEvent.TenantRef.Should().Be(declaration.TargetTenantRef);\n        auditEvent.TraceId.Should().Be(\"trace-123\");\n        auditEvent.AuditCode.Should().Be(AuditCode.BreakGlassInvoked);\n    }\n\n    private static BreakGlassDeclaration CreateDeclaration(string? targetTenantRef)\n        => new(\n            actorId: \"admin@example.com\",\n            reason: \"Emergency access\",\n            declaredScope: TrustContractV1.ScopeSharedSystem,\n            targetTenantRef: targetTenantRef,\n            timestamp: DateTimeOffset.UtcNow);\n}\nEOF","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:16:21.869850Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"dotnet test TenantSaas.ContractTests/TenantSaas.ContractTests.csproj","workdir":"/home/vlad/Source/TenantSaas","timeout_ms":120000}
+2026-02-01T23:16:54.258637Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat TenantSaas.ContractTests/TenantSaas.ContractTests.csproj","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:17:08.274901Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat <<'EOF' > TenantSaas.Abstractions/BreakGlass/BreakGlassDeclaration.cs\nusing System.Diagnostics.CodeAnalysis;\n\nnamespace TenantSaas.Abstractions.BreakGlass;\n\n/// <summary>\n/// Represents an explicit break-glass declaration for privileged operations.\n/// </summary>\n/// <remarks>\n/// Break-glass must always be explicit and never implicit or default.\n/// Missing or incomplete declarations result in refusal.\n/// </remarks>\npublic sealed record BreakGlassDeclaration\n{\n    private string _actorId = string.Empty;\n    private string _reason = string.Empty;\n    private string _declaredScope = string.Empty;\n    private DateTimeOffset _timestamp = DateTimeOffset.UtcNow;\n\n    /// <summary>\n    /// Creates a break-glass declaration with required details.\n    /// </summary>\n    [SetsRequiredMembers]\n    public BreakGlassDeclaration(\n        string actorId,\n        string reason,\n        string declaredScope,\n        string? targetTenantRef,\n        DateTimeOffset timestamp)\n    {\n        ActorId = actorId;\n        Reason = reason;\n        DeclaredScope = declaredScope;\n        TargetTenantRef = targetTenantRef;\n        Timestamp = timestamp;\n    }\n\n    /// <summary>\n    /// Gets the actor identity invoking break-glass.\n    /// </summary>\n    public required string ActorId\n    {\n        get => _actorId;\n        init\n        {\n            if (string.IsNullOrWhiteSpace(value))\n            {\n                throw new ArgumentException(\"Actor identity is required.\", nameof(actorId));\n            }\n\n            _actorId = value;\n        }\n    }\n\n    /// <summary>\n    /// Gets the justification for the escalation.\n    /// </summary>\n    public required string Reason\n    {\n        get => _reason;\n        init\n        {\n            if (string.IsNullOrWhiteSpace(value))\n            {\n                throw new ArgumentException(\"Break-glass reason is required.\", nameof(reason));\n            }\n\n            _reason = value;\n        }\n    }\n\n    /// <summary>\n    /// Gets the scope being claimed.\n    /// </summary>\n    public required string DeclaredScope\n    {\n        get => _declaredScope;\n        init\n        {\n            if (string.IsNullOrWhiteSpace(value))\n            {\n                throw new ArgumentException(\"Declared scope is required.\", nameof(declaredScope));\n            }\n\n            _declaredScope = value;\n        }\n    }\n\n    /// <summary>\n    /// Gets the target tenant reference, or null for cross-tenant.\n    /// </summary>\n    public string? TargetTenantRef { get; init; }\n\n    /// <summary>\n    /// Gets the timestamp when break-glass was declared (UTC).\n    /// </summary>\n    public DateTimeOffset Timestamp\n    {\n        get => _timestamp;\n        init\n        {\n            if (value.Offset != TimeSpan.Zero)\n            {\n                throw new ArgumentException(\"Break-glass timestamp must be UTC.\", nameof(timestamp));\n            }\n\n            _timestamp = value;\n        }\n    }\n}\nEOF","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:17:11.789456Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"mkdir -p TenantSaas.Abstractions/BreakGlass","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:17:26.748169Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat <<'EOF' > TenantSaas.Abstractions/BreakGlass/BreakGlassDeclaration.cs\nusing System.Diagnostics.CodeAnalysis;\n\nnamespace TenantSaas.Abstractions.BreakGlass;\n\n/// <summary>\n/// Represents an explicit break-glass declaration for privileged operations.\n/// </summary>\n/// <remarks>\n/// Break-glass must always be explicit and never implicit or default.\n/// Missing or incomplete declarations result in refusal.\n/// </remarks>\npublic sealed record BreakGlassDeclaration\n{\n    private string _actorId = string.Empty;\n    private string _reason = string.Empty;\n    private string _declaredScope = string.Empty;\n    private DateTimeOffset _timestamp = DateTimeOffset.UtcNow;\n\n    /// <summary>\n    /// Creates a break-glass declaration with required details.\n    /// </summary>\n    [SetsRequiredMembers]\n    public BreakGlassDeclaration(\n        string actorId,\n        string reason,\n        string declaredScope,\n        string? targetTenantRef,\n        DateTimeOffset timestamp)\n    {\n        ActorId = actorId;\n        Reason = reason;\n        DeclaredScope = declaredScope;\n        TargetTenantRef = targetTenantRef;\n        Timestamp = timestamp;\n    }\n\n    /// <summary>\n    /// Gets the actor identity invoking break-glass.\n    /// </summary>\n    public required string ActorId\n    {\n        get => _actorId;\n        init\n        {\n            if (string.IsNullOrWhiteSpace(value))\n            {\n                throw new ArgumentException(\"Actor identity is required.\", nameof(actorId));\n            }\n\n            _actorId = value;\n        }\n    }\n\n    /// <summary>\n    /// Gets the justification for the escalation.\n    /// </summary>\n    public required string Reason\n    {\n        get => _reason;\n        init\n        {\n            if (string.IsNullOrWhiteSpace(value))\n            {\n                throw new ArgumentException(\"Break-glass reason is required.\", nameof(reason));\n            }\n\n            _reason = value;\n        }\n    }\n\n    /// <summary>\n    /// Gets the scope being claimed.\n    /// </summary>\n    public required string DeclaredScope\n    {\n        get => _declaredScope;\n        init\n        {\n            if (string.IsNullOrWhiteSpace(value))\n            {\n                throw new ArgumentException(\"Declared scope is required.\", nameof(declaredScope));\n            }\n\n            _declaredScope = value;\n        }\n    }\n\n    /// <summary>\n    /// Gets the target tenant reference, or null for cross-tenant.\n    /// </summary>\n    public string? TargetTenantRef { get; init; }\n\n    /// <summary>\n    /// Gets the timestamp when break-glass was declared (UTC).\n    /// </summary>\n    public DateTimeOffset Timestamp\n    {\n        get => _timestamp;\n        init\n        {\n            if (value.Offset != TimeSpan.Zero)\n            {\n                throw new ArgumentException(\"Break-glass timestamp must be UTC.\", nameof(timestamp));\n            }\n\n            _timestamp = value;\n        }\n    }\n}\nEOF","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:17:33.585919Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: TenantSaas.Abstractions/BreakGlass/BreakGlassDeclaration.cs
+@@
+-                throw new ArgumentException("Actor identity is required.", nameof(actorId));
++                throw new ArgumentException("Actor identity is required.", "actorId");
+@@
+-                throw new ArgumentException("Break-glass reason is required.", nameof(reason));
++                throw new ArgumentException("Break-glass reason is required.", "reason");
+@@
+-                throw new ArgumentException("Declared scope is required.", nameof(declaredScope));
++                throw new ArgumentException("Declared scope is required.", "declaredScope");
+@@
+-                throw new ArgumentException("Break-glass timestamp must be UTC.", nameof(timestamp));
++                throw new ArgumentException("Break-glass timestamp must be UTC.", "timestamp");
+*** End Patch
+2026-02-01T23:17:40.303053Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat <<'EOF' > TenantSaas.Abstractions/BreakGlass/BreakGlassValidationResult.cs\nnamespace TenantSaas.Abstractions.BreakGlass;\n\n/// <summary>\n/// Represents the result of break-glass declaration validation.\n/// </summary>\npublic sealed record BreakGlassValidationResult(\n    bool IsValid,\n    string? InvariantCode,\n    string? Reason)\n{\n    /// <summary>\n    /// Creates a valid break-glass validation result.\n    /// </summary>\n    public static BreakGlassValidationResult Valid()\n        => new(true, null, null);\n\n    /// <summary>\n    /// Creates an invalid break-glass validation result.\n    /// </summary>\n    public static BreakGlassValidationResult Invalid(string invariantCode, string reason)\n    {\n        if (string.IsNullOrWhiteSpace(invariantCode))\n        {\n            throw new ArgumentException(\"Invariant code is required.\", nameof(invariantCode));\n        }\n\n        if (string.IsNullOrWhiteSpace(reason))\n        {\n            throw new ArgumentException(\"Reason is required.\", nameof(reason));\n        }\n\n        return new BreakGlassValidationResult(false, invariantCode, reason);\n    }\n}\nEOF","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:17:48.160689Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat <<'EOF' > TenantSaas.Abstractions/BreakGlass/BreakGlassValidator.cs\nusing TenantSaas.Abstractions.Invariants;\n\nnamespace TenantSaas.Abstractions.BreakGlass;\n\n/// <summary>\n/// Validates break-glass declarations for privileged or cross-tenant operations.\n/// </summary>\npublic static class BreakGlassValidator\n{\n    /// <summary>\n    /// Validates a break-glass declaration for required fields.\n    /// </summary>\n    public static BreakGlassValidationResult Validate(BreakGlassDeclaration? declaration)\n    {\n        if (declaration is null)\n        {\n            return BreakGlassValidationResult.Invalid(\n                InvariantCode.BreakGlassExplicitAndAudited,\n                \"Break-glass declaration is required.\");\n        }\n\n        if (string.IsNullOrWhiteSpace(declaration.ActorId))\n        {\n            return BreakGlassValidationResult.Invalid(\n                InvariantCode.BreakGlassExplicitAndAudited,\n                \"Break-glass actor identity is required.\");\n        }\n\n        if (string.IsNullOrWhiteSpace(declaration.Reason))\n        {\n            return BreakGlassValidationResult.Invalid(\n                InvariantCode.BreakGlassExplicitAndAudited,\n                \"Break-glass reason is required.\");\n        }\n\n        if (string.IsNullOrWhiteSpace(declaration.DeclaredScope))\n        {\n            return BreakGlassValidationResult.Invalid(\n                InvariantCode.BreakGlassExplicitAndAudited,\n                \"Break-glass declared scope is required.\");\n        }\n\n        return BreakGlassValidationResult.Valid();\n    }\n}\nEOF","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:17:55.558947Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat <<'EOF' > TenantSaas.Abstractions/BreakGlass/AuditCode.cs\nnamespace TenantSaas.Abstractions.BreakGlass;\n\n/// <summary>\n/// Defines stable audit event codes for break-glass operations.\n/// </summary>\npublic static class AuditCode\n{\n    /// <summary>\n    /// Break-glass was successfully invoked.\n    /// </summary>\n    public const string BreakGlassInvoked = \"BreakGlassInvoked\";\n\n    /// <summary>\n    /// Break-glass attempt was rejected.\n    /// </summary>\n    public const string BreakGlassAttemptDenied = \"BreakGlassAttemptDenied\";\n\n    /// <summary>\n    /// Cross-tenant operation was performed.\n    /// </summary>\n    public const string CrossTenantAccess = \"CrossTenantAccess\";\n\n    /// <summary>\n    /// Privilege escalation occurred.\n    /// </summary>\n    public const string PrivilegedEscalation = \"PrivilegedEscalation\";\n}\nEOF","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:18:00.387726Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat <<'EOF' > TenantSaas.Abstractions/BreakGlass/IBreakGlassAuditSink.cs\nnamespace TenantSaas.Abstractions.BreakGlass;\n\n/// <summary>\n/// Emits break-glass audit events to a durable audit sink.\n/// </summary>\n/// <remarks>\n/// Implementations must be idempotent, non-blocking, and fail-safe.\n/// </remarks>\npublic interface IBreakGlassAuditSink\n{\n    /// <summary>\n    /// Emits a break-glass audit event.\n    /// </summary>\n    Task EmitAsync(BreakGlassAuditEvent auditEvent, CancellationToken cancellationToken);\n}\nEOF","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:18:34.099493Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat <<'EOF' > TenantSaas.Abstractions/BreakGlass/BreakGlassAuditEvent.cs\nusing System.Diagnostics.CodeAnalysis;\nusing System.Text.Json.Serialization;\nusing TenantSaas.Abstractions.TrustContract;\n\nnamespace TenantSaas.Abstractions.BreakGlass;\n\n/// <summary>\n/// Represents a standard audit event emitted when break-glass is exercised.\n/// </summary>\npublic sealed record BreakGlassAuditEvent\n{\n    private string _actor = string.Empty;\n    private string _reason = string.Empty;\n    private string _scope = string.Empty;\n    private string _tenantRef = string.Empty;\n    private string _traceId = string.Empty;\n    private string _auditCode = string.Empty;\n    private DateTimeOffset _timestamp = DateTimeOffset.UtcNow;\n\n    /// <summary>\n    /// Creates a break-glass audit event.\n    /// </summary>\n    [SetsRequiredMembers]\n    public BreakGlassAuditEvent(\n        string actor,\n        string reason,\n        string scope,\n        string tenantRef,\n        string traceId,\n        string auditCode,\n        string? invariantCode,\n        DateTimeOffset timestamp,\n        string? operationName)\n    {\n        Actor = actor;\n        Reason = reason;\n        Scope = scope;\n        TenantRef = tenantRef;\n        TraceId = traceId;\n        AuditCode = auditCode;\n        InvariantCode = invariantCode;\n        Timestamp = timestamp;\n        OperationName = operationName;\n    }\n\n    /// <summary>\n    /// Gets the actor identity.\n    /// </summary>\n    [JsonPropertyName(\"actor\")]\n    public required string Actor\n    {\n        get => _actor;\n        init\n        {\n            if (string.IsNullOrWhiteSpace(value))\n            {\n                throw new ArgumentException(\"Actor identity is required.\", \"actor\");\n            }\n\n            _actor = value;\n        }\n    }\n\n    /// <summary>\n    /// Gets the reason for escalation.\n    /// </summary>\n    [JsonPropertyName(\"reason\")]\n    public required string Reason\n    {\n        get => _reason;\n        init\n        {\n            if (string.IsNullOrWhiteSpace(value))\n            {\n                throw new ArgumentException(\"Break-glass reason is required.\", \"reason\");\n            }\n\n            _reason = value;\n        }\n    }\n\n    /// <summary>\n    /// Gets the declared scope.\n    /// </summary>\n    [JsonPropertyName(\"scope\")]\n    public required string Scope\n    {\n        get => _scope;\n        init\n        {\n            if (string.IsNullOrWhiteSpace(value))\n            {\n                throw new ArgumentException(\"Declared scope is required.\", \"scope\");\n            }\n\n            _scope = value;\n        }\n    }\n\n    /// <summary>\n    /// Gets the tenant reference or cross-tenant marker.\n    /// </summary>\n    [JsonPropertyName(\"tenantRef\")]\n    public required string TenantRef\n    {\n        get => _tenantRef;\n        init\n        {\n            if (string.IsNullOrWhiteSpace(value))\n            {\n                throw new ArgumentException(\"Tenant reference is required.\", \"tenantRef\");\n            }\n\n            _tenantRef = value;\n        }\n    }\n\n    /// <summary>\n    /// Gets the correlation trace identifier.\n    /// </summary>\n    [JsonPropertyName(\"traceId\")]\n    public required string TraceId\n    {\n        get => _traceId;\n        init\n        {\n            if (string.IsNullOrWhiteSpace(value))\n            {\n                throw new ArgumentException(\"Trace identifier is required.\", \"traceId\");\n            }\n\n            _traceId = value;\n        }\n    }\n\n    /// <summary>\n    /// Gets the stable audit event type code.\n    /// </summary>\n    [JsonPropertyName(\"auditCode\")]\n    public required string AuditCode\n    {\n        get => _auditCode;\n        init\n        {\n            if (string.IsNullOrWhiteSpace(value))\n            {\n                throw new ArgumentException(\"Audit code is required.\", \"auditCode\");\n            }\n\n            _auditCode = value;\n        }\n    }\n\n    /// <summary>\n    /// Gets the invariant being bypassed, if applicable.\n    /// </summary>\n    [JsonPropertyName(\"invariantCode\")]\n    public string? InvariantCode { get; init; }\n\n    /// <summary>\n    /// Gets the event timestamp (UTC).\n    /// </summary>\n    [JsonPropertyName(\"timestamp\")]\n    public DateTimeOffset Timestamp\n    {\n        get => _timestamp;\n        init\n        {\n            if (value.Offset != TimeSpan.Zero)\n            {\n                throw new ArgumentException(\"Break-glass audit event timestamp must be UTC.\", \"timestamp\");\n            }\n\n            _timestamp = value;\n        }\n    }\n\n    /// <summary>\n    /// Gets the operation being performed, if applicable.\n    /// </summary>\n    [JsonPropertyName(\"operationName\")]\n    public string? OperationName { get; init; }\n\n    /// <summary>\n    /// Creates an audit event from a break-glass declaration.\n    /// </summary>\n    public static BreakGlassAuditEvent Create(BreakGlassDeclaration declaration, string traceId)\n    {\n        ArgumentNullException.ThrowIfNull(declaration);\n\n        if (string.IsNullOrWhiteSpace(traceId))\n        {\n            throw new ArgumentException(\"Trace identifier is required.\", nameof(traceId));\n        }\n\n        var tenantRef = string.IsNullOrWhiteSpace(declaration.TargetTenantRef)\n            ? TrustContractV1.BreakGlassMarkerCrossTenant\n            : declaration.TargetTenantRef;\n\n        return new BreakGlassAuditEvent(\n            actor: declaration.ActorId,\n            reason: declaration.Reason,\n            scope: declaration.DeclaredScope,\n            tenantRef: tenantRef,\n            traceId: traceId,\n            auditCode: AuditCode.BreakGlassInvoked,\n            invariantCode: null,\n            timestamp: DateTimeOffset.UtcNow,\n            operationName: null);\n    }\n}\nEOF","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:18:44.094189Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: TenantSaas.Abstractions/TrustContract/TrustContractV1.cs
+@@
+-using TenantSaas.Abstractions.Invariants;
++using TenantSaas.Abstractions.BreakGlass;
++using TenantSaas.Abstractions.Invariants;
+@@
+     /// <summary>
+     /// Explicit no-tenant operations.
+     /// </summary>
+     public const string ScopeNoTenant = "no-tenant";
+ 
++    /// <summary>
++    /// Cross-tenant marker for break-glass audit events.
++    /// </summary>
++    public const string BreakGlassMarkerCrossTenant = "cross_tenant";
++
++    /// <summary>
++    /// Privileged operation marker for break-glass declarations.
++    /// </summary>
++    public const string BreakGlassMarkerPrivileged = "privileged";
++
+@@
+     /// <summary>
+     /// Validates that a contract definition includes all required scopes and execution kinds.
+     /// </summary>
+@@
+     public static TrustContractValidationResult Validate(
+         IReadOnlyCollection<string> scopes,
+         IReadOnlyCollection<string> executionKinds)
+@@
+         return new TrustContractValidationResult(missingScopes, missingExecutionKinds);
+     }
++
++    /// <summary>
++    /// Validates a break-glass declaration for privileged operations.\n    /// </summary>
++    /// <remarks>
++    /// Break-glass is never implicit or default; privileged flows must provide a declaration.
++    /// </remarks>
++    public static BreakGlassValidationResult ValidateBreakGlassDeclaration(BreakGlassDeclaration? declaration)\n        => BreakGlassValidator.Validate(declaration);
+*** End Patch
+2026-02-01T23:18:47.588395Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"rg -n \"ValidateBreakGlassDeclaration\" -n TenantSaas.Abstractions/TrustContract/TrustContractV1.cs","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:18:52.167811Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: TenantSaas.Abstractions/TrustContract/TrustContractV1.cs
+@@
+-    /// <summary>
+-    /// Validates a break-glass declaration for privileged operations.\n    /// </summary>
++    /// <summary>
++    /// Validates a break-glass declaration for privileged operations.
++    /// </summary>
+@@
+-    public static BreakGlassValidationResult ValidateBreakGlassDeclaration(BreakGlassDeclaration? declaration)\n        => BreakGlassValidator.Validate(declaration);
++    public static BreakGlassValidationResult ValidateBreakGlassDeclaration(BreakGlassDeclaration? declaration)
++        => BreakGlassValidator.Validate(declaration);
+*** End Patch
+2026-02-01T23:19:13.880521Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: docs/trust-contract.md
+@@
+ ## ExecutionKind
+ 
+ Execution kind describes how the context was initiated:
+ 
+ - **Request**: HTTP or API request flow.
+ - **Background**: background job or worker flow.
+ - **Admin**: administrative operation flow.
+ - **Scripted**: CLI or script execution flow.
+ 
++## Break-Glass Contract
++
++Break-glass declarations are explicit and never implicit or default. Privileged or cross-tenant operations require a declaration with:
++
++- **actorId**: identity of the actor invoking break-glass (required).
++- **reason**: justification for the escalation (required).
++- **declaredScope**: scope being claimed, e.g., `tenant`, `cross-tenant`, `shared-system` (required).
++- **targetTenantRef**: target tenant reference; `null` indicates cross-tenant.
++- **timestamp**: UTC timestamp for the declaration.
++
++Markers:
++
++- **cross_tenant**: marker for cross-tenant audit events (`TrustContractV1.BreakGlassMarkerCrossTenant`).
++- **privileged**: marker for privileged operations (`TrustContractV1.BreakGlassMarkerPrivileged`).
++
++## Break-Glass Audit Event Schema
++
++Break-glass audit events are stable and include the following fields:
++
++- **actor**: actor identity from declaration.
++- **reason**: reason from declaration.
++- **scope**: declared scope.
++- **tenantRef**: target tenant reference or `cross_tenant` marker.
++- **traceId**: correlation trace identifier.
++- **auditCode**: stable audit event type code.
++- **invariantCode**: invariant being bypassed (optional).
++- **timestamp**: UTC timestamp for the event.
++- **operationName**: operation being performed (optional).
++
++Audit codes:
++
++- **BreakGlassInvoked**
++- **BreakGlassAttemptDenied**
++- **CrossTenantAccess**
++- **PrivilegedEscalation**
++
++### Example Break-Glass Audit Event
++
++```json
++{
++  "actor": "admin@example.com",
++  "reason": "Emergency data correction for incident INC-12345",
++  "scope": "cross-tenant",
++  "tenantRef": "cross_tenant",
++  "traceId": "abc123-def456-ghi789",
++  "auditCode": "BreakGlassInvoked",
++  "invariantCode": "TenantScopeRequired",
++  "timestamp": "2026-02-01T10:30:00Z",
++  "operationName": "UpdateUserData"
++}
++```
++
+ ## Tenant Attribution Sources
+*** End Patch
+2026-02-01T23:19:21.420986Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: docs/trust-contract.md
+@@
+ ## References
+ 
+-- Code contracts: `TenantSaas.Abstractions.Tenancy` and `TenantSaas.Abstractions.Contexts`
+-- Validation: `TenantSaas.Abstractions.TrustContract.TrustContractV1`
++- Code contracts: `TenantSaas.Abstractions.Tenancy`, `TenantSaas.Abstractions.Contexts`, `TenantSaas.Abstractions.BreakGlass`
++- Validation: `TenantSaas.Abstractions.TrustContract.TrustContractV1`
+*** End Patch
+2026-02-01T23:19:33.670871Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"dotnet test TenantSaas.ContractTests/TenantSaas.ContractTests.csproj","workdir":"/home/vlad/Source/TenantSaas","timeout_ms":120000}
+2026-02-01T23:19:43.326978Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"dotnet test TenantSaas.ContractTests/TenantSaas.ContractTests.csproj -v minimal","workdir":"/home/vlad/Source/TenantSaas","timeout_ms":120000}
+2026-02-01T23:19:56.188060Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"dotnet --version","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:19:59.539548Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"dotnet test TenantSaas.ContractTests/TenantSaas.ContractTests.csproj -v normal","workdir":"/home/vlad/Source/TenantSaas","timeout_ms":120000}
+2026-02-01T23:20:09.358063Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"dotnet test TenantSaas.ContractTests/TenantSaas.ContractTests.csproj -v minimal > /tmp/dotnet-test.log 2>&1; cat /tmp/dotnet-test.log","workdir":"/home/vlad/Source/TenantSaas","timeout_ms":120000}
+2026-02-01T23:20:20.843349Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"DOTNET_CLI_USE_MSBUILD_SERVER=0 MSBUILDNOINPROCNODE=1 dotnet test TenantSaas.ContractTests/TenantSaas.ContractTests.csproj -m:1 -v minimal > /tmp/dotnet-test.log 2>&1; cat /tmp/dotnet-test.log","workdir":"/home/vlad/Source/TenantSaas","timeout_ms":120000}
+2026-02-01T23:20:27.252117Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"DOTNET_CLI_USE_MSBUILD_SERVER=0 MSBUILDNOINPROCNODE=1 dotnet test TenantSaas.ContractTests/TenantSaas.ContractTests.csproj -m:1 -v minimal","workdir":"/home/vlad/Source/TenantSaas","timeout_ms":120000}
+2026-02-01T23:20:37.271526Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"DOTNET_CLI_USE_MSBUILD_SERVER=0 MSBUILDNOINPROCNODE=1 dotnet test TenantSaas.ContractTests/TenantSaas.ContractTests.csproj -m:1 -v minimal; echo EXIT:$?","workdir":"/home/vlad/Source/TenantSaas","timeout_ms":120000}
+2026-02-01T23:20:48.920852Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"echo hi","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:20:55.831943Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"DOTNET_CLI_USE_MSBUILD_SERVER=0 MSBUILDNOINPROCNODE=1 dotnet test TenantSaas.ContractTests/TenantSaas.ContractTests.csproj -m:1 -v minimal > /tmp/dotnet-test.log 2>&1; echo DONE; wc -l /tmp/dotnet-test.log; head -n 20 /tmp/dotnet-test.log","workdir":"/home/vlad/Source/TenantSaas","timeout_ms":120000}
+2026-02-01T23:21:34.715513Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"tail -n 60 _bmad-output/implementation-artifacts/2-4-define-break-glass-contract-and-standard-audit-event-schema.md","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:21:45.784557Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"dotnet test TenantSaas.ContractTests/TenantSaas.ContractTests.csproj --disable-build-servers -v minimal > /tmp/dotnet-test.log 2>&1; echo DONE; wc -l /tmp/dotnet-test.log; head -n 40 /tmp/dotnet-test.log","workdir":"/home/vlad/Source/TenantSaas","timeout_ms":120000}
+2026-02-01T23:22:11.975685Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: _bmad-output/implementation-artifacts/2-4-define-break-glass-contract-and-standard-audit-event-schema.md
+@@
+-Status: ready-for-dev
++Status: in-progress
+@@
+ ### Agent Model Used
+ 
+-{{agent_model_name_version}}
++GPT-5 (Codex CLI)
+@@
+ ### Debug Log References
++
++- 2026-02-01: `dotnet test` failed to start due to MSBuild NamedPipe `SocketException (13): Permission denied` (attempted with `--disable-build-servers`).
+@@
+ ### Completion Notes List
++
++- Implemented break-glass declaration, audit event, validator, audit codes, and audit sink contract.
++- Updated trust contract with break-glass markers and validation helper.
++- Added contract tests for break-glass declaration and audit event schema.
++- Updated trust contract documentation with break-glass contract and audit event schema.
+@@
+ ### File List
++
++- TenantSaas.Abstractions/BreakGlass/AuditCode.cs
++- TenantSaas.Abstractions/BreakGlass/BreakGlassAuditEvent.cs
++- TenantSaas.Abstractions/BreakGlass/BreakGlassDeclaration.cs
++- TenantSaas.Abstractions/BreakGlass/BreakGlassValidationResult.cs
++- TenantSaas.Abstractions/BreakGlass/BreakGlassValidator.cs
++- TenantSaas.Abstractions/BreakGlass/IBreakGlassAuditSink.cs
++- TenantSaas.Abstractions/TrustContract/TrustContractV1.cs
++- TenantSaas.ContractTests/BreakGlassContractTests.cs
++- _bmad-output/implementation-artifacts/sprint-status.yaml
++- docs/trust-contract.md
+*** End Patch
+2026-02-01T23:22:48.678315Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: TenantSaas.Abstractions/BreakGlass/BreakGlassDeclaration.cs
+@@
+-    public DateTimeOffset Timestamp
++    public required DateTimeOffset Timestamp
+*** End Patch
+2026-02-01T23:22:51.489394Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: TenantSaas.Abstractions/BreakGlass/BreakGlassAuditEvent.cs
+@@
+-    public DateTimeOffset Timestamp
++    public required DateTimeOffset Timestamp
+*** End Patch
+2026-02-01T23:23:11.235568Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"dotnet test TenantSaas.ContractTests/TenantSaas.ContractTests.csproj --disable-build-servers -v minimal","workdir":"/home/vlad/Source/TenantSaas","timeout_ms":120000,"sandbox_permissions":"require_escalated","justification":"dotnet test failed with MSBuild NamedPipe permission errors in the sandbox; rerunning without sandbox restrictions may allow tests to execute."}
+2026-02-01T23:32:33.470615Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"nl -ba TenantSaas.Abstractions/BreakGlass/BreakGlassAuditEvent.cs | sed -n '190,220p'","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:32:41.252117Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: TenantSaas.Abstractions/BreakGlass/BreakGlassAuditEvent.cs
+@@
+-            auditCode: AuditCode.BreakGlassInvoked,
++            auditCode: global::TenantSaas.Abstractions.BreakGlass.AuditCode.BreakGlassInvoked,
+*** End Patch
+2026-02-01T23:32:44.376732Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"dotnet test TenantSaas.ContractTests/TenantSaas.ContractTests.csproj --disable-build-servers -v minimal","workdir":"/home/vlad/Source/TenantSaas","timeout_ms":120000,"sandbox_permissions":"require_escalated","justification":"Re-running tests after fixing a compile error in BreakGlassAuditEvent."}
+2026-02-01T23:33:02.244502Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"dotnet test TenantSaas.sln --disable-build-servers -v minimal","workdir":"/home/vlad/Source/TenantSaas","timeout_ms":120000,"sandbox_permissions":"require_escalated","justification":"Running full regression suite for the solution as required by the workflow."}
+2026-02-01T23:33:24.544028Z  INFO codex_core::codex: interrupt received: abort current task, if any
+2026-02-01T23:33:53.752342Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat Directory.Build.props","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:34:14.009147Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: Directory.Build.props
+@@
+   <PropertyGroup>
+     <TargetFramework>net10.0</TargetFramework>
+     <Nullable>enable</Nullable>
+     <ImplicitUsings>enable</ImplicitUsings>
++    <LangVersion>latest</LangVersion>
+   </PropertyGroup>
+ </Project>
+*** End Patch
+2026-02-01T23:35:54.243378Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: TenantSaas.Abstractions/BreakGlass/BreakGlassDeclaration.cs
+@@
+-using System.Diagnostics.CodeAnalysis;
+-
+-namespace TenantSaas.Abstractions.BreakGlass;
+-
+-/// <summary>
+-/// Represents an explicit break-glass declaration for privileged operations.
+-/// </summary>
+-/// <remarks>
+-/// Break-glass must always be explicit and never implicit or default.
+-/// Missing or incomplete declarations result in refusal.
+-/// </remarks>
+-public sealed record BreakGlassDeclaration
+-{
+-    private string _actorId = string.Empty;
+-    private string _reason = string.Empty;
+-    private string _declaredScope = string.Empty;
+-    private DateTimeOffset _timestamp = DateTimeOffset.UtcNow;
+-
+-    /// <summary>
+-    /// Creates a break-glass declaration with required details.
+-    /// </summary>
+-    [SetsRequiredMembers]
+-    public BreakGlassDeclaration(
+-        string actorId,
+-        string reason,
+-        string declaredScope,
+-        string? targetTenantRef,
+-        DateTimeOffset timestamp)
+-    {
+-        ActorId = actorId;
+-        Reason = reason;
+-        DeclaredScope = declaredScope;
+-        TargetTenantRef = targetTenantRef;
+-        Timestamp = timestamp;
+-    }
+-
+-    /// <summary>
+-    /// Gets the actor identity invoking break-glass.
+-    /// </summary>
+-    public required string ActorId
+-    {
+-        get => _actorId;
+-        init
+-        {
+-            if (string.IsNullOrWhiteSpace(value))
+-            {
+-                throw new ArgumentException("Actor identity is required.", "actorId");
+-            }
+-
+-            _actorId = value;
+-        }
+-    }
+-
+-    /// <summary>
+-    /// Gets the justification for the escalation.
+-    /// </summary>
+-    public required string Reason
+-    {
+-        get => _reason;
+-        init
+-        {
+-            if (string.IsNullOrWhiteSpace(value))
+-            {
+-                throw new ArgumentException("Break-glass reason is required.", "reason");
+-            }
+-
+-            _reason = value;
+-        }
+-    }
+-
+-    /// <summary>
+-    /// Gets the scope being claimed.
+-    /// </summary>
+-    public required string DeclaredScope
+-    {
+-        get => _declaredScope;
+-        init
+-        {
+-            if (string.IsNullOrWhiteSpace(value))
+-            {
+-                throw new ArgumentException("Declared scope is required.", "declaredScope");
+-            }
+-
+-            _declaredScope = value;
+-        }
+-    }
+-
+-    /// <summary>
+-    /// Gets the target tenant reference, or null for cross-tenant.
+-    /// </summary>
+-    public string? TargetTenantRef { get; init; }
+-
+-    /// <summary>
+-    /// Gets the timestamp when break-glass was declared (UTC).
+-    /// </summary>
+-    public required DateTimeOffset Timestamp
+-    {
+-        get => _timestamp;
+-        init
+-        {
+-            if (value.Offset != TimeSpan.Zero)
+-            {
+-                throw new ArgumentException("Break-glass timestamp must be UTC.", "timestamp");
+-            }
+-
+-            _timestamp = value;
+-        }
+-    }
+-}
++using System.Diagnostics.CodeAnalysis;
++
++namespace TenantSaas.Abstractions.BreakGlass;
++
++/// <summary>
++/// Represents an explicit break-glass declaration for privileged operations.
++/// </summary>
++/// <remarks>
++/// Break-glass must always be explicit and never implicit or default.
++/// Missing or incomplete declarations result in refusal.
++/// </remarks>
++public sealed record BreakGlassDeclaration
++{
++    /// <summary>
++    /// Creates a break-glass declaration with required details.
++    /// </summary>
++    [SetsRequiredMembers]
++    public BreakGlassDeclaration(
++        string actorId,
++        string reason,
++        string declaredScope,
++        string? targetTenantRef,
++        DateTimeOffset timestamp)
++    {
++        ActorId = actorId;
++        Reason = reason;
++        DeclaredScope = declaredScope;
++        TargetTenantRef = targetTenantRef;
++        Timestamp = timestamp;
++    }
++
++    /// <summary>
++    /// Gets the actor identity invoking break-glass.
++    /// </summary>
++    public required string ActorId
++    {
++        get => field;
++        init
++        {
++            ArgumentException.ThrowIfNullOrWhiteSpace(value, "actorId");
++            field = value;
++        }
++    }
++
++    /// <summary>
++    /// Gets the justification for the escalation.
++    /// </summary>
++    public required string Reason
++    {
++        get => field;
++        init
++        {
++            ArgumentException.ThrowIfNullOrWhiteSpace(value, "reason");
++            field = value;
++        }
++    }
++
++    /// <summary>
++    /// Gets the scope being claimed.
++    /// </summary>
++    public required string DeclaredScope
++    {
++        get => field;
++        init
++        {
++            ArgumentException.ThrowIfNullOrWhiteSpace(value, "declaredScope");
++            field = value;
++        }
++    }
++
++    /// <summary>
++    /// Gets the target tenant reference, or null for cross-tenant.
++    /// </summary>
++    public string? TargetTenantRef { get; init; }
++
++    /// <summary>
++    /// Gets the timestamp when break-glass was declared (UTC).
++    /// </summary>
++    public required DateTimeOffset Timestamp
++    {
++        get => field;
++        init
++        {
++            if (value.Offset != TimeSpan.Zero)
++            {
++                throw new ArgumentException("Break-glass timestamp must be UTC.", "timestamp");
++            }
++
++            field = value;
++        }
++    }
++}
+*** End Patch
+2026-02-01T23:36:38.383088Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: TenantSaas.Abstractions/BreakGlass/BreakGlassAuditEvent.cs
+@@
+-using System.Diagnostics.CodeAnalysis;
+-using System.Text.Json.Serialization;
+-using TenantSaas.Abstractions.TrustContract;
+-
+-namespace TenantSaas.Abstractions.BreakGlass;
+-
+-/// <summary>
+-/// Represents a standard audit event emitted when break-glass is exercised.
+-/// </summary>
+-public sealed record BreakGlassAuditEvent
+-{
+-    private string _actor = string.Empty;
+-    private string _reason = string.Empty;
+-    private string _scope = string.Empty;
+-    private string _tenantRef = string.Empty;
+-    private string _traceId = string.Empty;
+-    private string _auditCode = string.Empty;
+-    private DateTimeOffset _timestamp = DateTimeOffset.UtcNow;
+-
+-    /// <summary>
+-    /// Creates a break-glass audit event.
+-    /// </summary>
+-    [SetsRequiredMembers]
+-    public BreakGlassAuditEvent(
+-        string actor,
+-        string reason,
+-        string scope,
+-        string tenantRef,
+-        string traceId,
+-        string auditCode,
+-        string? invariantCode,
+-        DateTimeOffset timestamp,
+-        string? operationName)
+-    {
+-        Actor = actor;
+-        Reason = reason;
+-        Scope = scope;
+-        TenantRef = tenantRef;
+-        TraceId = traceId;
+-        AuditCode = auditCode;
+-        InvariantCode = invariantCode;
+-        Timestamp = timestamp;
+-        OperationName = operationName;
+-    }
+-
+-    /// <summary>
+-    /// Gets the actor identity.
+-    /// </summary>
+-    [JsonPropertyName("actor")]
+-    public required string Actor
+-    {
+-        get => _actor;
+-        init
+-        {
+-            if (string.IsNullOrWhiteSpace(value))
+-            {
+-                throw new ArgumentException("Actor identity is required.", "actor");
+-            }
+-
+-            _actor = value;
+-        }
+-    }
+-
+-    /// <summary>
+-    /// Gets the reason for escalation.
+-    /// </summary>
+-    [JsonPropertyName("reason")]
+-    public required string Reason
+-    {
+-        get => _reason;
+-        init
+-        {
+-            if (string.IsNullOrWhiteSpace(value))
+-            {
+-                throw new ArgumentException("Break-glass reason is required.", "reason");
+-            }
+-
+-            _reason = value;
+-        }
+-    }
+-
+-    /// <summary>
+-    /// Gets the declared scope.
+-    /// </summary>
+-    [JsonPropertyName("scope")]
+-    public required string Scope
+-    {
+-        get => _scope;
+-        init
+-        {
+-            if (string.IsNullOrWhiteSpace(value))
+-            {
+-                throw new ArgumentException("Declared scope is required.", "scope");
+-            }
+-
+-            _scope = value;
+-        }
+-    }
+-
+-    /// <summary>
+-    /// Gets the tenant reference or cross-tenant marker.
+-    /// </summary>
+-    [JsonPropertyName("tenantRef")]
+-    public required string TenantRef
+-    {
+-        get => _tenantRef;
+-        init
+-        {
+-            if (string.IsNullOrWhiteSpace(value))
+-            {
+-                throw new ArgumentException("Tenant reference is required.", "tenantRef");
+-            }
+-
+-            _tenantRef = value;
+-        }
+-    }
+-
+-    /// <summary>
+-    /// Gets the correlation trace identifier.
+-    /// </summary>
+-    [JsonPropertyName("traceId")]
+-    public required string TraceId
+-    {
+-        get => _traceId;
+-        init
+-        {
+-            if (string.IsNullOrWhiteSpace(value))
+-            {
+-                throw new ArgumentException("Trace identifier is required.", "traceId");
+-            }
+-
+-            _traceId = value;
+-        }
+-    }
+-
+-    /// <summary>
+-    /// Gets the stable audit event type code.
+-    /// </summary>
+-    [JsonPropertyName("auditCode")]
+-    public required string AuditCode
+-    {
+-        get => _auditCode;
+-        init
+-        {
+-            if (string.IsNullOrWhiteSpace(value))
+-            {
+-                throw new ArgumentException("Audit code is required.", "auditCode");
+-            }
+-
+-            _auditCode = value;
+-        }
+-    }
+-
+-    /// <summary>
+-    /// Gets the invariant being bypassed, if applicable.
+-    /// </summary>
+-    [JsonPropertyName("invariantCode")]
+-    public string? InvariantCode { get; init; }
+-
+-    /// <summary>
+-    /// Gets the event timestamp (UTC).
+-    /// </summary>
+-    [JsonPropertyName("timestamp")]
+-    public required DateTimeOffset Timestamp
+-    {
+-        get => _timestamp;
+-        init
+-        {
+-            if (value.Offset != TimeSpan.Zero)
+-            {
+-                throw new ArgumentException("Break-glass audit event timestamp must be UTC.", "timestamp");
+-            }
+-
+-            _timestamp = value;
+-        }
+-    }
+-
+-    /// <summary>
+-    /// Gets the operation being performed, if applicable.
+-    /// </summary>
+-    [JsonPropertyName("operationName")]
+-    public string? OperationName { get; init; }
+-
+-    /// <summary>
+-    /// Creates an audit event from a break-glass declaration.
+-    /// </summary>
+-    public static BreakGlassAuditEvent Create(BreakGlassDeclaration declaration, string traceId)
+-    {
+-        ArgumentNullException.ThrowIfNull(declaration);
+-
+-        if (string.IsNullOrWhiteSpace(traceId))
+-        {
+-            throw new ArgumentException("Trace identifier is required.", nameof(traceId));
+-        }
+-
+-        var tenantRef = string.IsNullOrWhiteSpace(declaration.TargetTenantRef)
+-            ? TrustContractV1.BreakGlassMarkerCrossTenant
+-            : declaration.TargetTenantRef;
+-
+-        return new BreakGlassAuditEvent(
+-            actor: declaration.ActorId,
+-            reason: declaration.Reason,
+-            scope: declaration.DeclaredScope,
+-            tenantRef: tenantRef,
+-            traceId: traceId,
+-            auditCode: global::TenantSaas.Abstractions.BreakGlass.AuditCode.BreakGlassInvoked,
+-            invariantCode: null,
+-            timestamp: DateTimeOffset.UtcNow,
+-            operationName: null);
+-    }
+-}
++using System.Diagnostics.CodeAnalysis;
++using System.Text.Json.Serialization;
++using TenantSaas.Abstractions.TrustContract;
++
++namespace TenantSaas.Abstractions.BreakGlass;
++
++/// <summary>
++/// Represents a standard audit event emitted when break-glass is exercised.
++/// </summary>
++public sealed record BreakGlassAuditEvent
++{
++    /// <summary>
++    /// Creates a break-glass audit event.
++    /// </summary>
++    [SetsRequiredMembers]
++    public BreakGlassAuditEvent(
++        string actor,
++        string reason,
++        string scope,
++        string tenantRef,
++        string traceId,
++        string auditCode,
++        string? invariantCode,
++        DateTimeOffset timestamp,
++        string? operationName)
++    {
++        Actor = actor;
++        Reason = reason;
++        Scope = scope;
++        TenantRef = tenantRef;
++        TraceId = traceId;
++        AuditCode = auditCode;
++        InvariantCode = invariantCode;
++        Timestamp = timestamp;
++        OperationName = operationName;
++    }
++
++    /// <summary>
++    /// Gets the actor identity.
++    /// </summary>
++    [JsonPropertyName("actor")]
++    public required string Actor
++    {
++        get => field;
++        init
++        {
++            ArgumentException.ThrowIfNullOrWhiteSpace(value, "actor");
++            field = value;
++        }
++    }
++
++    /// <summary>
++    /// Gets the reason for escalation.
++    /// </summary>
++    [JsonPropertyName("reason")]
++    public required string Reason
++    {
++        get => field;
++        init
++        {
++            ArgumentException.ThrowIfNullOrWhiteSpace(value, "reason");
++            field = value;
++        }
++    }
++
++    /// <summary>
++    /// Gets the declared scope.
++    /// </summary>
++    [JsonPropertyName("scope")]
++    public required string Scope
++    {
++        get => field;
++        init
++        {
++            ArgumentException.ThrowIfNullOrWhiteSpace(value, "scope");
++            field = value;
++        }
++    }
++
++    /// <summary>
++    /// Gets the tenant reference or cross-tenant marker.
++    /// </summary>
++    [JsonPropertyName("tenantRef")]
++    public required string TenantRef
++    {
++        get => field;
++        init
++        {
++            ArgumentException.ThrowIfNullOrWhiteSpace(value, "tenantRef");
++            field = value;
++        }
++    }
++
++    /// <summary>
++    /// Gets the correlation trace identifier.
++    /// </summary>
++    [JsonPropertyName("traceId")]
++    public required string TraceId
++    {
++        get => field;
++        init
++        {
++            ArgumentException.ThrowIfNullOrWhiteSpace(value, "traceId");
++            field = value;
++        }
++    }
++
++    /// <summary>
++    /// Gets the stable audit event type code.
++    /// </summary>
++    [JsonPropertyName("auditCode")]
++    public required string AuditCode
++    {
++        get => field;
++        init
++        {
++            ArgumentException.ThrowIfNullOrWhiteSpace(value, "auditCode");
++            field = value;
++        }
++    }
++
++    /// <summary>
++    /// Gets the invariant being bypassed, if applicable.
++    /// </summary>
++    [JsonPropertyName("invariantCode")]
++    public string? InvariantCode { get; init; }
++
++    /// <summary>
++    /// Gets the event timestamp (UTC).
++    /// </summary>
++    [JsonPropertyName("timestamp")]
++    public required DateTimeOffset Timestamp
++    {
++        get => field;
++        init
++        {
++            if (value.Offset != TimeSpan.Zero)
++            {
++                throw new ArgumentException("Break-glass audit event timestamp must be UTC.", "timestamp");
++            }
++
++            field = value;
++        }
++    }
++
++    /// <summary>
++    /// Gets the operation being performed, if applicable.
++    /// </summary>
++    [JsonPropertyName("operationName")]
++    public string? OperationName { get; init; }
++
++    /// <summary>
++    /// Creates an audit event from a break-glass declaration.
++    /// </summary>
++    public static BreakGlassAuditEvent Create(BreakGlassDeclaration declaration, string traceId)
++    {
++        ArgumentNullException.ThrowIfNull(declaration);
++        ArgumentException.ThrowIfNullOrWhiteSpace(traceId);
++
++        var tenantRef = string.IsNullOrWhiteSpace(declaration.TargetTenantRef)
++            ? TrustContractV1.BreakGlassMarkerCrossTenant
++            : declaration.TargetTenantRef;
++
++        return new BreakGlassAuditEvent(
++            actor: declaration.ActorId,
++            reason: declaration.Reason,
++            scope: declaration.DeclaredScope,
++            tenantRef: tenantRef,
++            traceId: traceId,
++            auditCode: global::TenantSaas.Abstractions.BreakGlass.AuditCode.BreakGlassInvoked,
++            invariantCode: null,
++            timestamp: DateTimeOffset.UtcNow,
++            operationName: null);
++    }
++}
+*** End Patch
+2026-02-01T23:36:48.776703Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: TenantSaas.Abstractions/BreakGlass/BreakGlassValidationResult.cs
+@@
+-namespace TenantSaas.Abstractions.BreakGlass;
+-
+-/// <summary>
+-/// Represents the result of break-glass declaration validation.
+-/// </summary>
+-public sealed record BreakGlassValidationResult(
+-    bool IsValid,
+-    string? InvariantCode,
+-    string? Reason)
+-{
+-    /// <summary>
+-    /// Creates a valid break-glass validation result.
+-    /// </summary>
+-    public static BreakGlassValidationResult Valid()
+-        => new(true, null, null);
+-
+-    /// <summary>
+-    /// Creates an invalid break-glass validation result.
+-    /// </summary>
+-    public static BreakGlassValidationResult Invalid(string invariantCode, string reason)
+-    {
+-        if (string.IsNullOrWhiteSpace(invariantCode))
+-        {
+-            throw new ArgumentException("Invariant code is required.", nameof(invariantCode));
+-        }
+-
+-        if (string.IsNullOrWhiteSpace(reason))
+-        {
+-            throw new ArgumentException("Reason is required.", nameof(reason));
+-        }
+-
+-        return new BreakGlassValidationResult(false, invariantCode, reason);
+-    }
+-}
++namespace TenantSaas.Abstractions.BreakGlass;
++
++/// <summary>
++/// Represents the result of break-glass declaration validation.
++/// </summary>
++public sealed record BreakGlassValidationResult(
++    bool IsValid,
++    string? InvariantCode,
++    string? Reason)
++{
++    /// <summary>
++    /// Creates a valid break-glass validation result.
++    /// </summary>
++    public static BreakGlassValidationResult Valid() => new(true, null, null);
++
++    /// <summary>
++    /// Creates an invalid break-glass validation result.
++    /// </summary>
++    public static BreakGlassValidationResult Invalid(string invariantCode, string reason)
++    {
++        ArgumentException.ThrowIfNullOrWhiteSpace(invariantCode, nameof(invariantCode));
++        ArgumentException.ThrowIfNullOrWhiteSpace(reason, nameof(reason));
++
++        return new BreakGlassValidationResult(false, invariantCode, reason);
++    }
++}
+*** End Patch
+2026-02-01T23:41:59.960427Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: TenantSaas.ContractTests/BreakGlassContractTests.cs
+@@
+-        var properties = typeof(BreakGlassAuditEvent)
+-            .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+-            .Select(property => property.Name)
+-            .OrderBy(name => name)
+-            .ToArray();
+-
+-        properties.Should().Equal(
+-            "Actor",
+-            "AuditCode",
+-            "InvariantCode",
+-            "OperationName",
+-            "Reason",
+-            "Scope",
+-            "TenantRef",
+-            "Timestamp",
+-            "TraceId");
++        string[] properties =
++        [
++            .. typeof(BreakGlassAuditEvent)
++                .GetProperties(BindingFlags.Instance | BindingFlags.Public)
++                .Select(property => property.Name)
++                .OrderBy(name => name)
++        ];
++
++        properties.Should().Equal(
++            "Actor",
++            "AuditCode",
++            "InvariantCode",
++            "OperationName",
++            "Reason",
++            "Scope",
++            "TenantRef",
++            "Timestamp",
++            "TraceId");
+@@
+-    private static BreakGlassDeclaration CreateDeclaration(string? targetTenantRef)
+-        => new(
++    private static BreakGlassDeclaration CreateDeclaration(string? targetTenantRef)
++        => new(
+             actorId: "admin@example.com",
+             reason: "Emergency access",
+             declaredScope: TrustContractV1.ScopeSharedSystem,
+             targetTenantRef: targetTenantRef,
+             timestamp: DateTimeOffset.UtcNow);
+*** End Patch
+2026-02-01T23:45:58.653357Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: TenantSaas.Abstractions/BreakGlass/BreakGlassDeclaration.cs
+@@
+-            ArgumentException.ThrowIfNullOrWhiteSpace(value, "actorId");
++            ArgumentException.ThrowIfNullOrWhiteSpace(value, nameof(ActorId));
+@@
+-            ArgumentException.ThrowIfNullOrWhiteSpace(value, "reason");
++            ArgumentException.ThrowIfNullOrWhiteSpace(value, nameof(Reason));
+@@
+-            ArgumentException.ThrowIfNullOrWhiteSpace(value, "declaredScope");
++            ArgumentException.ThrowIfNullOrWhiteSpace(value, nameof(DeclaredScope));
+@@
+-                throw new ArgumentException("Break-glass timestamp must be UTC.", "timestamp");
++                throw new ArgumentException("Break-glass timestamp must be UTC.", nameof(Timestamp));
+*** End Patch
+2026-02-01T23:46:05.719599Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: TenantSaas.Abstractions/BreakGlass/BreakGlassAuditEvent.cs
+@@
+-            ArgumentException.ThrowIfNullOrWhiteSpace(value, "actor");
++            ArgumentException.ThrowIfNullOrWhiteSpace(value, nameof(Actor));
+@@
+-            ArgumentException.ThrowIfNullOrWhiteSpace(value, "reason");
++            ArgumentException.ThrowIfNullOrWhiteSpace(value, nameof(Reason));
+@@
+-            ArgumentException.ThrowIfNullOrWhiteSpace(value, "scope");
++            ArgumentException.ThrowIfNullOrWhiteSpace(value, nameof(Scope));
+@@
+-            ArgumentException.ThrowIfNullOrWhiteSpace(value, "tenantRef");
++            ArgumentException.ThrowIfNullOrWhiteSpace(value, nameof(TenantRef));
+@@
+-            ArgumentException.ThrowIfNullOrWhiteSpace(value, "traceId");
++            ArgumentException.ThrowIfNullOrWhiteSpace(value, nameof(TraceId));
+@@
+-            ArgumentException.ThrowIfNullOrWhiteSpace(value, "auditCode");
++            ArgumentException.ThrowIfNullOrWhiteSpace(value, nameof(AuditCode));
+@@
+-                throw new ArgumentException("Break-glass audit event timestamp must be UTC.", "timestamp");
++                throw new ArgumentException("Break-glass audit event timestamp must be UTC.", nameof(Timestamp));
+*** End Patch
+2026-02-01T23:46:34.186493Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"rg -n \"ThrowIfNullOrWhiteSpace\\(value, \\\"|new ArgumentException\\(.*\\\"[a-zA-Z]+\\\"\\)\" TenantSaas.Abstractions/BreakGlass","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:46:39.621989Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"rg -n \"ArgumentException\\(.*\\, \\\"\" TenantSaas.Abstractions/BreakGlass TenantSaas.Abstractions/TrustContract TenantSaas.ContractTests","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-01T23:46:47.362930Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"dotnet test TenantSaas.sln --disable-build-servers -v minimal","workdir":"/home/vlad/Source/TenantSaas","timeout_ms":120000,"sandbox_permissions":"require_escalated","justification":"Running full test suite for the solution after code fixes."}
+2026-02-01T23:55:46.994872Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: TenantSaas.ContractTests/BreakGlassContractTests.cs
+@@
+-        act.Should().Throw<ArgumentException>()
+-            .WithParameterName("actorId");
++        act.Should().Throw<ArgumentException>()
++            .WithParameterName("ActorId");
+@@
+-        act.Should().Throw<ArgumentException>()
+-            .WithParameterName("reason");
++        act.Should().Throw<ArgumentException>()
++            .WithParameterName("Reason");
+@@
+-        act.Should().Throw<ArgumentException>()
+-            .WithParameterName("declaredScope");
++        act.Should().Throw<ArgumentException>()
++            .WithParameterName("DeclaredScope");
+*** End Patch
+2026-02-01T23:55:51.317979Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"dotnet test TenantSaas.sln --disable-build-servers -v minimal","workdir":"/home/vlad/Source/TenantSaas","timeout_ms":120000,"sandbox_permissions":"require_escalated","justification":"Re-running full test suite after fixing parameter-name assertions."}
+2026-02-02T00:09:05.653966Z  INFO codex_core::rollout::recorder: Resuming rollout from "/home/vlad/Source/TenantSaas/.codex/sessions/2026/02/01/rollout-2026-02-01T15-12-10-019c1b7a-5e44-7a81-bf3f-4496be93cc22.jsonl"
+2026-02-02T00:09:05.661135Z  INFO codex_core::rollout::recorder: Resumed rollout with 584 items, thread ID: Some(ThreadId { uuid: 019c1b7a-5e44-7a81-bf3f-4496be93cc22 })
+2026-02-02T00:09:05.661154Z  INFO codex_core::rollout::recorder: Resumed rollout successfully from "/home/vlad/Source/TenantSaas/.codex/sessions/2026/02/01/rollout-2026-02-01T15-12-10-019c1b7a-5e44-7a81-bf3f-4496be93cc22.jsonl"

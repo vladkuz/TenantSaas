@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using TenantSaas.Abstractions.BreakGlass;
 using TenantSaas.Abstractions.Invariants;
 
 namespace TenantSaas.Abstractions.TrustContract;
@@ -27,6 +28,16 @@ public static class TrustContractV1
     /// Explicit no-tenant operations.
     /// </summary>
     public const string ScopeNoTenant = "no-tenant";
+
+    /// <summary>
+    /// Cross-tenant marker for break-glass audit events.
+    /// </summary>
+    public const string BreakGlassMarkerCrossTenant = "cross_tenant";
+
+    /// <summary>
+    /// Privileged operation marker for break-glass declarations.
+    /// </summary>
+    public const string BreakGlassMarkerPrivileged = "privileged";
 
     /// <summary>
     /// HTTP or API request flow.
@@ -202,6 +213,15 @@ public static class TrustContractV1
 
         return new TrustContractValidationResult(missingScopes, missingExecutionKinds);
     }
+
+    /// <summary>
+    /// Validates a break-glass declaration for privileged operations.
+    /// </summary>
+    /// <remarks>
+    /// Break-glass is never implicit or default; privileged flows must provide a declaration.
+    /// </remarks>
+    public static BreakGlassValidationResult ValidateBreakGlassDeclaration(BreakGlassDeclaration? declaration)
+        => BreakGlassValidator.Validate(declaration);
 
     /// <summary>
     /// Gets an invariant definition by code.
