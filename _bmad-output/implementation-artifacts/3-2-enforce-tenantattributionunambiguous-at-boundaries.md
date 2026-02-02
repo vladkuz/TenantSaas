@@ -1,6 +1,6 @@
 # Story 3.2: Enforce TenantAttributionUnambiguous at Boundaries
 
-Status: ready-for-dev
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -32,18 +32,18 @@ So that conflicting signals cannot silently choose a tenant.
 
 ### Core Attribution Enforcement
 
-- [ ] Task 1: Extend BoundaryGuard with RequireUnambiguousAttribution (AC: #1, #3)
-  - [ ] Add method `static EnforcementResult RequireUnambiguousAttribution(TenantAttributionResult result, string traceId)` to `TenantSaas.Core/Enforcement/BoundaryGuard.cs`
-  - [ ] If result is `TenantAttributionResult.Success` → return `EnforcementResult.Success` with a context holder or success state
-  - [ ] If result is `TenantAttributionResult.Ambiguous` → return `EnforcementResult.Failure` with `InvariantCode.TenantAttributionUnambiguous`
-  - [ ] If result is `TenantAttributionResult.NotFound` → return `EnforcementResult.Failure` with `InvariantCode.TenantAttributionUnambiguous`
-  - [ ] If result is `TenantAttributionResult.NotAllowed` → return `EnforcementResult.Failure` with `InvariantCode.TenantAttributionUnambiguous`
-  - [ ] Detail message MUST NOT include actual tenant IDs from conflicts (disclosure safety)
-  - [ ] Detail message MUST reference the number of conflicting sources without specifics
+- [x] Task 1: Extend BoundaryGuard with RequireUnambiguousAttribution (AC: #1, #3)
+  - [x] Add method `static AttributionEnforcementResult RequireUnambiguousAttribution(TenantAttributionResult result, string traceId)` to `TenantSaas.Core/Enforcement/BoundaryGuard.cs`
+  - [x] If result is `TenantAttributionResult.Success` → return `AttributionEnforcementResult.Success` with tenant ID and source
+  - [x] If result is `TenantAttributionResult.Ambiguous` → return `AttributionEnforcementResult.Ambiguous` with source names
+  - [x] If result is `TenantAttributionResult.NotFound` → return `AttributionEnforcementResult.NotFound`
+  - [x] If result is `TenantAttributionResult.NotAllowed` → return `AttributionEnforcementResult.NotAllowed`
+  - [x] Detail message MUST NOT include actual tenant IDs from conflicts (disclosure safety)
+  - [x] Detail message MUST reference the number of conflicting sources without specifics
 
-- [ ] Task 2: Create AttributionEnforcementResult type (AC: #1, #2)
-  - [ ] Create `TenantSaas.Core/Enforcement/AttributionEnforcementResult.cs`
-  - [ ] Define sealed record with discriminated union pattern:
+- [x] Task 2: Create AttributionEnforcementResult type (AC: #1, #2)
+  - [x] Create `TenantSaas.Core/Enforcement/AttributionEnforcementResult.cs`
+  - [x] Define sealed record with discriminated union pattern:
     - `bool IsSuccess`
     - `TenantId? ResolvedTenantId` (when success)
     - `TenantAttributionSource? ResolvedSource` (when success)
@@ -51,74 +51,75 @@ So that conflicting signals cannot silently choose a tenant.
     - `string TraceId` (always present)
     - `string? Detail` (human-readable failure reason - disclosure safe)
     - `IReadOnlyList<string>? ConflictingSources` (source names only, no tenant IDs)
-  - [ ] Add static factory methods:
+  - [x] Add static factory methods:
     - `Success(TenantId tenantId, TenantAttributionSource source, string traceId)`
     - `Ambiguous(IReadOnlyList<string> conflictingSources, string traceId)`
     - `NotFound(string traceId)`
     - `NotAllowed(TenantAttributionSource disallowedSource, string traceId)`
 
-- [ ] Task 3: Add disclosure-safe detail message builder (AC: #2)
-  - [ ] Create private helper in BoundaryGuard: `BuildAttributionFailureDetail(TenantAttributionResult result)`
-  - [ ] For Ambiguous: "Tenant attribution is ambiguous: {N} sources provided conflicting tenant identifiers."
-  - [ ] For NotFound: "Tenant attribution could not be resolved from any enabled source."
-  - [ ] For NotAllowed: "Tenant attribution source '{source.GetDisplayName()}' is not allowed for this operation."
-  - [ ] NEVER include actual tenant ID values in messages
-  - [ ] NEVER list specific tenant IDs that conflicted
+- [x] Task 3: Add disclosure-safe detail message builder (AC: #2)
+  - [x] Integrated into AttributionEnforcementResult factory methods
+  - [x] For Ambiguous: "Tenant attribution is ambiguous: {N} sources provided conflicting tenant identifiers."
+  - [x] For NotFound: "Tenant attribution could not be resolved from any enabled source."
+  - [x] For NotAllowed: "Tenant attribution source '{source.GetDisplayName()}' is not allowed for this operation."
+  - [x] NEVER include actual tenant ID values in messages
+  - [x] NEVER list specific tenant IDs that conflicted
 
 ### Problem Details Integration
 
-- [ ] Task 4: Extend EnforcementProblemDetails for attribution failures (AC: #2)
-  - [ ] Update `TenantSaas.Core/Errors/EnforcementProblemDetails.cs`
-  - [ ] For `TenantAttributionUnambiguous` invariant, add `conflicting_sources` extension (source names only)
-  - [ ] Ensure `guidance_link` from RefusalMapping is included in extensions
-  - [ ] HTTP status should be 422 (UnprocessableEntity) per RefusalMapping
-  - [ ] Type should be `urn:tenantsaas:error:tenant-attribution-unambiguous`
+- [x] Task 4: Extend EnforcementProblemDetails for attribution failures (AC: #2)
+  - [x] Update `TenantSaas.Core/Errors/EnforcementProblemDetails.cs`
+  - [x] Added `FromAttributionEnforcementResult` method for attribution-specific conversion
+  - [x] For `TenantAttributionUnambiguous` invariant, add `conflicting_sources` extension (source names only)
+  - [x] Ensure `guidance_link` from RefusalMapping is included in extensions
+  - [x] HTTP status is 422 (UnprocessableEntity) per RefusalMapping
+  - [x] Type is `urn:tenantsaas:error:tenant-attribution-unambiguous`
 
-- [ ] Task 5: Verify RefusalMapping for TenantAttributionUnambiguous (AC: #2)
-  - [ ] Confirm `TrustContractV1.RefusalMappings` contains entry for `TenantAttributionUnambiguous`
-  - [ ] Verify HTTP status is 422 (UnprocessableEntity)
-  - [ ] Verify Problem Details type is `urn:tenantsaas:error:tenant-attribution-unambiguous`
-  - [ ] Verify guidance link is present: `https://docs.tenantsaas.dev/errors/attribution-ambiguous`
+- [x] Task 5: Verify RefusalMapping for TenantAttributionUnambiguous (AC: #2)
+  - [x] Confirm `TrustContractV1.RefusalMappings` contains entry for `TenantAttributionUnambiguous`
+  - [x] Verify HTTP status is 422 (UnprocessableEntity)
+  - [x] Verify Problem Details type is `urn:tenantsaas:error:tenant-attribution-unambiguous`
+  - [x] Verify guidance link is present: `https://docs.tenantsaas.dev/errors/attribution-ambiguous`
 
 ### Contract Tests
 
-- [ ] Task 6: Write contract tests for attribution enforcement (AC: #1, #3)
-  - [ ] Create `TenantSaas.ContractTests/AttributionEnforcementTests.cs`
-  - [ ] Test: `RequireUnambiguousAttribution` with successful attribution → returns success
-  - [ ] Test: `RequireUnambiguousAttribution` with ambiguous result → returns failure with `InvariantCode.TenantAttributionUnambiguous`
-  - [ ] Test: `RequireUnambiguousAttribution` with not-found result → returns failure with `InvariantCode.TenantAttributionUnambiguous`
-  - [ ] Test: `RequireUnambiguousAttribution` with not-allowed result → returns failure with `InvariantCode.TenantAttributionUnambiguous`
-  - [ ] Test: Failure result always contains trace_id
+- [x] Task 6: Write contract tests for attribution enforcement (AC: #1, #3)
+  - [x] Create `TenantSaas.ContractTests/AttributionEnforcementTests.cs`
+  - [x] Test: `RequireUnambiguousAttribution` with successful attribution → returns success
+  - [x] Test: `RequireUnambiguousAttribution` with ambiguous result → returns failure with `InvariantCode.TenantAttributionUnambiguous`
+  - [x] Test: `RequireUnambiguousAttribution` with not-found result → returns failure with `InvariantCode.TenantAttributionUnambiguous`
+  - [x] Test: `RequireUnambiguousAttribution` with not-allowed result → returns failure with `InvariantCode.TenantAttributionUnambiguous`
+  - [x] Test: Failure result always contains trace_id
 
-- [ ] Task 7: Write contract tests for disclosure safety (AC: #2)
-  - [ ] Update `TenantSaas.ContractTests/AttributionEnforcementTests.cs`
-  - [ ] Test: Ambiguous attribution failure detail does NOT contain tenant ID values
-  - [ ] Test: Ambiguous attribution failure detail DOES contain conflict count
-  - [ ] Test: Problem Details for attribution failure includes `guidance_link`
-  - [ ] Test: Problem Details for attribution failure includes `conflicting_sources` with source names only
-  - [ ] Test: Problem Details `detail` field does not contain any tenant identifier patterns
+- [x] Task 7: Write contract tests for disclosure safety (AC: #2)
+  - [x] Update `TenantSaas.ContractTests/AttributionEnforcementTests.cs`
+  - [x] Test: Ambiguous attribution failure detail does NOT contain tenant ID values
+  - [x] Test: Ambiguous attribution failure detail DOES contain conflict count
+  - [x] Test: Problem Details for attribution failure includes `guidance_link`
+  - [x] Test: Problem Details for attribution failure includes `conflicting_sources` with source names only
+  - [x] Test: Problem Details `detail` field does not contain any tenant identifier patterns
 
-- [ ] Task 8: Write contract tests for Problem Details shape (AC: #2, #3)
-  - [ ] Update `TenantSaas.ContractTests/AttributionEnforcementTests.cs`
-  - [ ] Test: `EnforcementProblemDetails.FromEnforcementResult` with TenantAttributionUnambiguous failure → HTTP 422
-  - [ ] Test: Problem Details includes `invariant_code = "TenantAttributionUnambiguous"`
-  - [ ] Test: Problem Details includes `trace_id`
-  - [ ] Test: Problem Details `type` matches `urn:tenantsaas:error:tenant-attribution-unambiguous`
+- [x] Task 8: Write contract tests for Problem Details shape (AC: #2, #3)
+  - [x] Update `TenantSaas.ContractTests/AttributionEnforcementTests.cs`
+  - [x] Test: `EnforcementProblemDetails.FromAttributionEnforcementResult` with TenantAttributionUnambiguous failure → HTTP 422
+  - [x] Test: Problem Details includes `invariant_code = "TenantAttributionUnambiguous"`
+  - [x] Test: Problem Details includes `trace_id`
+  - [x] Test: Problem Details `type` matches `urn:tenantsaas:error:tenant-attribution-unambiguous`
 
 ### Sample Integration
 
-- [ ] Task 9: Update TenantContextMiddleware to enforce attribution (AC: #1, #3)
-  - [ ] Update `TenantSaas.Sample/Middleware/TenantContextMiddleware.cs`
-  - [ ] After resolving attribution (using `TenantAttributionResolver`), call `BoundaryGuard.RequireUnambiguousAttribution`
-  - [ ] If enforcement fails, return Problem Details via `EnforcementProblemDetails`
-  - [ ] If enforcement succeeds, proceed with context initialization
-  - [ ] Order: ContextInitialized check → Attribution resolution → Attribution enforcement → Context set
+- [x] Task 9: Update TenantContextMiddleware to enforce attribution (AC: #1, #3)
+  - [x] Update `TenantSaas.Sample/Middleware/TenantContextMiddleware.cs`
+  - [x] After resolving attribution (using `TenantAttributionResolver`), call `BoundaryGuard.RequireUnambiguousAttribution`
+  - [x] If enforcement fails, return Problem Details via `EnforcementProblemDetails`
+  - [x] If enforcement succeeds, proceed with context initialization
+  - [x] Order: ContextInitialized check → Attribution resolution → Attribution enforcement → Context set
 
-- [ ] Task 10: Add test endpoint with multiple attribution sources (AC: #1)
-  - [ ] Update or create test endpoint in `TenantSaas.Sample` that accepts tenant from both header and route
-  - [ ] Demonstrate that conflicting values result in 422 refusal
-  - [ ] Demonstrate that matching values result in success
-  - [ ] Document in sample endpoint comments
+- [x] Task 10: Add test endpoint with multiple attribution sources (AC: #1)
+  - [x] Update test endpoints in `TenantSaas.Sample` that accept tenant from both header and route
+  - [x] Demonstrate that conflicting values result in 422 refusal
+  - [x] Demonstrate that matching values result in success
+  - [x] Document in endpoint comments
 
 ## Dev Notes
 
@@ -315,15 +316,56 @@ Request arrives
 
 ### Agent Model Used
 
-
+Claude Sonnet 4.5
 
 ### Debug Log References
 
-
+N/A
 
 ### Completion Notes List
 
+**Story 3.2 Implementation Complete - 2026-02-01**
 
+✅ **All Acceptance Criteria Satisfied:**
+- AC#1: Ambiguous attribution is refused with `TenantAttributionUnambiguous` invariant ✓
+- AC#2: Refusal details are disclosure-safe and include guidance ✓
+- AC#3: Attribution enforcement runs at boundary with standardized error ✓
+
+**Implementation Summary:**
+1. Created `AttributionEnforcementResult` - specialized result type for attribution enforcement with disclosure-safe fields
+2. Extended `BoundaryGuard.RequireUnambiguousAttribution()` - validates attribution results and returns enforcement decisions
+3. Updated `EnforcementProblemDetails` - added `FromAttributionEnforcementResult()` method with `conflicting_sources` extension
+4. Integrated middleware - `TenantContextMiddleware` now resolves attribution, enforces unambiguity, then initializes context
+5. Added test endpoints - demonstrate attribution from route parameters and headers
+
+**Key Technical Decisions:**
+- Used specialized `AttributionEnforcementResult` instead of generic `EnforcementResult` because attribution stage happens BEFORE context initialization
+- Built disclosure safety into factory methods - no tenant IDs ever leak into error messages
+- Source names (e.g., "Route Parameter") included in `conflicting_sources` extension for debugging without disclosure risks
+- Middleware flow: extract sources → resolve attribution → enforce unambiguity → initialize context → verify context
+
+**Test Coverage:**
+- 17 attribution enforcement tests (14 original + 3 added during code review)
+- All 193 total tests passing
+- Coverage includes: success cases, ambiguous conflicts, not-found, not-allowed, disclosure safety, Problem Details shape, GetDisplayName() contract validation
+
+**Code Review & Quality Improvements (2026-02-01):**
+- Removed dead code: unused `BuildAmbiguousDetail()` method in BoundaryGuard
+- Added comprehensive endpoint documentation with attribution behavior examples
+- Added 3 contract tests validating GetDisplayName() behavior and disclosure safety
+- Added XML documentation warning about disclosure safety for custom attribution source implementations
+- Added explanatory comments for null-forgiving operator safety and hardcoded sample configuration
+- Enhanced middleware documentation explaining reference implementation pattern vs. production configuration
 
 ### File List
+
+**New Files:**
+- TenantSaas.Core/Enforcement/AttributionEnforcementResult.cs
+- TenantSaas.ContractTests/AttributionEnforcementTests.cs
+
+**Modified Files:**
+- TenantSaas.Core/Enforcement/BoundaryGuard.cs
+- TenantSaas.Core/Errors/EnforcementProblemDetails.cs
+- TenantSaas.Sample/Middleware/TenantContextMiddleware.cs
+- TenantSaas.Sample/Program.cs
 

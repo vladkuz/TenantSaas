@@ -5,6 +5,7 @@ using TenantSaas.Core.Enforcement;
 using TenantSaas.Core.Tenancy;
 using TenantSaas.Core.Errors;
 using Xunit;
+using static TenantSaas.Core.Errors.ProblemDetailsExtensions;
 
 namespace TenantSaas.ContractTests;
 
@@ -194,8 +195,8 @@ public class ContextInitializedTests
 
         // Assert
         problemDetails.Status.Should().Be(401);
-        problemDetails.Extensions["invariant_code"].Should().Be(InvariantCode.ContextInitialized);
-        problemDetails.Extensions["trace_id"].Should().Be("trace-123");
+        problemDetails.Extensions[InvariantCodeKey].Should().Be(Abstractions.Invariants.InvariantCode.ContextInitialized);
+        problemDetails.Extensions[TraceId].Should().Be("trace-123");
         problemDetails.Type.Should().Contain("context-");
         problemDetails.Detail.Should().Be("Context not initialized");
     }
@@ -213,9 +214,9 @@ public class ContextInitializedTests
         var problemDetails = EnforcementProblemDetails.FromEnforcementResult(result);
 
         // Assert
-        problemDetails.Extensions.Should().ContainKey("invariant_code");
-        problemDetails.Extensions.Should().ContainKey("trace_id");
-        problemDetails.Extensions["trace_id"].Should().Be("trace-456");
+        problemDetails.Extensions.Should().ContainKey(InvariantCodeKey);
+        problemDetails.Extensions.Should().ContainKey(TraceId);
+        problemDetails.Extensions[TraceId].Should().Be("trace-456");
     }
 
     [Fact]

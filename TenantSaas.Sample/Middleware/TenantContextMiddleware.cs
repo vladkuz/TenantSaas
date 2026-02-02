@@ -1,6 +1,7 @@
 using TenantSaas.Abstractions.Tenancy;
 using TenantSaas.Core.Enforcement;
 using TenantSaas.Core.Errors;
+using TenantSaas.Core.Tenancy;
 
 namespace TenantSaas.Sample.Middleware;
 
@@ -12,51 +13,88 @@ namespace TenantSaas.Sample.Middleware;
 /// It initializes tenant context before request processing and cleans up afterward
 /// to prevent context leakage in pooled execution environments.
 /// </remarks>
-public class TenantContextMiddleware
+/// <param name="next">The next middleware in the pipeline.</param>
+/// <param name="accessor">Mutable tenant context accessor for setting/clearing context.</param>
+/// <param name="attributionResolver">Resolver for tenant attribution from request sources.</param>
+public class TenantContextMiddleware(
+    RequestDelegate next,
+    IMutableTenantContextAccessor accessor,
+    ITenantAttributionResolver attributionResolver)
 {
-    private readonly RequestDelegate _next;
-    private readonly IMutableTenantContextAccessor _accessor;
-
-    public TenantContextMiddleware(
-        RequestDelegate next,
-        IMutableTenantContextAccessor accessor)
-    {
-        _next = next;
-        _accessor = accessor;
-    }
-
     public async Task InvokeAsync(HttpContext httpContext)
     {
         // Skip if already initialized (idempotency)
-        if (_accessor.IsInitialized)
+        if (accessor.IsInitialized)
         {
-            await _next(httpContext);
+            await next(httpContext);
             return;
         }
 
-        // Resolve tenant scope (placeholder - will be Story 3.2)
-        var scope = ResolveTenantScope(httpContext);
-
         // TraceId: correlation ID that spans distributed systems (may come from incoming headers)
         // RequestId: unique identifier for this specific HTTP request
-        // TODO: Story 3.2 will extract distributed trace ID from headers (e.g., traceparent)
-        //       For now, both use TraceIdentifier as placeholder
         var traceId = httpContext.TraceIdentifier;
         var requestId = httpContext.TraceIdentifier;
 
+        // Health check bypass - no tenant required
+        if (httpContext.Request.Path.StartsWithSegments("/health"))
+        {
+            var healthContext = TenantContext.ForRequest(
+                TenantScope.ForNoTenant(NoTenantReason.HealthCheck),
+                traceId,
+                requestId);
+            accessor.Set(healthContext);
+            try
+            {
+                await next(httpContext);
+            }
+            finally
+            {
+                accessor.Clear();
+            }
+            return;
+        }
+
+        // Extract attribution sources from request
+        var sources = ExtractAttributionSources(httpContext);
+
+        // Resolve tenant attribution with rules
+        var rules = TenantAttributionRules.Default();
+        var attributionResult = attributionResolver.Resolve(
+            sources,
+            rules,
+            Abstractions.Contexts.ExecutionKind.Request);
+
+        // Enforce unambiguous attribution
+        var enforcementResult = BoundaryGuard.RequireUnambiguousAttribution(
+            attributionResult,
+            traceId);
+
+        if (!enforcementResult.IsSuccess)
+        {
+            var problemDetails = EnforcementProblemDetails.FromAttributionEnforcementResult(
+                enforcementResult,
+                httpContext);
+
+            httpContext.Response.StatusCode = problemDetails.Status ?? 422;
+            await httpContext.Response.WriteAsJsonAsync(problemDetails);
+            return;
+        }
+
+        // Initialize context with resolved tenant
+        // Safety: ResolvedTenantId is guaranteed non-null when IsSuccess is true
+        var scope = TenantScope.ForTenant(enforcementResult.ResolvedTenantId!.Value);
         var context = TenantContext.ForRequest(scope, traceId, requestId);
 
-        // Initialize context and ensure cleanup on all exit paths
-        _accessor.Set(context);
+        // Set context and ensure cleanup on all exit paths
+        accessor.Set(context);
         try
         {
-            // Enforce boundary - verify context is properly initialized
-            var result = BoundaryGuard.RequireContext(_accessor);
-
-            if (!result.IsSuccess)
+            // Verify context initialization (defensive check)
+            var contextCheck = BoundaryGuard.RequireContext(accessor);
+            if (!contextCheck.IsSuccess)
             {
                 var problemDetails = EnforcementProblemDetails.FromEnforcementResult(
-                    result,
+                    contextCheck,
                     httpContext);
 
                 httpContext.Response.StatusCode = problemDetails.Status ?? 500;
@@ -64,25 +102,43 @@ public class TenantContextMiddleware
                 return;
             }
 
-            await _next(httpContext);
+            await next(httpContext);
         }
         finally
         {
             // Always clear context to prevent leakage in pooled environments
-            _accessor.Clear();
+            accessor.Clear();
         }
     }
 
-    private static TenantScope ResolveTenantScope(HttpContext context)
+    /// <summary>
+    /// Extracts tenant attribution sources from HTTP request.
+    /// </summary>
+    /// <remarks>
+    /// Reference implementation uses hardcoded source names ("tenantId" route, "X-Tenant-Id" header).
+    /// Production implementations should inject attribution source configuration from settings.
+    /// This sample demonstrates the extraction pattern; adopters customize for their needs.
+    /// </remarks>
+    private static IReadOnlyDictionary<TenantAttributionSource, TenantId> ExtractAttributionSources(
+        HttpContext context)
     {
-        // Placeholder: always return no-tenant for health checks
-        // Story 3.2 will implement full attribution resolution
-        if (context.Request.Path.StartsWithSegments("/health"))
+        var sources = new Dictionary<TenantAttributionSource, TenantId>();
+
+        // Extract from route parameter (e.g., /tenants/{tenantId}/...)
+        if (context.Request.RouteValues.TryGetValue("tenantId", out var routeTenantId)
+            && routeTenantId is string routeValue
+            && !string.IsNullOrWhiteSpace(routeValue))
         {
-            return TenantScope.ForNoTenant(NoTenantReason.HealthCheck);
+            sources[TenantAttributionSource.RouteParameter] = new TenantId(routeValue);
         }
 
-        // For now, return a dummy tenant
-        return TenantScope.ForTenant(new TenantId("placeholder-tenant"));
+        // Extract from X-Tenant-Id header
+        if (context.Request.Headers.TryGetValue("X-Tenant-Id", out var headerTenantId)
+            && !string.IsNullOrWhiteSpace(headerTenantId.ToString()))
+        {
+            sources[TenantAttributionSource.HeaderValue] = new TenantId(headerTenantId.ToString());
+        }
+
+        return sources;
     }
 }

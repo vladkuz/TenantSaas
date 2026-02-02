@@ -31,4 +31,38 @@ public static class BoundaryGuard
 
         return EnforcementResult.Success(accessor.Current!);
     }
+
+    /// <summary>
+    /// Requires that tenant attribution is unambiguous.
+    /// </summary>
+    /// <param name="result">Attribution resolution result.</param>
+    /// <param name="traceId">Trace identifier for correlation.</param>
+    /// <returns>Success with resolved tenant ID and source, or failure with invariant violation.</returns>
+    public static AttributionEnforcementResult RequireUnambiguousAttribution(
+        TenantAttributionResult result,
+        string traceId)
+    {
+        ArgumentNullException.ThrowIfNull(result);
+        ArgumentException.ThrowIfNullOrWhiteSpace(traceId);
+
+        return result switch
+        {
+            TenantAttributionResult.Success success => AttributionEnforcementResult.Success(
+                success.TenantId,
+                success.Source,
+                traceId),
+            
+            TenantAttributionResult.Ambiguous ambiguous => AttributionEnforcementResult.Ambiguous(
+                [.. ambiguous.Conflicts.Select(c => c.Source.GetDisplayName())],
+                traceId),
+            
+            TenantAttributionResult.NotFound => AttributionEnforcementResult.NotFound(traceId),
+            
+            TenantAttributionResult.NotAllowed notAllowed => AttributionEnforcementResult.NotAllowed(
+                notAllowed.Source,
+                traceId),
+            
+            _ => throw new InvalidOperationException("Unknown attribution result type.")
+        };
+    }
 }

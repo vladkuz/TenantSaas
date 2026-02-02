@@ -59,7 +59,7 @@ development_status:
   # Epic 3: Invariant Enforcement (IN PROGRESS)
   epic-3: in-progress
   3-1-enforce-contextinitialized-at-boundary-helpers: done
-  3-2-enforce-tenantattributionunambiguous-at-boundaries: ready-for-dev
+  3-2-enforce-tenantattributionunambiguous-at-boundaries: done
   3-3-standardize-problem-details-refusals-for-invariant-violations: backlog
   3-4-enrich-structured-logs-with-tenant-ref-and-invariant-context: backlog
   3-5-require-explicit-break-glass-with-audit-event-emission: backlog

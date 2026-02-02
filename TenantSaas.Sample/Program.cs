@@ -17,6 +17,9 @@ public static class SampleApp
         builder.Services.AddSingleton<ITenantContextAccessor>(accessor);
         builder.Services.AddSingleton<IMutableTenantContextAccessor>(accessor);
 
+        // Register tenant attribution resolver
+        builder.Services.AddSingleton<ITenantAttributionResolver, TenantAttributionResolver>();
+
         if (enableOpenApi)
         {
             // Add services to the container.
@@ -43,6 +46,53 @@ public static class SampleApp
         app.UseMiddleware<TenantContextMiddleware>();
 
         app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
+
+        /// <summary>
+        /// Test endpoint demonstrating multi-source tenant attribution enforcement.
+        /// </summary>
+        /// <remarks>
+        /// Attribution sources (in precedence order):
+        /// 1. Route parameter: {tenantId}
+        /// 2. Header: X-Tenant-Id
+        /// 
+        /// Behavior:
+        /// - Both match → 200 OK (unambiguous, uses higher precedence source)
+        /// - Both provided but conflicting → 422 Unprocessable Entity (ambiguous attribution)
+        /// - Only one provided → 200 OK (unambiguous)
+        /// - Neither provided → 422 Unprocessable Entity (attribution not found)
+        /// 
+        /// This demonstrates Story 3.2 AC#1: ambiguous tenant attribution is refused consistently.
+        /// </remarks>
+        app.MapGet("/tenants/{tenantId}/data", (string tenantId, ITenantContextAccessor accessor) =>
+        {
+            var context = accessor.Current;
+            return Results.Ok(new
+            {
+                message = "Tenant attribution successful",
+                tenantId = context!.Scope is TenantScope.Tenant t ? t.Id.Value : "unknown",
+                traceId = context.TraceId
+            });
+        })
+        .WithName("GetTenantData");
+
+        /// <summary>
+        /// Test endpoint for header-only attribution.
+        /// </summary>
+        /// <remarks>
+        /// Requires X-Tenant-Id header. No route parameter to avoid ambiguity testing.
+        /// Returns 422 if header is missing or empty.
+        /// </remarks>
+        app.MapGet("/test/attribution", (ITenantContextAccessor accessor) =>
+        {
+            var context = accessor.Current;
+            return Results.Ok(new
+            {
+                message = "Attribution test endpoint",
+                tenantId = context!.Scope is TenantScope.Tenant t ? t.Id.Value : "unknown",
+                traceId = context.TraceId
+            });
+        })
+        .WithName("TestAttribution");
 
         var summaries = new[]
         {
