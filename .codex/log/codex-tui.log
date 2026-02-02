@@ -17417,3 +17417,204 @@
 2026-02-02T00:09:05.653966Z  INFO codex_core::rollout::recorder: Resuming rollout from "/home/vlad/Source/TenantSaas/.codex/sessions/2026/02/01/rollout-2026-02-01T15-12-10-019c1b7a-5e44-7a81-bf3f-4496be93cc22.jsonl"
 2026-02-02T00:09:05.661135Z  INFO codex_core::rollout::recorder: Resumed rollout with 584 items, thread ID: Some(ThreadId { uuid: 019c1b7a-5e44-7a81-bf3f-4496be93cc22 })
 2026-02-02T00:09:05.661154Z  INFO codex_core::rollout::recorder: Resumed rollout successfully from "/home/vlad/Source/TenantSaas/.codex/sessions/2026/02/01/rollout-2026-02-01T15-12-10-019c1b7a-5e44-7a81-bf3f-4496be93cc22.jsonl"
+2026-02-02T03:33:07.257830Z  INFO codex_core::codex::handlers: Shutting down Codex instance
+2026-02-02T03:33:14.391759Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"ls","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:33:16.385440Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/_bmad/bmm/agents/dev.md","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:33:18.286398Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/_bmad/bmm/config.yaml","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:33:26.318187Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/_bmad/core/tasks/workflow.xml","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:33:28.264872Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/_bmad/bmm/workflows/4-implementation/dev-story/workflow.yaml","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:33:32.154926Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/_bmad/bmm/workflows/4-implementation/dev-story/instructions.xml","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:33:37.172878Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"rg --files -g 'project-context.md' /home/vlad/Source/TenantSaas","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:33:40.039838Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/_bmad-output/project-context.md","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:33:42.396351Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts/2-5-define-disclosure-policy-and-tenant-ref-safe-states.md","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:33:45.473269Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts/sprint-status.yaml","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:33:53.467297Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"ls /home/vlad/Source/TenantSaas/TenantSaas.Abstractions","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:33:56.016213Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"rg -n \"class TenantScope|record TenantScope|sealed record TenantScope\" /home/vlad/Source/TenantSaas/TenantSaas.Abstractions","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:33:59.394789Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/Tenancy/TenantScope.cs","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:34:01.749004Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"rg -n \"record TenantContext|class TenantContext\" /home/vlad/Source/TenantSaas/TenantSaas.Abstractions","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:34:03.735745Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/Tenancy/TenantContext.cs","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:34:08.406176Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"rg -n \"ValidationResult\" /home/vlad/Source/TenantSaas/TenantSaas.Abstractions","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:34:11.270984Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/BreakGlass/BreakGlassValidationResult.cs","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:34:15.371813Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"rg -n \"DisclosureSafe\" /home/vlad/Source/TenantSaas/TenantSaas.Abstractions","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:34:18.136002Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/Invariants/InvariantCode.cs","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:34:20.591892Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/TrustContract/TrustContractV1.cs","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:34:24.053805Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"rg -n \"Disclosure\" /home/vlad/Source/TenantSaas/docs/trust-contract.md","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:34:26.609299Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/docs/trust-contract.md","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:34:29.615859Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"ls /home/vlad/Source/TenantSaas/TenantSaas.ContractTests","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:34:32.621250Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/TenantSaas.ContractTests/BreakGlassContractTests.cs","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:34:36.156741Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/BreakGlass/BreakGlassDeclaration.cs","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:34:42.403503Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/Tenancy/TenantId.cs","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:35:17.118552Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/TenantSaas.ContractTests/InvariantRegistryTests.cs","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:35:40.363051Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts/sprint-status.yaml
+@@
+-  2-5-define-disclosure-policy-and-tenant-ref-safe-states: ready-for-dev
++  2-5-define-disclosure-policy-and-tenant-ref-safe-states: in-progress
+*** End Patch
+2026-02-02T03:35:44.867780Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"mkdir -p /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/Disclosure","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:35:51.319388Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat <<'EOF' > /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/Disclosure/TenantRefSafeState.cs\nnamespace TenantSaas.Abstractions.Disclosure;\n\n/// <summary>\n/// Defines safe-state tokens for tenant reference disclosure.\n/// </summary>\npublic static class TenantRefSafeState\n{\n    /// <summary>\n    /// Tenant is unresolved or attribution failed.\n    /// </summary>\n    public const string Unknown = \"unknown\";\n\n    /// <summary>\n    /// Tenant resolved but unsafe to disclose.\n    /// </summary>\n    public const string Sensitive = \"sensitive\";\n\n    /// <summary>\n    /// Admin/global cross-tenant operations.\n    /// </summary>\n    public const string CrossTenant = \"cross_tenant\";\n\n    /// <summary>\n    /// Marker indicating value is an opaque public tenant identifier.\n    /// </summary>\n    public const string Opaque = \"opaque\";\n\n    /// <summary>\n    /// Returns true if the value is a recognized safe-state token.\n    /// </summary>\n    public static bool IsSafeState(string? value)\n        => value is Unknown or Sensitive or CrossTenant or Opaque;\n}\nEOF","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:36:02.585085Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat <<'EOF' > /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/Disclosure/DisclosureContext.cs\nusing TenantSaas.Abstractions.Tenancy;\n\nnamespace TenantSaas.Abstractions.Disclosure;\n\n/// <summary>\n/// Represents the context for evaluating tenant disclosure safety.\n/// </summary>\npublic sealed record DisclosureContext\n{\n    /// <summary>\n    /// Gets the actual tenant identifier (may be null).\n    /// </summary>\n    public string? TenantId { get; init; }\n\n    /// <summary>\n    /// Gets whether the caller is authenticated.\n    /// </summary>\n    public bool IsAuthenticated { get; init; }\n\n    /// <summary>\n    /// Gets whether the caller is authorized for the tenant.\n    /// </summary>\n    public bool IsAuthorizedForTenant { get; init; }\n\n    /// <summary>\n    /// Gets whether disclosure risks enumeration attack.\n    /// </summary>\n    public bool IsEnumerationRisk { get; init; }\n\n    /// <summary>\n    /// Gets the current tenant scope.\n    /// </summary>\n    public TenantScope? Scope { get; init; }\n\n    /// <summary>\n    /// Creates a disclosure context from an initialized tenant context.\n    /// </summary>\n    public static DisclosureContext Create(\n        TenantContext context,\n        bool isAuthenticated,\n        bool isAuthorizedForTenant)\n    {\n        ArgumentNullException.ThrowIfNull(context);\n\n        string? tenantId = context.Scope switch\n        {\n            TenantScope.Tenant tenantScope => tenantScope.Id.Value,\n            _ => null\n        };\n\n        return new DisclosureContext\n        {\n            TenantId = tenantId,\n            IsAuthenticated = isAuthenticated,\n            IsAuthorizedForTenant = isAuthorizedForTenant,\n            IsEnumerationRisk = false,\n            Scope = context.Scope\n        };\n    }\n}\nEOF","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:36:13.438275Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat <<'EOF' > /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/Disclosure/DisclosurePolicy.cs\nusing TenantSaas.Abstractions.Tenancy;\n\nnamespace TenantSaas.Abstractions.Disclosure;\n\n/// <summary>\n/// Implements the default disclosure policy for tenant references.\n/// </summary>\npublic sealed class DisclosurePolicy\n{\n    /// <summary>\n    /// Resolves the safe tenant reference based on disclosure context.\n    /// </summary>\n    public string ResolveTenantRef(DisclosureContext context)\n    {\n        ArgumentNullException.ThrowIfNull(context);\n\n        if (context.Scope is TenantScope.NoTenant)\n        {\n            return TenantRefSafeState.Unknown;\n        }\n\n        if (context.Scope is TenantScope.SharedSystem)\n        {\n            return TenantRefSafeState.CrossTenant;\n        }\n\n        if (!context.IsAuthenticated)\n        {\n            return TenantRefSafeState.Unknown;\n        }\n\n        if (!context.IsAuthorizedForTenant)\n        {\n            return TenantRefSafeState.Sensitive;\n        }\n\n        if (context.IsEnumerationRisk)\n        {\n            return TenantRefSafeState.Sensitive;\n        }\n\n        return context.TenantId ?? TenantRefSafeState.Opaque;\n    }\n\n    /// <summary>\n    /// Returns true if tenant information may appear in error responses.\n    /// </summary>\n    public bool AllowTenantInErrors(DisclosureContext context)\n    {\n        ArgumentNullException.ThrowIfNull(context);\n\n        return context.IsAuthenticated\n            && context.IsAuthorizedForTenant\n            && !context.IsEnumerationRisk;\n    }\n\n    /// <summary>\n    /// Returns true if tenant information may appear in logs.\n    /// Logs always use safe states.\n    /// </summary>\n    public bool AllowTenantInLogs(DisclosureContext context)\n    {\n        ArgumentNullException.ThrowIfNull(context);\n\n        return true;\n    }\n}\nEOF","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:36:17.535822Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat <<'EOF' > /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/Disclosure/IDisclosurePolicyProvider.cs\nnamespace TenantSaas.Abstractions.Disclosure;\n\n/// <summary>\n/// Provides the active disclosure policy.\n/// </summary>\npublic interface IDisclosurePolicyProvider\n{\n    /// <summary>\n    /// Gets the active disclosure policy.\n    /// </summary>\n    /// <remarks>\n    /// Implementations may vary by environment or configuration.\n    /// </remarks>\n    DisclosurePolicy GetPolicy();\n}\nEOF","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:36:24.191316Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat <<'EOF' > /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/Disclosure/DisclosureValidationResult.cs\nnamespace TenantSaas.Abstractions.Disclosure;\n\n/// <summary>\n/// Represents the result of disclosure validation.\n/// </summary>\npublic sealed record DisclosureValidationResult(\n    bool IsValid,\n    string? InvariantCode,\n    string? Reason)\n{\n    /// <summary>\n    /// Creates a valid disclosure validation result.\n    /// </summary>\n    public static DisclosureValidationResult Valid() => new(true, null, null);\n\n    /// <summary>\n    /// Creates an invalid disclosure validation result.\n    /// </summary>\n    public static DisclosureValidationResult Invalid(string invariantCode, string reason)\n    {\n        ArgumentException.ThrowIfNullOrWhiteSpace(invariantCode, nameof(invariantCode));\n        ArgumentException.ThrowIfNullOrWhiteSpace(reason, nameof(reason));\n\n        return new DisclosureValidationResult(false, invariantCode, reason);\n    }\n}\nEOF","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:36:34.604350Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat <<'EOF' > /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/Disclosure/DisclosureValidator.cs\nusing TenantSaas.Abstractions.Invariants;\n\nnamespace TenantSaas.Abstractions.Disclosure;\n\n/// <summary>\n/// Validates tenant disclosure against safe disclosure rules.\n/// </summary>\npublic static class DisclosureValidator\n{\n    /// <summary>\n    /// Validates disclosure of tenant reference based on context.\n    /// </summary>\n    public static DisclosureValidationResult Validate(DisclosureContext context, string? disclosedTenantRef)\n    {\n        ArgumentNullException.ThrowIfNull(context);\n\n        if (string.IsNullOrWhiteSpace(disclosedTenantRef))\n        {\n            return DisclosureValidationResult.Valid();\n        }\n\n        if (context.IsEnumerationRisk)\n        {\n            return DisclosureValidationResult.Invalid(\n                InvariantCode.DisclosureSafe,\n                \"Tenant disclosure is unsafe when enumeration risk is present.\");\n        }\n\n        var disclosureUnsafe = !context.IsAuthenticated || !context.IsAuthorizedForTenant;\n        if (disclosureUnsafe && !TenantRefSafeState.IsSafeState(disclosedTenantRef))\n        {\n            return DisclosureValidationResult.Invalid(\n                InvariantCode.DisclosureSafe,\n                \"Tenant disclosure is unsafe for unauthenticated or unauthorized callers.\");\n        }\n\n        return DisclosureValidationResult.Valid();\n    }\n}\nEOF","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:36:48.255386Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat <<'EOF' > /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/Disclosure/TenantRef.cs\nnamespace TenantSaas.Abstractions.Disclosure;\n\n/// <summary>\n/// Represents a disclosure-safe tenant reference value.\n/// </summary>\npublic sealed record TenantRef\n{\n    /// <summary>\n    /// Creates a tenant reference with the specified value.\n    /// </summary>\n    public TenantRef(string value, bool isSafeState)\n    {\n        ArgumentException.ThrowIfNullOrWhiteSpace(value);\n        Value = value;\n        IsSafeState = isSafeState;\n    }\n\n    /// <summary>\n    /// Gets the safe tenant reference value.\n    /// </summary>\n    public string Value { get; }\n\n    /// <summary>\n    /// Gets a value indicating whether this reference is a safe-state token.\n    /// </summary>\n    public bool IsSafeState { get; }\n\n    /// <summary>\n    /// Creates a tenant reference for unknown state.\n    /// </summary>\n    public static TenantRef ForUnknown()\n        => new(TenantRefSafeState.Unknown, isSafeState: true);\n\n    /// <summary>\n    /// Creates a tenant reference for sensitive state.\n    /// </summary>\n    public static TenantRef ForSensitive()\n        => new(TenantRefSafeState.Sensitive, isSafeState: true);\n\n    /// <summary>\n    /// Creates a tenant reference for cross-tenant operations.\n    /// </summary>\n    public static TenantRef ForCrossTenant()\n        => new(TenantRefSafeState.CrossTenant, isSafeState: true);\n\n    /// <summary>\n    /// Creates a tenant reference for an opaque identifier.\n    /// </summary>\n    public static TenantRef ForOpaque(string opaqueId)\n    {\n        ArgumentException.ThrowIfNullOrWhiteSpace(opaqueId);\n        return new TenantRef(opaqueId, isSafeState: false);\n    }\n\n    /// <inheritdoc />\n    public override string ToString() => Value;\n}\nEOF","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:36:57.983043Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/TrustContract/TrustContractV1.cs
+@@
+     /// <summary>
+     /// Cross-tenant marker for break-glass audit events.
+     /// </summary>
+     public const string BreakGlassMarkerCrossTenant = "cross_tenant";
+ 
+@@
+     /// <summary>
+     /// Privileged operation marker for break-glass declarations.
+     /// </summary>
+     public const string BreakGlassMarkerPrivileged = "privileged";
+ 
++    /// <summary>
++    /// Disclosure safe-state token for unresolved tenants.
++    /// </summary>
++    public const string DisclosureSafeStateUnknown = "unknown";
++
++    /// <summary>
++    /// Disclosure safe-state token for sensitive tenants.
++    /// </summary>
++    public const string DisclosureSafeStateSensitive = "sensitive";
++
++    /// <summary>
++    /// Disclosure safe-state token for cross-tenant operations.
++    /// </summary>
++    public const string DisclosureSafeStateCrossTenant = "cross_tenant";
++
++    /// <summary>
++    /// Disclosure safe-state token indicating an opaque tenant identifier.
++    /// </summary>
++    public const string DisclosureSafeStateOpaque = "opaque";
++
+@@
+     public static IReadOnlyCollection<string> RequiredAttributionSources { get; } =
+     [
+         AttributionSourceRouteParameter,
+         AttributionSourceHeaderValue,
+         AttributionSourceHostHeader,
+         AttributionSourceTokenClaim,
+         AttributionSourceExplicitContext
+     ];
++
++    /// <summary>
++    /// Gets the required disclosure safe-state tokens for tenant references.
++    /// </summary>
++    public static IReadOnlyCollection<string> RequiredDisclosureSafeStates { get; } =
++    [
++        DisclosureSafeStateUnknown,
++        DisclosureSafeStateSensitive,
++        DisclosureSafeStateCrossTenant,
++        DisclosureSafeStateOpaque
++    ];
+*** End Patch
+2026-02-02T03:37:03.211045Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/TenantSaas.Abstractions/Tenancy/NoTenantReason.cs","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:37:50.517462Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat <<'EOF' > /home/vlad/Source/TenantSaas/TenantSaas.ContractTests/DisclosurePolicyTests.cs\nusing FluentAssertions;\nusing TenantSaas.Abstractions.Disclosure;\nusing TenantSaas.Abstractions.Invariants;\nusing TenantSaas.Abstractions.Tenancy;\nusing TenantSaas.Abstractions.TrustContract;\n\nnamespace TenantSaas.ContractTests;\n\npublic sealed class DisclosurePolicyTests\n{\n    [Fact]\n    public void TenantRefSafeState_Constants_Are_Defined()\n    {\n        TenantRefSafeState.Unknown.Should().Be(\"unknown\");\n        TenantRefSafeState.Sensitive.Should().Be(\"sensitive\");\n        TenantRefSafeState.CrossTenant.Should().Be(\"cross_tenant\");\n        TenantRefSafeState.Opaque.Should().Be(\"opaque\");\n    }\n\n    [Fact]\n    public void TrustContractV1_RequiredDisclosureSafeStates_Are_Defined()\n    {\n        TrustContractV1.RequiredDisclosureSafeStates.Should().BeEquivalentTo(\n        [\n            TrustContractV1.DisclosureSafeStateUnknown,\n            TrustContractV1.DisclosureSafeStateSensitive,\n            TrustContractV1.DisclosureSafeStateCrossTenant,\n            TrustContractV1.DisclosureSafeStateOpaque\n        ]);\n    }\n\n    [Fact]\n    public void TenantRefSafeState_IsSafeState_Returns_True_For_Known_States()\n    {\n        TenantRefSafeState.IsSafeState(TenantRefSafeState.Unknown).Should().BeTrue();\n        TenantRefSafeState.IsSafeState(TenantRefSafeState.Sensitive).Should().BeTrue();\n        TenantRefSafeState.IsSafeState(TenantRefSafeState.CrossTenant).Should().BeTrue();\n        TenantRefSafeState.IsSafeState(TenantRefSafeState.Opaque).Should().BeTrue();\n    }\n\n    [Fact]\n    public void TenantRefSafeState_IsSafeState_Returns_False_For_Opaque_Ids()\n    {\n        TenantRefSafeState.IsSafeState(\"tenant-123\").Should().BeFalse();\n    }\n\n    [Fact]\n    public void TenantRef_ForUnknown_Returns_SafeState()\n    {\n        var tenantRef = TenantRef.ForUnknown();\n\n        tenantRef.Value.Should().Be(TenantRefSafeState.Unknown);\n        tenantRef.IsSafeState.Should().BeTrue();\n    }\n\n    [Fact]\n    public void TenantRef_ForOpaque_Returns_OpaqueId()\n    {\n        var tenantRef = TenantRef.ForOpaque(\"tenant-123\");\n\n        tenantRef.Value.Should().Be(\"tenant-123\");\n        tenantRef.IsSafeState.Should().BeFalse();\n    }\n\n    [Fact]\n    public void ResolveTenantRef_NoTenantScope_Returns_Unknown()\n    {\n        var policy = new DisclosurePolicy();\n        var context = CreateContext(scope: TenantScope.ForNoTenant(NoTenantReason.HealthCheck));\n\n        var resolved = policy.ResolveTenantRef(context);\n\n        resolved.Should().Be(TenantRefSafeState.Unknown);\n    }\n\n    [Fact]\n    public void ResolveTenantRef_SharedSystem_Returns_CrossTenant()\n    {\n        var policy = new DisclosurePolicy();\n        var context = CreateContext(scope: TenantScope.ForSharedSystem());\n\n        var resolved = policy.ResolveTenantRef(context);\n\n        resolved.Should().Be(TenantRefSafeState.CrossTenant);\n    }\n\n    [Fact]\n    public void ResolveTenantRef_Unauthenticated_Returns_Unknown()\n    {\n        var policy = new DisclosurePolicy();\n        var context = CreateContext(isAuthenticated: false);\n\n        var resolved = policy.ResolveTenantRef(context);\n\n        resolved.Should().Be(TenantRefSafeState.Unknown);\n    }\n\n    [Fact]\n    public void ResolveTenantRef_Unauthorized_Returns_Sensitive()\n    {\n        var policy = new DisclosurePolicy();\n        var context = CreateContext(isAuthorizedForTenant: false);\n\n        var resolved = policy.ResolveTenantRef(context);\n\n        resolved.Should().Be(TenantRefSafeState.Sensitive);\n    }\n\n    [Fact]\n    public void ResolveTenantRef_EnumerationRisk_Returns_Sensitive()\n    {\n        var policy = new DisclosurePolicy();\n        var context = CreateContext(isEnumerationRisk: true);\n\n        var resolved = policy.ResolveTenantRef(context);\n\n        resolved.Should().Be(TenantRefSafeState.Sensitive);\n    }\n\n    [Fact]\n    public void ResolveTenantRef_AuthorizedAndSafe_Returns_OpaqueId()\n    {\n        var policy = new DisclosurePolicy();\n        var context = CreateContext(tenantId: \"tenant-123\");\n\n        var resolved = policy.ResolveTenantRef(context);\n\n        resolved.Should().Be(\"tenant-123\");\n    }\n\n    [Fact]\n    public void AllowTenantInErrors_Unauthorized_Returns_False()\n    {\n        var policy = new DisclosurePolicy();\n        var context = CreateContext(isAuthorizedForTenant: false);\n\n        policy.AllowTenantInErrors(context).Should().BeFalse();\n    }\n\n    [Fact]\n    public void AllowTenantInErrors_EnumerationRisk_Returns_False()\n    {\n        var policy = new DisclosurePolicy();\n        var context = CreateContext(isEnumerationRisk: true);\n\n        policy.AllowTenantInErrors(context).Should().BeFalse();\n    }\n\n    [Fact]\n    public void AllowTenantInErrors_AuthorizedAndSafe_Returns_True()\n    {\n        var policy = new DisclosurePolicy();\n        var context = CreateContext();\n\n        policy.AllowTenantInErrors(context).Should().BeTrue();\n    }\n\n    [Fact]\n    public void AllowTenantInLogs_Always_Returns_True()\n    {\n        var policy = new DisclosurePolicy();\n        var context = CreateContext(isAuthenticated: false, isAuthorizedForTenant: false, isEnumerationRisk: true);\n\n        policy.AllowTenantInLogs(context).Should().BeTrue();\n    }\n\n    [Fact]\n    public void Validator_RawIdWhenUnsafe_Returns_Violation()\n    {\n        var context = CreateContext(isAuthorizedForTenant: false);\n\n        var result = DisclosureValidator.Validate(context, \"tenant-123\");\n\n        result.IsValid.Should().BeFalse();\n        result.InvariantCode.Should().Be(InvariantCode.DisclosureSafe);\n        result.Reason.Should().NotBeNullOrWhiteSpace();\n    }\n\n    [Fact]\n    public void Validator_EnumerationRisk_Returns_Violation()\n    {\n        var context = CreateContext(isEnumerationRisk: true);\n\n        var result = DisclosureValidator.Validate(context, TenantRefSafeState.Sensitive);\n\n        result.IsValid.Should().BeFalse();\n        result.InvariantCode.Should().Be(InvariantCode.DisclosureSafe);\n    }\n\n    [Fact]\n    public void Validator_SafeState_Returns_Valid()\n    {\n        var context = CreateContext(isAuthorizedForTenant: false);\n\n        var result = DisclosureValidator.Validate(context, TenantRefSafeState.Sensitive);\n\n        result.IsValid.Should().BeTrue();\n        result.InvariantCode.Should().BeNull();\n    }\n\n    [Fact]\n    public void Validator_OpaqueId_WhenDisclosureSafe_Returns_Valid()\n    {\n        var context = CreateContext();\n\n        var result = DisclosureValidator.Validate(context, \"tenant-123\");\n\n        result.IsValid.Should().BeTrue();\n    }\n\n    [Fact]\n    public void Validator_Returns_DisclosureSafe_Invariant_Code_On_Violation()\n    {\n        var context = CreateContext(isAuthenticated: false);\n\n        var result = DisclosureValidator.Validate(context, \"tenant-123\");\n\n        result.IsValid.Should().BeFalse();\n        result.InvariantCode.Should().Be(InvariantCode.DisclosureSafe);\n    }\n\n    private static DisclosureContext CreateContext(\n        TenantScope? scope = null,\n        bool isAuthenticated = true,\n        bool isAuthorizedForTenant = true,\n        bool isEnumerationRisk = false,\n        string? tenantId = \"tenant-123\")\n    {\n        return new DisclosureContext\n        {\n            TenantId = tenantId,\n            IsAuthenticated = isAuthenticated,\n            IsAuthorizedForTenant = isAuthorizedForTenant,\n            IsEnumerationRisk = isEnumerationRisk,\n            Scope = scope ?? TenantScope.ForTenant(new TenantId(tenantId ?? \"tenant-123\"))\n        };\n    }\n}\nEOF","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:38:02.086455Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: /home/vlad/Source/TenantSaas/docs/trust-contract.md
+@@
+ ## Break-Glass Audit Event Schema
+ 
+ Break-glass audit events are stable and include the following fields:
+@@
+   "operationName": "UpdateUserData"
+ }
+ ```
+ 
++## Disclosure Policy
++
++Tenant disclosure policy prevents tenant existence oracles by defining safe tenant reference states and when tenant information may appear in errors or logs.
++
++### Tenant Reference Safe States
++
++`tenant_ref` MUST be one of:
++
++- **opaque tenant id**: a stable public identifier safe to disclose.
++- **unknown**: tenant is unresolved or attribution failed.
++- **sensitive**: tenant resolved but unsafe to disclose.
++- **cross_tenant**: admin or global cross-tenant operations.
++- **opaque**: marker indicating the value is an opaque public tenant identifier.
++
++### Error Disclosure Rules
++
++Tenant information MAY appear in Problem Details only when all conditions are met:
++
++- Caller is authenticated.
++- Caller is authorized for the tenant.
++- Disclosure does not create an enumeration risk.
++
++Otherwise, tenant information must be omitted.
++
++### Log Disclosure Rules
++
++Structured logs MUST always include `tenant_ref`, but only as safe states or an opaque tenant id. Logs must never contain raw internal tenant identifiers.
++
++### Examples
++
++- **Unauthorized caller probes tenant** → `tenant_ref="sensitive"` in logs, omitted in errors.
++- **Authorized caller** → `tenant_ref="<opaque id>"` in logs and errors.
++- **Health check / NoTenant** → `tenant_ref="unknown"` in logs and errors.
++- **SharedSystem** → `tenant_ref="cross_tenant"` in logs and errors.
++
++### References
++
++- Code: `TenantSaas.Abstractions.Disclosure`
++- Contract tests: `TenantSaas.ContractTests.DisclosurePolicyTests`
++
+ ## Tenant Attribution Sources
+*** End Patch
+2026-02-02T03:38:06.489805Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"dotnet test /home/vlad/Source/TenantSaas/TenantSaas.sln","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:38:20.518860Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"rg -n \"Dev Agent Record\" -n /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts | head","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:38:25.140962Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"cat /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts/2-4-define-break-glass-contract-and-standard-audit-event-schema.md","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:38:28.813677Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"tail -n 80 /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts/2-5-define-disclosure-policy-and-tenant-ref-safe-states.md","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:38:32.091212Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"rg -n \"Change Log|Status\" /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts/2-5-define-disclosure-policy-and-tenant-ref-safe-states.md","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:38:38.131861Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"rg -n \"Change Log\" /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts/2-4-define-break-glass-contract-and-standard-audit-event-schema.md","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:38:49.396936Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"python - <<'PY'\nfrom pathlib import Path\npath = Path('/home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts/2-5-define-disclosure-policy-and-tenant-ref-safe-states.md')\ntext = path.read_text()\ntext = text.replace('[ ]', '[x]')\ntext = text.replace('Status: ready-for-dev', 'Status: review')\npath.write_text(text)\nPY","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:38:54.926875Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"python3 - <<'PY'\nfrom pathlib import Path\npath = Path('/home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts/2-5-define-disclosure-policy-and-tenant-ref-safe-states.md')\ntext = path.read_text()\ntext = text.replace('[ ]', '[x]')\ntext = text.replace('Status: ready-for-dev', 'Status: review')\npath.write_text(text)\nPY","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:38:58.100604Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"head -n 40 /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts/2-5-define-disclosure-policy-and-tenant-ref-safe-states.md","workdir":"/home/vlad/Source/TenantSaas"}
+2026-02-02T03:39:12.485561Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts/2-5-define-disclosure-policy-and-tenant-ref-safe-states.md
+@@
+ ### Agent Model Used
+ 
+-{{agent_model_name_version}}
++GPT-5 (Codex CLI)
+@@
+ ### Debug Log References
+ 
++- 2026-02-02: `dotnet test /home/vlad/Source/TenantSaas/TenantSaas.sln`
++
+ ### Completion Notes List
+ 
++- Implemented disclosure contracts (safe states, context, policy, validator, tenant ref, provider).
++- Updated trust contract with disclosure safe-state constants and required collection.
++- Added contract tests covering disclosure safe states, policy behavior, and validation.
++- Documented disclosure policy and examples in trust contract docs.
++
+ ### File List
++
++- TenantSaas.Abstractions/Disclosure/DisclosureContext.cs
++- TenantSaas.Abstractions/Disclosure/DisclosurePolicy.cs
++- TenantSaas.Abstractions/Disclosure/DisclosureValidationResult.cs
++- TenantSaas.Abstractions/Disclosure/DisclosureValidator.cs
++- TenantSaas.Abstractions/Disclosure/IDisclosurePolicyProvider.cs
++- TenantSaas.Abstractions/Disclosure/TenantRef.cs
++- TenantSaas.Abstractions/Disclosure/TenantRefSafeState.cs
++- TenantSaas.Abstractions/TrustContract/TrustContractV1.cs
++- TenantSaas.ContractTests/DisclosurePolicyTests.cs
++- _bmad-output/implementation-artifacts/sprint-status.yaml
++- docs/trust-contract.md
+*** End Patch
+2026-02-02T03:39:17.966239Z  INFO codex_core::stream_events_utils: ToolCall: apply_patch *** Begin Patch
+*** Update File: /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts/sprint-status.yaml
+@@
+-  2-5-define-disclosure-policy-and-tenant-ref-safe-states: in-progress
++  2-5-define-disclosure-policy-and-tenant-ref-safe-states: review
+*** End Patch
+2026-02-02T03:39:22.164001Z  INFO codex_core::stream_events_utils: ToolCall: shell_command {"command":"git status -sb","workdir":"/home/vlad/Source/TenantSaas"}

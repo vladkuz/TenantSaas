@@ -84,6 +84,46 @@ Audit codes:
 }
 ```
 
+## Disclosure Policy
+
+Tenant disclosure policy prevents tenant existence oracles by defining safe tenant reference states and when tenant information may appear in errors or logs.
+
+### Tenant Reference Safe States
+
+`tenant_ref` MUST be one of:
+
+- **opaque tenant id**: a stable public identifier safe to disclose.
+- **unknown**: tenant is unresolved or attribution failed.
+- **sensitive**: tenant resolved but unsafe to disclose.
+- **cross_tenant**: admin or global cross-tenant operations.
+- **opaque**: marker indicating the value is an opaque public tenant identifier.
+
+### Error Disclosure Rules
+
+Tenant information MAY appear in Problem Details only when all conditions are met:
+
+- Caller is authenticated.
+- Caller is authorized for the tenant.
+- Disclosure does not create an enumeration risk.
+
+Otherwise, tenant information must be omitted.
+
+### Log Disclosure Rules
+
+Structured logs MUST always include `tenant_ref`, but only as safe states or an opaque tenant id. Logs must never contain raw internal tenant identifiers.
+
+### Examples
+
+- **Unauthorized caller probes tenant** → `tenant_ref="sensitive"` in logs, omitted in errors.
+- **Authorized caller** → `tenant_ref="<opaque id>"` in logs and errors.
+- **Health check / NoTenant** → `tenant_ref="unknown"` in logs and errors.
+- **SharedSystem** → `tenant_ref="cross_tenant"` in logs and errors.
+
+### References
+
+- Code: `TenantSaas.Abstractions.Disclosure`
+- Contract tests: `TenantSaas.ContractTests.DisclosurePolicyTests`
+
 ## Tenant Attribution Sources
 
 Allowed sources for tenant attribution:

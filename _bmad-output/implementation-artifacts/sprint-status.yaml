@@ -47,13 +47,13 @@ development_status:
   1-3-ci-pipeline-skeleton-build-smoke-checks: done
   epic-1-retrospective: optional
 
-  # Epic 2: Trust Contract v1 Foundations (IN-PROGRESS)
-  epic-2: in-progress
+  # Epic 2: Trust Contract v1 Foundations (DONE - all stories complete)
+  epic-2: done
   2-1-define-context-taxonomy-and-execution-kinds: done
   2-2-define-tenant-attribution-sources-precedence-and-ambiguity-rules: done
   2-3-define-invariant-registry-and-refusal-mapping-schema: done
   2-4-define-break-glass-contract-and-standard-audit-event-schema: done
-  2-5-define-disclosure-policy-and-tenant-ref-safe-states: backlog
+  2-5-define-disclosure-policy-and-tenant-ref-safe-states: done
   epic-2-retrospective: optional
 
   # Epic 3: Invariant Enforcement (BACKLOG)

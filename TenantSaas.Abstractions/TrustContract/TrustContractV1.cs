@@ -40,6 +40,26 @@ public static class TrustContractV1
     public const string BreakGlassMarkerPrivileged = "privileged";
 
     /// <summary>
+    /// Disclosure safe-state token for unresolved tenants.
+    /// </summary>
+    public const string DisclosureSafeStateUnknown = "unknown";
+
+    /// <summary>
+    /// Disclosure safe-state token for sensitive tenants.
+    /// </summary>
+    public const string DisclosureSafeStateSensitive = "sensitive";
+
+    /// <summary>
+    /// Disclosure safe-state token for cross-tenant operations.
+    /// </summary>
+    public const string DisclosureSafeStateCrossTenant = "cross_tenant";
+
+    /// <summary>
+    /// Disclosure safe-state token indicating an opaque tenant identifier.
+    /// </summary>
+    public const string DisclosureSafeStateOpaque = "opaque";
+
+    /// <summary>
     /// HTTP or API request flow.
     /// </summary>
     public const string ExecutionRequest = "request";
@@ -187,6 +207,17 @@ public static class TrustContractV1
         AttributionSourceHostHeader,
         AttributionSourceTokenClaim,
         AttributionSourceExplicitContext
+    ];
+
+    /// <summary>
+    /// Gets the required disclosure safe-state tokens for tenant references.
+    /// </summary>
+    public static IReadOnlyCollection<string> RequiredDisclosureSafeStates { get; } =
+    [
+        DisclosureSafeStateUnknown,
+        DisclosureSafeStateSensitive,
+        DisclosureSafeStateCrossTenant,
+        DisclosureSafeStateOpaque
     ];
 
     /// <summary>
