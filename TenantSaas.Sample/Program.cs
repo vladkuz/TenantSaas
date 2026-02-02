@@ -1,3 +1,7 @@
+using TenantSaas.Abstractions.Tenancy;
+using TenantSaas.Core.Tenancy;
+using TenantSaas.Sample.Middleware;
+
 var app = SampleApp.BuildApp(args);
 app.Run();
 
@@ -6,6 +10,12 @@ public static class SampleApp
     public static WebApplication BuildApp(string[] args, bool enableOpenApi = true)
     {
         var builder = WebApplication.CreateBuilder(args);
+
+        // Register context accessor as singleton - all instances share static AsyncLocal storage
+        // Register both interfaces pointing to the same instance for DI flexibility
+        var accessor = new AmbientTenantContextAccessor();
+        builder.Services.AddSingleton<ITenantContextAccessor>(accessor);
+        builder.Services.AddSingleton<IMutableTenantContextAccessor>(accessor);
 
         if (enableOpenApi)
         {
@@ -28,6 +38,9 @@ public static class SampleApp
         {
             app.UseHttpsRedirection();
         }
+
+        // Add tenant context middleware after auth, before endpoints
+        app.UseMiddleware<TenantContextMiddleware>();
 
         app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
 

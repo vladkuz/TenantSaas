@@ -154,7 +154,7 @@ public static class TrustContractV1
     public static readonly FrozenDictionary<string, RefusalMapping> RefusalMappings =
         new Dictionary<string, RefusalMapping>(StringComparer.Ordinal)
         {
-            [InvariantCode.ContextInitialized] = RefusalMapping.ForBadRequest(
+            [InvariantCode.ContextInitialized] = RefusalMapping.ForUnauthorized(
                 InvariantCode.ContextInitialized,
                 title: "Tenant context not initialized",
                 guidanceUri: "https://docs.tenantsaas.dev/errors/context-not-initialized"),

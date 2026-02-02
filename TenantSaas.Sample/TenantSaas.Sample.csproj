@@ -11,4 +11,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TenantSaas.Core\TenantSaas.Core.csproj" />
+  </ItemGroup>
+
 </Project>

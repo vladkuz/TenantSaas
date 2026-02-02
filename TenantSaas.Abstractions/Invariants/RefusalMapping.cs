@@ -81,6 +81,20 @@ public sealed record RefusalMapping
             guidanceUri);
 
     /// <summary>
+    /// Creates a refusal mapping for unauthorized scenarios.
+    /// </summary>
+    public static RefusalMapping ForUnauthorized(
+        string invariantCode,
+        string title,
+        string guidanceUri)
+        => new(
+            invariantCode,
+            httpStatusCode: 401,
+            problemType: BuildProblemType(invariantCode),
+            title,
+            guidanceUri);
+
+    /// <summary>
     /// Creates a refusal mapping for forbidden scenarios.
     /// </summary>
     public static RefusalMapping ForForbidden(
