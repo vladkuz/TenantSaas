@@ -288,4 +288,72 @@ public sealed class InvariantRegistryTests
             TrustContractV1.RefusalMappings.Should().ContainKey(code);
         }
     }
+
+    [Theory]
+    [InlineData("not-a-uri")]
+    [InlineData("relative/path")]
+    [InlineData("://missing-scheme")]
+    public void RefusalMapping_Throws_On_Malformed_GuidanceUri(string malformedUri)
+    {
+        Action act = () => new RefusalMapping("Code", 400, "urn:test", "Title", malformedUri);
+
+        act.Should().Throw<ArgumentException>()
+            .WithParameterName("guidanceUri")
+            .WithMessage("*valid absolute URI*");
+    }
+
+    [Fact]
+    public void ForBadRequest_Sets_Status_400_And_Builds_ProblemType()
+    {
+        var mapping = RefusalMapping.ForBadRequest("TestCode", "Title", "https://example.com");
+
+        mapping.HttpStatusCode.Should().Be(400);
+        mapping.ProblemType.Should().Be("urn:tenantsaas:error:test-code");
+        mapping.InvariantCode.Should().Be("TestCode");
+        mapping.Title.Should().Be("Title");
+        mapping.GuidanceUri.Should().Be("https://example.com");
+    }
+
+    [Fact]
+    public void ForForbidden_Sets_Status_403_And_Builds_ProblemType()
+    {
+        var mapping = RefusalMapping.ForForbidden("AnotherCode", "Forbidden Title", "https://docs.example.com");
+
+        mapping.HttpStatusCode.Should().Be(403);
+        mapping.ProblemType.Should().Be("urn:tenantsaas:error:another-code");
+        mapping.InvariantCode.Should().Be("AnotherCode");
+        mapping.Title.Should().Be("Forbidden Title");
+    }
+
+    [Fact]
+    public void ForUnprocessableEntity_Sets_Status_422_And_Builds_ProblemType()
+    {
+        var mapping = RefusalMapping.ForUnprocessableEntity("ValidationCode", "Validation Failed", "https://help.example.com");
+
+        mapping.HttpStatusCode.Should().Be(422);
+        mapping.ProblemType.Should().Be("urn:tenantsaas:error:validation-code");
+        mapping.InvariantCode.Should().Be("ValidationCode");
+    }
+
+    [Fact]
+    public void ForInternalServerError_Sets_Status_500_And_Builds_ProblemType()
+    {
+        var mapping = RefusalMapping.ForInternalServerError("ServerError", "Internal Error", "https://status.example.com");
+
+        mapping.HttpStatusCode.Should().Be(500);
+        mapping.ProblemType.Should().Be("urn:tenantsaas:error:server-error");
+        mapping.InvariantCode.Should().Be("ServerError");
+    }
+
+    [Theory]
+    [InlineData("SimpleCode", "simple-code")]
+    [InlineData("TwoWords", "two-words")]
+    [InlineData("ContextInitialized", "context-initialized")]
+    [InlineData("DisclosureSafe", "disclosure-safe")]
+    public void ToKebabCase_Converts_PascalCase_Correctly(string input, string expected)
+    {
+        var mapping = RefusalMapping.ForBadRequest(input, "Title", "https://example.com");
+
+        mapping.ProblemType.Should().Be($"urn:tenantsaas:error:{expected}");
+    }
 }

@@ -51,7 +51,7 @@ development_status:
   epic-2: in-progress
   2-1-define-context-taxonomy-and-execution-kinds: done
   2-2-define-tenant-attribution-sources-precedence-and-ambiguity-rules: done
-  2-3-define-invariant-registry-and-refusal-mapping-schema: review
+  2-3-define-invariant-registry-and-refusal-mapping-schema: done
   2-4-define-break-glass-contract-and-standard-audit-event-schema: done
   2-5-define-disclosure-policy-and-tenant-ref-safe-states: backlog
   epic-2-retrospective: optional

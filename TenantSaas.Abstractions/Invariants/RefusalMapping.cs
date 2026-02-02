@@ -54,6 +54,10 @@ public sealed record RefusalMapping
         ArgumentException.ThrowIfNullOrWhiteSpace(problemType);
         ArgumentException.ThrowIfNullOrWhiteSpace(title);
         ArgumentException.ThrowIfNullOrWhiteSpace(guidanceUri);
+        if (!Uri.IsWellFormedUriString(guidanceUri, UriKind.Absolute))
+        {
+            throw new ArgumentException("GuidanceUri must be a valid absolute URI.", nameof(guidanceUri));
+        }
 
         InvariantCode = invariantCode;
         HttpStatusCode = httpStatusCode;
@@ -100,6 +104,20 @@ public sealed record RefusalMapping
         => new(
             invariantCode,
             httpStatusCode: 422,
+            problemType: BuildProblemType(invariantCode),
+            title,
+            guidanceUri);
+
+    /// <summary>
+    /// Creates a refusal mapping for internal server error scenarios.
+    /// </summary>
+    public static RefusalMapping ForInternalServerError(
+        string invariantCode,
+        string title,
+        string guidanceUri)
+        => new(
+            invariantCode,
+            httpStatusCode: 500,
             problemType: BuildProblemType(invariantCode),
             title,
             guidanceUri);

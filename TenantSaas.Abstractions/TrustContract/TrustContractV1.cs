@@ -150,10 +150,8 @@ public static class TrustContractV1
                 InvariantCode.BreakGlassExplicitAndAudited,
                 title: "Break-glass must be explicit",
                 guidanceUri: "https://docs.tenantsaas.dev/errors/break-glass-required"),
-            [InvariantCode.DisclosureSafe] = new RefusalMapping(
+            [InvariantCode.DisclosureSafe] = RefusalMapping.ForInternalServerError(
                 InvariantCode.DisclosureSafe,
-                httpStatusCode: 500,
-                problemType: "urn:tenantsaas:error:disclosure-safe",
                 title: "Tenant disclosure policy violation",
                 guidanceUri: "https://docs.tenantsaas.dev/errors/disclosure-unsafe")
         }.ToFrozenDictionary(StringComparer.Ordinal);

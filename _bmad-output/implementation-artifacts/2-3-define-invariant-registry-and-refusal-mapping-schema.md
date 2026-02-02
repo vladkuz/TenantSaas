@@ -1,6 +1,6 @@
 # Story 2.3: Define Invariant Registry and Refusal Mapping Schema
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -773,3 +773,4 @@ GPT-5 (Codex CLI)
 ### Change Log
 
 - 2026-02-01: Added invariant registry, refusal mappings, contract tests, and documentation updates for Trust Contract v1.
+- 2026-02-01: [Code Review] Added `ForInternalServerError` factory method for consistency. Added URI validation to `RefusalMapping` constructor. Added tests for all factory methods and `ToKebabCase` conversion. Updated `DisclosureSafe` mapping to use factory method.
