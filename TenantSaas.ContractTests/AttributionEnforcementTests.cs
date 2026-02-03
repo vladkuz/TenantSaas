@@ -176,26 +176,20 @@ public class AttributionEnforcementTests
     }
 
     [Fact]
-    public void AttributionEnforcementResult_ToProblemDetails_ReturnsHttp422()
+    public void ProblemDetailsFactory_TenantAttributionUnambiguous_ReturnsHttp422()
     {
-        // Arrange
-        var result = AttributionEnforcementResult.NotFound("trace-009");
-
-        // Act
-        var problemDetails = EnforcementProblemDetails.FromAttributionEnforcementResult(result);
+        // Arrange & Act
+        var problemDetails = ProblemDetailsFactory.ForTenantAttributionAmbiguous("trace-009");
 
         // Assert
         problemDetails.Status.Should().Be(422); // UnprocessableEntity
     }
 
     [Fact]
-    public void AttributionEnforcementResult_ToProblemDetails_IncludesInvariantCode()
+    public void ProblemDetailsFactory_TenantAttributionUnambiguous_IncludesInvariantCode()
     {
-        // Arrange
-        var result = AttributionEnforcementResult.NotFound("trace-010");
-
-        // Act
-        var problemDetails = EnforcementProblemDetails.FromAttributionEnforcementResult(result);
+        // Arrange & Act
+        var problemDetails = ProblemDetailsFactory.ForTenantAttributionAmbiguous("trace-010");
 
         // Assert
         problemDetails.Extensions.Should().ContainKey(InvariantCodeKey);
@@ -203,14 +197,13 @@ public class AttributionEnforcementTests
     }
 
     [Fact]
-    public void AttributionEnforcementResult_ToProblemDetails_IncludesTraceId()
+    public void ProblemDetailsFactory_TenantAttributionUnambiguous_IncludesTraceId()
     {
         // Arrange
         var traceId = "trace-011";
-        var result = AttributionEnforcementResult.NotFound(traceId);
 
         // Act
-        var problemDetails = EnforcementProblemDetails.FromAttributionEnforcementResult(result);
+        var problemDetails = ProblemDetailsFactory.ForTenantAttributionAmbiguous(traceId);
 
         // Assert
         problemDetails.Extensions.Should().ContainKey(TraceId);
@@ -218,26 +211,20 @@ public class AttributionEnforcementTests
     }
 
     [Fact]
-    public void AttributionEnforcementResult_ToProblemDetails_HasCorrectType()
+    public void ProblemDetailsFactory_TenantAttributionUnambiguous_HasCorrectType()
     {
-        // Arrange
-        var result = AttributionEnforcementResult.NotFound("trace-012");
-
-        // Act
-        var problemDetails = EnforcementProblemDetails.FromAttributionEnforcementResult(result);
+        // Arrange & Act
+        var problemDetails = ProblemDetailsFactory.ForTenantAttributionAmbiguous("trace-012");
 
         // Assert
         problemDetails.Type.Should().Be("urn:tenantsaas:error:tenant-attribution-unambiguous");
     }
 
     [Fact]
-    public void AttributionEnforcementResult_ToProblemDetails_IncludesGuidanceLink()
+    public void ProblemDetailsFactory_TenantAttributionUnambiguous_IncludesGuidanceLink()
     {
-        // Arrange
-        var result = AttributionEnforcementResult.NotFound("trace-013");
-
-        // Act
-        var problemDetails = EnforcementProblemDetails.FromAttributionEnforcementResult(result);
+        // Arrange & Act
+        var problemDetails = ProblemDetailsFactory.ForTenantAttributionAmbiguous("trace-013");
 
         // Assert
         problemDetails.Extensions.Should().ContainKey(GuidanceLink);
@@ -245,14 +232,19 @@ public class AttributionEnforcementTests
     }
 
     [Fact]
-    public void AttributionEnforcementResult_ToProblemDetails_AmbiguousIncludesConflictingSources()
+    public void ProblemDetailsFactory_TenantAttributionUnambiguous_IncludesConflictingSources()
     {
         // Arrange
         var conflictingSources = new List<string> { "Route Parameter", "Header Value" };
-        var result = AttributionEnforcementResult.Ambiguous(conflictingSources, "trace-014");
+        var extensions = new Dictionary<string, object?>
+        {
+            [ConflictingSources] = conflictingSources
+        };
 
         // Act
-        var problemDetails = EnforcementProblemDetails.FromAttributionEnforcementResult(result);
+        var problemDetails = ProblemDetailsFactory.ForTenantAttributionAmbiguous(
+            "trace-014",
+            conflictingSources: conflictingSources);
 
         // Assert
         problemDetails.Extensions.Should().ContainKey(ConflictingSources);

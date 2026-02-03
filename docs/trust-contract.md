@@ -180,11 +180,57 @@ Lookup:
 - `TrustContractV1.GetRefusalMapping(invariantCode)` returns the mapping or throws.
 - `TrustContractV1.TryGetRefusalMapping(invariantCode, out mapping)` returns false if missing.
 
+## Problem Details Factory
+
+`ProblemDetailsFactory` is the authoritative factory for constructing RFC 7807 Problem Details responses from invariant violations. All enforcement boundaries must use this factory to ensure consistent error shapes.
+
+### Core Factory Method
+
+```csharp
+ProblemDetailsFactory.FromInvariantViolation(
+    invariantCode,    // From InvariantCode constants
+    traceId,          // End-to-end correlation ID
+    requestId?,       // Request-specific ID (for request execution)
+    detail?,          // Custom detail message (falls back to invariant description)
+    extensions?       // Additional extension fields
+)
+```
+
+### Convenience Methods
+
+| Method | Invariant | HTTP Status |
+| --- | --- | --- |
+| `ForContextNotInitialized()` | ContextInitialized | 401 |
+| `ForTenantAttributionAmbiguous()` | TenantAttributionUnambiguous | 422 |
+| `ForTenantScopeRequired()` | TenantScopeRequired | 403 |
+| `ForBreakGlassRequired()` | BreakGlassExplicitAndAudited | 403 |
+| `ForDisclosureUnsafe()` | DisclosureSafe | 500 |
+
+### Required Extension Fields
+
+All Problem Details responses include:
+
+- **invariant_code**: Stable invariant identifier from `InvariantCode` class.
+- **trace_id**: End-to-end correlation ID for distributed tracing.
+- **guidance_link**: URL to error documentation and remediation.
+
+Conditional extensions:
+
+- **request_id**: Request-specific ID (present for request execution kinds).
+- **tenant_ref**: Disclosure-safe tenant reference (only when safe per policy).
+- **conflicting_sources**: Attribution sources in conflict (for ambiguous attribution).
+
+### References
+
+- Code: `TenantSaas.Core.Errors.ProblemDetailsFactory`
+- Extension keys: `TenantSaas.Core.Errors.ProblemDetailsExtensions`
+- Contract tests: `TenantSaas.ContractTests.Errors.ProblemDetailsFactoryTests`, `TenantSaas.ContractTests.Errors.ProblemDetailsShapeTests`
+
 ### HTTP Status → Invariant Mapping
 
 | Invariant | Status | Problem Type |
 | --- | --- | --- |
-| ContextInitialized | 400 | `urn:tenantsaas:error:context-initialized` |
+| ContextInitialized | 401 | `urn:tenantsaas:error:context-initialized` |
 | TenantAttributionUnambiguous | 422 | `urn:tenantsaas:error:tenant-attribution-unambiguous` |
 | TenantScopeRequired | 403 | `urn:tenantsaas:error:tenant-scope-required` |
 | BreakGlassExplicitAndAudited | 403 | `urn:tenantsaas:error:break-glass-explicit-and-audited` |
@@ -208,12 +254,13 @@ Refusals include a stable invariant code and Problem Details type identifier:
 {
   "type": "urn:tenantsaas:error:context-initialized",
   "title": "Tenant context not initialized",
-  "status": 400,
+  "status": 401,
   "detail": "Tenant context must be initialized before operations can proceed.",
-  "instance": "/api/tenants/123",
+  "instance": null,
   "invariant_code": "ContextInitialized",
   "trace_id": "trace-abc-123",
-  "guidance_uri": "https://docs.tenantsaas.dev/errors/context-not-initialized"
+  "request_id": "req-xyz-789",
+  "guidance_link": "https://docs.tenantsaas.dev/errors/context-not-initialized"
 }
 ```
 

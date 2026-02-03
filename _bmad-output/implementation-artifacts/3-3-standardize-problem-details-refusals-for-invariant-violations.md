@@ -61,13 +61,22 @@ So that clients, tests, and logs can rely on consistent semantics.
   - [x] Add `ForDisclosureUnsafe(string traceId, string? requestId = null)` → HTTP 500
   - [x] Each convenience method calls `FromInvariantViolation` with appropriate invariantCode
 
-### Deprecate Specialized Problem Details Classes
+### Remove Legacy Problem Details Classes
 
-- [x] Task 4: Mark EnforcementProblemDetails as deprecated (AC: #1)
-  - [x] Add `[Obsolete("Use ProblemDetailsFactory instead")]` to `TenantSaas.Core/Errors/EnforcementProblemDetails.cs`
-  - [x] Update XML documentation to point to ProblemDetailsFactory
-  - [x] Keep existing functionality for backward compatibility in this story
-  - [x] Document: Will be removed in next major version
+- [x] Task 4: ~~Mark EnforcementProblemDetails as deprecated (AC: #1)~~ **REVISED: Remove entirely**
+  - [x] ~~Add `[Obsolete("Use ProblemDetailsFactory instead")]` to `TenantSaas.Core/Errors/EnforcementProblemDetails.cs`~~
+  - [x] ~~Update XML documentation to point to ProblemDetailsFactory~~
+  - [x] ~~Keep existing functionality for backward compatibility in this story~~
+  - [x] ~~Document: Will be removed in next major version~~
+  - **Revision Note:** Deprecation is unnecessary in greenfield - no external consumers exist
+
+- [x] Task 4b: Delete EnforcementProblemDetails entirely (AC: #1)
+  - [x] Delete `TenantSaas.Core/Errors/EnforcementProblemDetails.cs`
+  - [x] Update `ContextInitializedTests.cs` to use `ProblemDetailsFactory` (3 usages)
+  - [x] Update `AttributionEnforcementTests.cs` to use `ProblemDetailsFactory` (6 usages)
+  - [x] Remove any remaining `using TenantSaas.Core.Errors` referencing EnforcementProblemDetails
+  - [x] Verify zero CS0618 (obsolete) warnings on build
+  - [x] All 290 tests pass
 
 - [x] Task 5: Update BoundaryGuard to use ProblemDetailsFactory (AC: #1, #3)
   - [x] ~~Update `RequireContext` to return ProblemDetails directly via ProblemDetailsFactory~~
@@ -528,10 +537,10 @@ No issues encountered during implementation.
 
 **Implementation Summary:**
 - ✅ Created centralized `ProblemDetailsFactory` with primary factory method and convenience methods
-- ✅ Marked `EnforcementProblemDetails` as obsolete while maintaining backward compatibility
+- ✅ Deleted `EnforcementProblemDetails` (greenfield project - no external consumers, deprecation unnecessary)
 - ✅ Updated `TenantContextMiddleware` to use new factory
 - ✅ Created `ProblemDetailsExceptionMiddleware` for global exception handling
-- ✅ Wrote comprehensive contract tests (72 total tests across 4 test files)
+- ✅ Wrote comprehensive contract tests (66 new tests across 4 test files)
 - ✅ Created complete error catalog documentation
 - ✅ Created integration guide with client examples and error handling patterns
 
@@ -540,7 +549,7 @@ No issues encountered during implementation.
 - 34 tests in `ProblemDetailsShapeTests` - RFC 7807 compliance and stability
 - 5 tests in `MiddlewareProblemDetailsTests` - end-to-end middleware integration
 - 11 tests in `HttpCorrelationExtensionsTests` - distributed tracing header extraction
-- **All 259 tests passing** (full regression suite)
+- **All 290 tests passing** (full regression suite after code review fixes)
 
 **Architecture Decisions:**
 - BoundaryGuard remains unchanged - correctly returns domain enforcement results, not Problem Details
@@ -566,8 +575,12 @@ No issues encountered during implementation.
 - `docs/error-catalog.md`
 - `docs/integration-guide.md`
 
+**Deleted Files:**
+- `TenantSaas.Core/Errors/EnforcementProblemDetails.cs` - Removed (greenfield project, no external consumers - per Task 4b)
+
 **Modified Files:**
-- `TenantSaas.Core/Errors/EnforcementProblemDetails.cs` - Marked obsolete
+- `TenantSaas.ContractTests/ContextInitializedTests.cs` - Migrated from EnforcementProblemDetails to ProblemDetailsFactory
+- `TenantSaas.ContractTests/AttributionEnforcementTests.cs` - Migrated from EnforcementProblemDetails to ProblemDetailsFactory
 - `TenantSaas.Sample/Middleware/TenantContextMiddleware.cs` - Updated to use ProblemDetailsFactory, HttpCorrelationExtensions, and Content-Type header
 - `TenantSaas.Sample/Program.cs` - Registered ProblemDetailsExceptionMiddleware in pipeline
 - `_bmad-output/implementation-artifacts/sprint-status.yaml` - Story marked in-progress then review

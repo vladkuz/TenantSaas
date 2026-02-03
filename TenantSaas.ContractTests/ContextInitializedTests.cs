@@ -182,36 +182,24 @@ public class ContextInitializedTests
     }
 
     [Fact]
-    public void EnforcementProblemDetails_FromFailure_ReturnsHttp401()
+    public void ProblemDetailsFactory_ContextInitialized_ReturnsHttp401()
     {
-        // Arrange
-        var result = EnforcementResult.Failure(
-            InvariantCode.ContextInitialized,
-            "trace-123",
-            "Context not initialized");
-
-        // Act
-        var problemDetails = EnforcementProblemDetails.FromEnforcementResult(result);
+        // Arrange & Act
+        var problemDetails = ProblemDetailsFactory.ForContextNotInitialized("trace-123");
 
         // Assert
         problemDetails.Status.Should().Be(401);
         problemDetails.Extensions[InvariantCodeKey].Should().Be(Abstractions.Invariants.InvariantCode.ContextInitialized);
         problemDetails.Extensions[TraceId].Should().Be("trace-123");
         problemDetails.Type.Should().Contain("context-");
-        problemDetails.Detail.Should().Be("Context not initialized");
+        problemDetails.Detail.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
-    public void EnforcementProblemDetails_FromFailure_IncludesInvariantCodeAndTraceId()
+    public void ProblemDetailsFactory_ContextInitialized_IncludesInvariantCodeAndTraceId()
     {
-        // Arrange
-        var result = EnforcementResult.Failure(
-            InvariantCode.ContextInitialized,
-            "trace-456",
-            "Tenant context must be initialized before operations can proceed.");
-
-        // Act
-        var problemDetails = EnforcementProblemDetails.FromEnforcementResult(result);
+        // Arrange & Act
+        var problemDetails = ProblemDetailsFactory.ForContextNotInitialized("trace-456");
 
         // Assert
         problemDetails.Extensions.Should().ContainKey(InvariantCodeKey);
@@ -220,17 +208,13 @@ public class ContextInitializedTests
     }
 
     [Fact]
-    public void EnforcementProblemDetails_FromSuccess_ThrowsInvalidOperationException()
+    public void ProblemDetailsFactory_WithUnknownInvariantCode_ThrowsKeyNotFoundException()
     {
-        // Arrange
-        var scope = TenantScope.ForTenant(new TenantId("tenant-1"));
-        var context = TenantContext.ForRequest(scope, "trace-123", "req-456");
-        var result = EnforcementResult.Success(context);
-
-        // Act & Assert
-        var act = () => EnforcementProblemDetails.FromEnforcementResult(result);
-        act.Should().Throw<InvalidOperationException>()
-            .WithMessage("*successful enforcement*");
+        // Arrange & Act & Assert
+        var act = () => ProblemDetailsFactory.FromInvariantViolation(
+            "UnknownInvariant",
+            "trace-123");
+        act.Should().Throw<KeyNotFoundException>();
     }
 
     [Fact]
