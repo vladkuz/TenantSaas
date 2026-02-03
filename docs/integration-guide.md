@@ -72,6 +72,30 @@ All invariant violations in TenantSaas return standardized RFC 7807 Problem Deta
 }
 ```
 
+### Available Constants
+
+TenantSaas provides constants for all Problem Details extension keys and invariant codes to avoid hardcoded strings:
+
+```csharp
+// Extension key constants (TenantSaas.Core.Errors.ProblemDetailsExtensions)
+using static TenantSaas.Core.Errors.ProblemDetailsExtensions;
+
+InvariantCodeKey     // "invariant_code"
+TraceId              // "trace_id"
+RequestId            // "request_id"
+GuidanceLink         // "guidance_link"
+ConflictingSources   // "conflicting_sources"
+
+// Invariant code constants (TenantSaas.Abstractions.Invariants.InvariantCode)
+using TenantSaas.Abstractions.Invariants;
+
+InvariantCode.ContextInitialized           // "ContextInitialized"
+InvariantCode.TenantAttributionUnambiguous // "TenantAttributionUnambiguous"
+InvariantCode.TenantScopeRequired          // "TenantScopeRequired"
+InvariantCode.BreakGlassExplicitAndAudited // "BreakGlassExplicitAndAudited"
+InvariantCode.DisclosureSafe               // "DisclosureSafe"
+```
+
 ### Client-Side Error Handling
 
 #### C# Client Example
@@ -79,6 +103,8 @@ All invariant violations in TenantSaas return standardized RFC 7807 Problem Deta
 ```csharp
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Json;
+using TenantSaas.Abstractions.Invariants;
+using static TenantSaas.Core.Errors.ProblemDetailsExtensions;
 
 public class TenantSaasClient
 {
@@ -121,9 +147,9 @@ public class TenantSaasClient
             return Result<TEntity>.Failure("Unknown error occurred");
         }
 
-        // Extract invariant code for specific handling
-        var invariantCode = problemDetails.Extensions?["invariant_code"]?.ToString();
-        var traceId = problemDetails.Extensions?["trace_id"]?.ToString();
+        // Extract invariant code for specific handling using standard extension keys
+        var invariantCode = problemDetails.Extensions?[InvariantCodeKey]?.ToString();
+        var traceId = problemDetails.Extensions?[TraceId]?.ToString();
 
         // Log for support correlation
         _logger.LogWarning(
@@ -135,17 +161,17 @@ public class TenantSaasClient
 
         switch (invariantCode)
         {
-            case "ContextInitialized":
+            case InvariantCode.ContextInitialized:
                 // Missing tenant context - may need to re-authenticate or retry
                 return Result<TEntity>.Failure("Authentication required. Please sign in again.");
 
-            case "TenantAttributionUnambiguous":
+            case InvariantCode.TenantAttributionUnambiguous:
                 // Ambiguous attribution - fix request headers/parameters
-                var sources = problemDetails.Extensions?["conflicting_sources"];
+                var sources = problemDetails.Extensions?[ConflictingSources];
                 return Result<TEntity>.Failure(
                     $"Request has conflicting tenant information: {sources}. Please provide only one tenant identifier.");
 
-            case "TenantScopeRequired":
+            case InvariantCode.TenantScopeRequired:
                 // Operation requires tenant scope but context doesn't have it
                 return Result<TEntity>.Failure("This operation requires a tenant context.");
 
@@ -264,10 +290,12 @@ class TenantSaasClient {
 The `trace_id` is your lifeline for debugging. Always log it and include it in support requests.
 
 ```csharp
+using static TenantSaas.Core.Errors.ProblemDetailsExtensions;
+
 _logger.LogError(
     "Operation failed. TraceId: {TraceId}, InvariantCode: {InvariantCode}",
-    problemDetails.Extensions["trace_id"],
-    problemDetails.Extensions["invariant_code"]);
+    problemDetails.Extensions[TraceId],
+    problemDetails.Extensions[InvariantCodeKey]);
 ```
 
 ### 2. Use invariant_code for Specific Handling
@@ -293,11 +321,13 @@ if (invariantCode == "TenantScopeRequired")
 Problem Details `detail` field is human-readable but technical. Translate to user-friendly language:
 
 ```csharp
+using TenantSaas.Abstractions.Invariants;
+
 var userMessage = invariantCode switch
 {
-    "ContextInitialized" => "Please sign in to continue.",
-    "TenantAttributionUnambiguous" => "We couldn't identify your organization. Please check your request.",
-    "TenantScopeRequired" => "This operation requires organization context.",
+    InvariantCode.ContextInitialized => "Please sign in to continue.",
+    InvariantCode.TenantAttributionUnambiguous => "We couldn't identify your organization. Please check your request.",
+    InvariantCode.TenantScopeRequired => "This operation requires organization context.",
     _ => "An error occurred. Please try again or contact support."
 };
 ```
@@ -388,6 +418,8 @@ Description: [What the user was trying to do]
 ### Extraction Example (C#)
 
 ```csharp
+using static TenantSaas.Core.Errors.ProblemDetailsExtensions;
+
 public class ErrorReport
 {
     public string TraceId { get; set; }
@@ -400,11 +432,11 @@ public class ErrorReport
     {
         return new ErrorReport
         {
-            TraceId = pd.Extensions["trace_id"]?.ToString() ?? "unknown",
-            RequestId = pd.Extensions.ContainsKey("request_id")
-                ? pd.Extensions["request_id"]?.ToString()
+            TraceId = pd.Extensions[ProblemDetailsExtensions.TraceId]?.ToString() ?? "unknown",
+            RequestId = pd.Extensions.ContainsKey(RequestId)
+                ? pd.Extensions[RequestId]?.ToString()
                 : null,
-            InvariantCode = pd.Extensions["invariant_code"]?.ToString() ?? "unknown",
+            InvariantCode = pd.Extensions[InvariantCodeKey]?.ToString() ?? "unknown",
             Timestamp = DateTimeOffset.UtcNow.ToString("O"),
             UserDescription = "" // Filled by user
         };
@@ -463,6 +495,8 @@ using System.Net.Http.Json;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using TenantSaas.Abstractions.Invariants;
+using static TenantSaas.Core.Errors.ProblemDetailsExtensions;
 
 [Fact]
 public async Task Client_ReceivesContextNotInitialized_ReturnsAuthenticationRequired()
@@ -475,9 +509,9 @@ public async Task Client_ReceivesContextNotInitialized_ReturnsAuthenticationRequ
         Status = 401,
         Detail = "Tenant context must be initialized before operations can proceed.",
     };
-    problemDetails.Extensions["invariant_code"] = "ContextInitialized";
-    problemDetails.Extensions["trace_id"] = "test-trace-123";
-    problemDetails.Extensions["request_id"] = "test-request-456";
+    problemDetails.Extensions[InvariantCodeKey] = InvariantCode.ContextInitialized;
+    problemDetails.Extensions[TraceId] = "test-trace-123";
+    problemDetails.Extensions[RequestId] = "test-request-456";
 
     var handler = new TestHttpMessageHandler(
         HttpStatusCode.Unauthorized,
@@ -531,6 +565,7 @@ using System.Net.Http.Json;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
+using static TenantSaas.Core.Errors.ProblemDetailsExtensions;
 
 public class TenantSaasIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
 {
@@ -555,8 +590,8 @@ public class TenantSaasIntegrationTests : IClassFixture<WebApplicationFactory<Pr
 
         var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>();
         problemDetails.Should().NotBeNull();
-        problemDetails!.Extensions.Should().ContainKey("invariant_code");
-        problemDetails.Extensions.Should().ContainKey("trace_id");
+        problemDetails!.Extensions.Should().ContainKey(InvariantCodeKey);
+        problemDetails.Extensions.Should().ContainKey(TraceId);
         problemDetails.Type.Should().StartWith("urn:tenantsaas:error:");
     }
 
@@ -593,6 +628,9 @@ public class TenantSaasIntegrationTests : IClassFixture<WebApplicationFactory<Pr
 Test that your error extraction logic works correctly:
 
 ```csharp
+using TenantSaas.Abstractions.Invariants;
+using static TenantSaas.Core.Errors.ProblemDetailsExtensions;
+
 [Fact]
 public void ErrorReport_FromProblemDetails_ExtractsAllFields()
 {
@@ -604,9 +642,9 @@ public void ErrorReport_FromProblemDetails_ExtractsAllFields()
         Status = 401,
         Detail = "Test detail"
     };
-    problemDetails.Extensions["invariant_code"] = "ContextInitialized";
-    problemDetails.Extensions["trace_id"] = "abc-123";
-    problemDetails.Extensions["request_id"] = "req-456";
+    problemDetails.Extensions[InvariantCodeKey] = InvariantCode.ContextInitialized;
+    problemDetails.Extensions[TraceId] = "abc-123";
+    problemDetails.Extensions[RequestId] = "req-456";
 
     // Act
     var report = ErrorReport.FromProblemDetails(problemDetails);
@@ -614,7 +652,7 @@ public void ErrorReport_FromProblemDetails_ExtractsAllFields()
     // Assert
     report.TraceId.Should().Be("abc-123");
     report.RequestId.Should().Be("req-456");
-    report.InvariantCode.Should().Be("ContextInitialized");
+    report.InvariantCode.Should().Be(InvariantCode.ContextInitialized);
 }
 
 ---
