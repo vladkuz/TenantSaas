@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using System.Text.Json;
 using TenantSaas.Abstractions.Logging;
 using TenantSaas.Abstractions.Tenancy;
+using TenantSaas.Core.Enforcement;
 using TenantSaas.Core.Logging;
 using TenantSaas.Core.Tenancy;
 using TenantSaas.Sample.Middleware;
@@ -18,6 +19,12 @@ namespace TenantSaas.ContractTests.Logging;
 /// </summary>
 public class RefusalCorrelationTests
 {
+    private static IBoundaryGuard CreateBoundaryGuard()
+    {
+        var logger = NullLogger<BoundaryGuard>.Instance;
+        var enricher = new DefaultLogEnricher();
+        return new BoundaryGuard(logger, enricher);
+    }
     [Fact]
     public async Task TenantContextMiddleware_Refusal_LogAndProblemDetailsMatchTraceId()
     {
@@ -26,10 +33,12 @@ public class RefusalCorrelationTests
         var attributionResolver = new TenantAttributionResolver();
         var logger = NullLogger<TenantContextMiddleware>.Instance;
         var enricher = new DefaultLogEnricher();
+        var boundaryGuard = CreateBoundaryGuard();
         var middleware = new TenantContextMiddleware(
             next: _ => Task.CompletedTask,
             accessor: accessor,
             attributionResolver: attributionResolver,
+            boundaryGuard: boundaryGuard,
             logger: logger,
             enricher: enricher);
 
@@ -63,10 +72,12 @@ public class RefusalCorrelationTests
         var attributionResolver = new TenantAttributionResolver();
         var logger = NullLogger<TenantContextMiddleware>.Instance;
         var enricher = new DefaultLogEnricher();
+        var boundaryGuard = CreateBoundaryGuard();
         var middleware = new TenantContextMiddleware(
             next: _ => Task.CompletedTask,
             accessor: accessor,
             attributionResolver: attributionResolver,
+            boundaryGuard: boundaryGuard,
             logger: logger,
             enricher: enricher);
 
@@ -100,10 +111,12 @@ public class RefusalCorrelationTests
         var attributionResolver = new TenantAttributionResolver();
         var logger = NullLogger<TenantContextMiddleware>.Instance;
         var enricher = new DefaultLogEnricher();
+        var boundaryGuard = CreateBoundaryGuard();
         var middleware = new TenantContextMiddleware(
             next: _ => Task.CompletedTask,
             accessor: accessor,
             attributionResolver: attributionResolver,
+            boundaryGuard: boundaryGuard,
             logger: logger,
             enricher: enricher);
 
@@ -137,10 +150,12 @@ public class RefusalCorrelationTests
         var attributionResolver = new TenantAttributionResolver();
         var logger = NullLogger<TenantContextMiddleware>.Instance;
         var enricher = new DefaultLogEnricher();
+        var boundaryGuard = CreateBoundaryGuard();
         var middleware = new TenantContextMiddleware(
             next: _ => Task.CompletedTask,
             accessor: accessor,
             attributionResolver: attributionResolver,
+            boundaryGuard: boundaryGuard,
             logger: logger,
             enricher: enricher);
 
@@ -174,10 +189,12 @@ public class RefusalCorrelationTests
         var attributionResolver = new TenantAttributionResolver();
         var logger = NullLogger<TenantContextMiddleware>.Instance;
         var enricher = new DefaultLogEnricher();
+        var boundaryGuard = CreateBoundaryGuard();
         var middleware = new TenantContextMiddleware(
             next: _ => Task.CompletedTask,
             accessor: accessor,
             attributionResolver: attributionResolver,
+            boundaryGuard: boundaryGuard,
             logger: logger,
             enricher: enricher);
 
@@ -219,10 +236,12 @@ public class RefusalCorrelationTests
         var attributionResolver = new TenantAttributionResolver();
         var logger = NullLogger<TenantContextMiddleware>.Instance;
         var enricher = new DefaultLogEnricher();
+        var boundaryGuard = CreateBoundaryGuard();
         var middleware = new TenantContextMiddleware(
             next: _ => Task.CompletedTask,
             accessor: accessor,
             attributionResolver: attributionResolver,
+            boundaryGuard: boundaryGuard,
             logger: logger,
             enricher: enricher);
 
@@ -260,10 +279,12 @@ public class RefusalCorrelationTests
         var attributionResolver = new TenantAttributionResolver();
         var logger = NullLogger<TenantContextMiddleware>.Instance;
         var enricher = new DefaultLogEnricher();
+        var boundaryGuard = CreateBoundaryGuard();
         var middleware = new TenantContextMiddleware(
             next: _ => Task.CompletedTask,
             accessor: accessor,
             attributionResolver: attributionResolver,
+            boundaryGuard: boundaryGuard,
             logger: logger,
             enricher: enricher);
 

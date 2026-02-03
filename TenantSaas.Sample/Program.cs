@@ -4,7 +4,6 @@ using TenantSaas.Core.Tenancy;
 using TenantSaas.Core.Logging;
 using TenantSaas.Core.Enforcement;
 using TenantSaas.Sample.Middleware;
-using Microsoft.Extensions.Logging;
 
 var app = SampleApp.BuildApp(args);
 app.Run();
@@ -27,6 +26,9 @@ public static class SampleApp
         // Register logging infrastructure for structured enforcement events
         builder.Services.AddSingleton<ILogEnricher, DefaultLogEnricher>();
 
+        // Register boundary guard for invariant enforcement
+        builder.Services.AddSingleton<IBoundaryGuard, BoundaryGuard>();
+
         if (enableOpenApi)
         {
             // Add services to the container.
@@ -36,12 +38,6 @@ public static class SampleApp
         }
 
         var app = builder.Build();
-
-        // Configure BoundaryGuard with logging after service provider is built
-        var loggerFactory = app.Services.GetRequiredService<ILoggerFactory>();
-        var logger = loggerFactory.CreateLogger("TenantSaas.Core.Enforcement.BoundaryGuard");
-        var enricher = app.Services.GetRequiredService<ILogEnricher>();
-        BoundaryGuard.Configure(logger, enricher);
 
         // Configure the HTTP request pipeline.
         if (enableOpenApi && app.Environment.IsDevelopment())

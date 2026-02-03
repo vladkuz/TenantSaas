@@ -43,3 +43,6 @@ out/
 *.temp
 .cache/
 .codex/
+.codex/history.jsonl
+.codex/models_cache.json
+.codex/log/codex-tui.log

@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using TenantSaas.Abstractions.Tenancy;
 using TenantSaas.Abstractions.Logging;
+using TenantSaas.Core.Enforcement;
 using TenantSaas.Core.Tenancy;
 using TenantSaas.Core.Logging;
 using TenantSaas.Sample.Middleware;
@@ -22,6 +23,12 @@ namespace TenantSaas.ContractTests;
 /// </summary>
 public class MiddlewareProblemDetailsTests
 {
+    private static IBoundaryGuard CreateBoundaryGuard()
+    {
+        var logger = NullLogger<BoundaryGuard>.Instance;
+        var enricher = new DefaultLogEnricher();
+        return new BoundaryGuard(logger, enricher);
+    }
     [Fact]
     public async Task TenantContextMiddleware_MissingAttribution_ReturnsStandardizedProblemDetails()
     {
@@ -30,10 +37,12 @@ public class MiddlewareProblemDetailsTests
         var attributionResolver = new TenantAttributionResolver();
         var logger = NullLogger<TenantContextMiddleware>.Instance;
         var enricher = new DefaultLogEnricher();
+        var boundaryGuard = CreateBoundaryGuard();
         var middleware = new TenantContextMiddleware(
             next: _ => Task.CompletedTask,
             accessor: accessor,
             attributionResolver: attributionResolver,
+            boundaryGuard: boundaryGuard,
             logger: logger,
             enricher: enricher);
 
@@ -78,6 +87,7 @@ public class MiddlewareProblemDetailsTests
         var attributionResolver = new TenantAttributionResolver();
         var logger = NullLogger<TenantContextMiddleware>.Instance;
         var enricher = new DefaultLogEnricher();
+        var boundaryGuard = CreateBoundaryGuard();
         var nextCalled = false;
 
         var middleware = new TenantContextMiddleware(
@@ -88,6 +98,7 @@ public class MiddlewareProblemDetailsTests
             },
             accessor: accessor,
             attributionResolver: attributionResolver,
+            boundaryGuard: boundaryGuard,
             logger: logger,
             enricher: enricher);
 
@@ -111,6 +122,7 @@ public class MiddlewareProblemDetailsTests
         var attributionResolver = new TenantAttributionResolver();
         var logger = NullLogger<TenantContextMiddleware>.Instance;
         var enricher = new DefaultLogEnricher();
+        var boundaryGuard = CreateBoundaryGuard();
         var nextCalled = false;
 
         var middleware = new TenantContextMiddleware(
@@ -121,6 +133,7 @@ public class MiddlewareProblemDetailsTests
             },
             accessor: accessor,
             attributionResolver: attributionResolver,
+            boundaryGuard: boundaryGuard,
             logger: logger,
             enricher: enricher);
 
@@ -241,10 +254,12 @@ public class MiddlewareProblemDetailsTests
         var attributionResolver = new TenantAttributionResolver();
         var logger = NullLogger<TenantContextMiddleware>.Instance;
         var enricher = new DefaultLogEnricher();
+        var boundaryGuard = CreateBoundaryGuard();
         var middleware = new TenantContextMiddleware(
             next: _ => Task.CompletedTask,
             accessor: accessor,
             attributionResolver: attributionResolver,
+            boundaryGuard: boundaryGuard,
             logger: logger,
             enricher: enricher);
 

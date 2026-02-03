@@ -42,10 +42,12 @@ app.UseMiddleware<ProblemDetailsExceptionMiddleware>();
 // Add tenant context middleware
 app.UseMiddleware<TenantContextMiddleware>();
 
-// Your application middleware follows
-app.UseRouting();
-app.UseAuthorization();
-app.MapControllers();
+// Your Minimal API endpoints follow
+app.MapGet("/tenants/{tenantId}/data", (string tenantId, ITenantContextAccessor accessor) =>
+{
+    var context = accessor.Current;
+    return Results.Ok(new { tenantId = context!.Scope });
+});
 ```
 
 **Important:** Order matters! `ProblemDetailsExceptionMiddleware` should be first to catch all unhandled exceptions.
@@ -471,7 +473,7 @@ Add these NuGet packages to your test project:
 
 ```xml
 <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.0" />
-<PackageReference Include="FluentAssertions" Version="8.0.1" />
+<PackageReference Include="FluentAssertions" Version="7.0.0" />
 <PackageReference Include="Moq" Version="4.20.72" />
 ```
 

@@ -31,12 +31,14 @@ internal static class LoggingDefaults
 /// <param name="next">The next middleware in the pipeline.</param>
 /// <param name="accessor">Mutable tenant context accessor for setting/clearing context.</param>
 /// <param name="attributionResolver">Resolver for tenant attribution from request sources.</param>
+/// <param name="boundaryGuard">Boundary guard for invariant enforcement.</param>
 /// <param name="logger">Logger for structured enforcement events.</param>
 /// <param name="enricher">Log enricher for structured field extraction.</param>
 public class TenantContextMiddleware(
     RequestDelegate next,
     IMutableTenantContextAccessor accessor,
     ITenantAttributionResolver attributionResolver,
+    IBoundaryGuard boundaryGuard,
     ILogger<TenantContextMiddleware> logger,
     ILogEnricher enricher)
 {
@@ -95,7 +97,7 @@ public class TenantContextMiddleware(
             Abstractions.Contexts.ExecutionKind.Request);
 
         // Enforce unambiguous attribution
-        var enforcementResult = BoundaryGuard.RequireUnambiguousAttribution(
+        var enforcementResult = boundaryGuard.RequireUnambiguousAttribution(
             attributionResult,
             traceId);
 
@@ -142,7 +144,7 @@ public class TenantContextMiddleware(
         try
         {
             // Verify context initialization (defensive check)
-            var contextCheck = BoundaryGuard.RequireContext(accessor);
+            var contextCheck = boundaryGuard.RequireContext(accessor);
             if (!contextCheck.IsSuccess)
             {
                 // Cannot write Problem Details if response has already started (e.g., streaming)

@@ -281,11 +281,11 @@ Naming, structure, API formats, error handling, logging fields, and date/time fo
 TenantSaas/
 ├── README.md
 ├── docs/
-│   ├── architecture.md
 │   ├── trust-contract.md
 │   ├── integration-guide.md
-│   ├── verification-guide.md
-│   └── error-catalog.md
+│   ├── error-catalog.md
+│   ├── verification-guide.md              # Deferred: Epic 6, Story 6.6
+│   └── api-reference.md                   # Deferred: Epic 6, Story 6.7
 ├── TenantSaas.sln
 ├── .gitignore
 ├── Directory.Build.props
@@ -294,8 +294,7 @@ TenantSaas/
 ├── .editorconfig
 ├── .github/
 │   └── workflows/
-│       ├── ci.yml
-│       └── release.yml
+│       └── ci.yml                          # release.yml deferred to Epic 1 completion
 ├── TenantSaas.Abstractions/
 │   ├── TenantSaas.Abstractions.csproj
 │   ├── Tenancy/
@@ -327,11 +326,8 @@ TenantSaas/
 │       ├── ProblemDetailsFactory.cs
 │       ├── ProblemDetailsExtensions.cs
 │       └── InvariantProblemDetails.cs
-├── TenantSaas.EfCore/
-│   ├── TenantSaas.EfCore.csproj
-│   └── EfCore/
-│       ├── TenantDbContext.cs
-│       └── SaveChangesGuards.cs
+├── TenantSaas.EfCore/                      # Planned: Epic 6, Story 6.3
+│   └── TenantSaas.EfCore.csproj            # Shell only; adapter not yet implemented
 ├── TenantSaas.ContractTests/
 │   ├── TenantSaas.ContractTests.csproj
 │   ├── Fixtures/
@@ -345,49 +341,31 @@ TenantSaas/
 │       └── LogFieldPresenceTests.cs
 ├── TenantSaas.Sample/
 │   ├── TenantSaas.Sample.csproj
-│   ├── Program.cs
-│   ├── Endpoints/
-│   │   ├── TenantsEndpoints.cs
-│   │   └── InvariantsEndpoints.cs
-│   ├── Auth/
-│   │   └── ApiKeyAuthHandler.cs
+│   ├── Program.cs                         # Minimal API routes defined inline
 │   ├── Middleware/
 │   │   ├── TenantContextMiddleware.cs
-│   │   └── ProblemDetailsMiddleware.cs
-│   ├── Data/
-│   │   └── SampleDbContext.cs
-│   ├── Models/
-│   │   └── Tenant.cs
-│   ├── Logging/
-│   │   └── SampleLoggingSetup.cs
+│   │   └── ProblemDetailsExceptionMiddleware.cs
+│   ├── Properties/
+│   │   └── launchSettings.json
 │   ├── appsettings.json
 │   └── appsettings.Development.json
-├── TenantSaas.Sample.BackgroundJobs/   (planned)
-│   ├── TenantSaas.Sample.BackgroundJobs.csproj
-│   ├── Program.cs
-│   └── Jobs/
-│       └── SampleJob.cs
-├── docker/
-│   ├── sample.Dockerfile
-│   └── docker-compose.yml
-└── scripts/
-    ├── build.ps1
-    ├── test.ps1
-    └── pack.ps1
+├── TenantSaas.Sample.BackgroundJobs/       # Planned: post-MVP
+├── docker/                                  # Deferred: optional infrastructure
+└── scripts/                                 # Deferred: optional infrastructure
 ```
 
 ### Architectural Boundaries
 
 **API Boundaries:**
 - External API is only in `TenantSaas.Sample` (Minimal APIs).
-- Authentication boundary is in `TenantSaas.Sample/Auth` with API key handler.
+- Authentication: BYO-auth stance; sample does not implement auth (adopters bring their own). Deferred to adopter integration.
 - Error boundary is enforced via Problem Details middleware.
 
 **Component Boundaries:**
 - `TenantSaas.Abstractions` defines contracts and shared types only.
 - `TenantSaas.Core` implements invariant enforcement and logging helpers.
-- `TenantSaas.EfCore` provides the reference EF Core adapter only.
-- Contract tests target abstractions, core behavior, and reference adapters as needed; no sample coupling.
+- `TenantSaas.EfCore` provides the reference EF Core adapter only (shell; implementation deferred to Epic 6, Story 6.3).
+- Contract tests target abstractions, core behavior, and the sample host for E2E integration verification. Note: Some tests use `WebApplicationFactory<Program>` for integration testing; this coupling is intentional for E2E validation.
 
 **Service Boundaries:**
 - No internal services; the library remains a single trust-kernel.
@@ -451,6 +429,24 @@ TenantSaas/
 - Sample API containerized for demo; library shipped via NuGet (packaging deferred).
 
 ## Architecture Validation Results
+
+### Implementation Status
+
+> **Last Updated:** 2026-02-03
+
+| Component | Status | Notes |
+|-----------|--------|-------|
+| TenantSaas.Abstractions | ✅ Implemented | Contracts, tenancy, invariants, logging abstractions |
+| TenantSaas.Core | ✅ Implemented | Enforcement, errors, logging, tenancy resolution |
+| TenantSaas.EfCore | 🔜 Deferred | Shell only; adapter planned in Epic 6, Story 6.3 |
+| TenantSaas.Sample | ✅ Implemented | Minimal API host with middleware; BYO-auth stance |
+| TenantSaas.ContractTests | ✅ Implemented | Contract + E2E tests; intentional Sample coupling for integration verification |
+| docs/verification-guide.md | 🔜 Deferred | Planned in Epic 6, Story 6.6 |
+| docs/api-reference.md | 🔜 Deferred | Planned in Epic 6, Story 6.7 |
+| .github/workflows/release.yml | 🔜 Deferred | Planned post-Epic 1 completion |
+| docker/, scripts/ | 🔜 Deferred | Optional infrastructure |
+| Sample Auth (ApiKeyAuthHandler) | ⏭️ Not Planned | BYO-auth stance; adopters bring their own |
+| Logging `event_name` field | ⏸️ Pending | Requires architectural decision on field format before implementation |
 
 ### Coherence Validation ✅
 

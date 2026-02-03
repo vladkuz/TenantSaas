@@ -1,8 +1,11 @@
 using FluentAssertions;
+using Microsoft.Extensions.Logging.Abstractions;
 using TenantSaas.Abstractions.Invariants;
+using TenantSaas.Abstractions.Logging;
 using TenantSaas.Abstractions.Tenancy;
 using TenantSaas.Core.Enforcement;
 using TenantSaas.Core.Errors;
+using TenantSaas.Core.Logging;
 using Xunit;
 using static TenantSaas.Core.Errors.ProblemDetailsExtensions;
 
@@ -13,6 +16,12 @@ namespace TenantSaas.ContractTests;
 /// </summary>
 public class AttributionEnforcementTests
 {
+    private static IBoundaryGuard CreateBoundaryGuard()
+    {
+        var logger = NullLogger<BoundaryGuard>.Instance;
+        var enricher = new DefaultLogEnricher();
+        return new BoundaryGuard(logger, enricher);
+    }
     [Fact]
     public void RequireUnambiguousAttribution_WithSuccessfulAttribution_ReturnsSuccess()
     {
@@ -20,9 +29,10 @@ public class AttributionEnforcementTests
         var tenantId = new TenantId("tenant-123");
         var attributionResult = TenantAttributionResult.Succeeded(tenantId, TenantAttributionSource.RouteParameter);
         var traceId = "trace-001";
+        var boundaryGuard = CreateBoundaryGuard();
 
         // Act
-        var result = BoundaryGuard.RequireUnambiguousAttribution(attributionResult, traceId);
+        var result = boundaryGuard.RequireUnambiguousAttribution(attributionResult, traceId);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -45,9 +55,10 @@ public class AttributionEnforcementTests
         };
         var attributionResult = TenantAttributionResult.IsAmbiguous(conflicts);
         var traceId = "trace-002";
+        var boundaryGuard = CreateBoundaryGuard();
 
         // Act
-        var result = BoundaryGuard.RequireUnambiguousAttribution(attributionResult, traceId);
+        var result = boundaryGuard.RequireUnambiguousAttribution(attributionResult, traceId);
 
         // Assert
         result.IsSuccess.Should().BeFalse();
@@ -66,9 +77,10 @@ public class AttributionEnforcementTests
         // Arrange
         var attributionResult = TenantAttributionResult.WasNotFound();
         var traceId = "trace-003";
+        var boundaryGuard = CreateBoundaryGuard();
 
         // Act
-        var result = BoundaryGuard.RequireUnambiguousAttribution(attributionResult, traceId);
+        var result = boundaryGuard.RequireUnambiguousAttribution(attributionResult, traceId);
 
         // Assert
         result.IsSuccess.Should().BeFalse();
@@ -84,9 +96,10 @@ public class AttributionEnforcementTests
         // Arrange
         var attributionResult = TenantAttributionResult.IsNotAllowed(TenantAttributionSource.HostHeader);
         var traceId = "trace-004";
+        var boundaryGuard = CreateBoundaryGuard();
 
         // Act
-        var result = BoundaryGuard.RequireUnambiguousAttribution(attributionResult, traceId);
+        var result = boundaryGuard.RequireUnambiguousAttribution(attributionResult, traceId);
 
         // Assert
         result.IsSuccess.Should().BeFalse();
@@ -103,9 +116,10 @@ public class AttributionEnforcementTests
         // Arrange
         var attributionResult = TenantAttributionResult.WasNotFound();
         var traceId = "trace-005";
+        var boundaryGuard = CreateBoundaryGuard();
 
         // Act
-        var result = BoundaryGuard.RequireUnambiguousAttribution(attributionResult, traceId);
+        var result = boundaryGuard.RequireUnambiguousAttribution(attributionResult, traceId);
 
         // Assert
         result.TraceId.Should().Be(traceId);
@@ -123,9 +137,10 @@ public class AttributionEnforcementTests
         };
         var attributionResult = TenantAttributionResult.IsAmbiguous(conflicts);
         var traceId = "trace-006";
+        var boundaryGuard = CreateBoundaryGuard();
 
         // Act
-        var result = BoundaryGuard.RequireUnambiguousAttribution(attributionResult, traceId);
+        var result = boundaryGuard.RequireUnambiguousAttribution(attributionResult, traceId);
 
         // Assert - Detail must NOT contain actual tenant IDs
         result.Detail.Should().NotContain("tenant-123");
@@ -144,9 +159,10 @@ public class AttributionEnforcementTests
         };
         var attributionResult = TenantAttributionResult.IsAmbiguous(conflicts);
         var traceId = "trace-007";
+        var boundaryGuard = CreateBoundaryGuard();
 
         // Act
-        var result = BoundaryGuard.RequireUnambiguousAttribution(attributionResult, traceId);
+        var result = boundaryGuard.RequireUnambiguousAttribution(attributionResult, traceId);
 
         // Assert - Detail should contain the count of conflicts
         result.Detail.Should().Contain("3 sources");
@@ -164,9 +180,10 @@ public class AttributionEnforcementTests
         };
         var attributionResult = TenantAttributionResult.IsAmbiguous(conflicts);
         var traceId = "trace-008";
+        var boundaryGuard = CreateBoundaryGuard();
 
         // Act
-        var result = BoundaryGuard.RequireUnambiguousAttribution(attributionResult, traceId);
+        var result = boundaryGuard.RequireUnambiguousAttribution(attributionResult, traceId);
 
         // Assert - ConflictingSources should contain display names, not tenant IDs
         result.ConflictingSources.Should().Contain("Route Parameter");

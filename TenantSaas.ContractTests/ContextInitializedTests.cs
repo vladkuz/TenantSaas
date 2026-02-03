@@ -1,16 +1,28 @@
 using FluentAssertions;
+using Microsoft.Extensions.Logging.Abstractions;
 using TenantSaas.Abstractions.Tenancy;
 using TenantSaas.Abstractions.Invariants;
+using TenantSaas.Abstractions.Logging;
 using TenantSaas.Core.Enforcement;
 using TenantSaas.Core.Tenancy;
+using TenantSaas.Core.Logging;
 using TenantSaas.Core.Errors;
 using Xunit;
 using static TenantSaas.Core.Errors.ProblemDetailsExtensions;
 
 namespace TenantSaas.ContractTests;
 
+/// <summary>
+/// Contract tests for ContextInitialized invariant.
+/// </summary>
 public class ContextInitializedTests
 {
+    private static IBoundaryGuard CreateBoundaryGuard()
+    {
+        var logger = NullLogger<BoundaryGuard>.Instance;
+        var enricher = new DefaultLogEnricher();
+        return new BoundaryGuard(logger, enricher);
+    }
     [Fact]
     public void EnforcementResult_Success_ShouldContainContext()
     {
@@ -51,9 +63,10 @@ public class ContextInitializedTests
     {
         // Arrange
         var accessor = new AmbientTenantContextAccessor();
+        var boundaryGuard = CreateBoundaryGuard();
 
         // Act
-        var result = BoundaryGuard.RequireContext(accessor);
+        var result = boundaryGuard.RequireContext(accessor);
 
         // Assert
         result.IsSuccess.Should().BeFalse();
@@ -70,9 +83,10 @@ public class ContextInitializedTests
         var scope = TenantScope.ForTenant(new TenantId("tenant-1"));
         var context = TenantContext.ForRequest(scope, "trace-123", "req-456");
         accessor.Set(context);
+        var boundaryGuard = CreateBoundaryGuard();
 
         // Act
-        var result = BoundaryGuard.RequireContext(accessor);
+        var result = boundaryGuard.RequireContext(accessor);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -86,9 +100,10 @@ public class ContextInitializedTests
         // Arrange
         var accessor = new AmbientTenantContextAccessor();
         var overrideTraceId = "custom-trace-456";
+        var boundaryGuard = CreateBoundaryGuard();
 
         // Act
-        var result = BoundaryGuard.RequireContext(accessor, overrideTraceId);
+        var result = boundaryGuard.RequireContext(accessor, overrideTraceId);
 
         // Assert
         result.IsSuccess.Should().BeFalse();
@@ -277,8 +292,11 @@ public class ContextInitializedTests
     [Fact]
     public void BoundaryGuard_RequireContext_ThrowsOnNullAccessor()
     {
+        // Arrange
+        var boundaryGuard = CreateBoundaryGuard();
+
         // Act & Assert
-        var act = () => BoundaryGuard.RequireContext(null!);
+        var act = () => boundaryGuard.RequireContext(null!);
         act.Should().Throw<ArgumentNullException>()
             .WithParameterName("accessor");
     }

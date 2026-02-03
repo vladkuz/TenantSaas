@@ -3,15 +3,62 @@ using Microsoft.Extensions.Logging;
 namespace TenantSaas.ContractTests.TestUtilities;
 
 /// <summary>
+/// Thread-safe collection for capturing log entries in tests.
+/// Provides safe enumeration via ToList() snapshot.
+/// </summary>
+internal sealed class CapturedLogCollection
+{
+    private readonly List<CapturedLogEntry> entries = [];
+    private readonly object syncRoot = new();
+
+    public void Add(CapturedLogEntry entry)
+    {
+        lock (syncRoot)
+        {
+            entries.Add(entry);
+        }
+    }
+
+    public int Count
+    {
+        get
+        {
+            lock (syncRoot)
+            {
+                return entries.Count;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Returns a snapshot of all captured entries. Safe for enumeration.
+    /// </summary>
+    public List<CapturedLogEntry> ToList()
+    {
+        lock (syncRoot)
+        {
+            return [.. entries];
+        }
+    }
+
+    public void Clear()
+    {
+        lock (syncRoot)
+        {
+            entries.Clear();
+        }
+    }
+}
+
+/// <summary>
 /// Test logger factory for capturing log messages in tests.
 /// Provides a thread-safe collection of captured log entries for verification.
 /// </summary>
 internal sealed class TestLoggerFactory : ILoggerFactory
 {
-    private readonly List<CapturedLogEntry> capturedEntries;
-    private readonly object lockObject = new();
+    private readonly CapturedLogCollection capturedEntries;
 
-    public TestLoggerFactory(List<CapturedLogEntry> capturedEntries)
+    public TestLoggerFactory(CapturedLogCollection capturedEntries)
     {
         ArgumentNullException.ThrowIfNull(capturedEntries);
         this.capturedEntries = capturedEntries;
@@ -19,9 +66,35 @@ internal sealed class TestLoggerFactory : ILoggerFactory
 
     public void AddProvider(ILoggerProvider provider) { }
 
-    public ILogger CreateLogger(string categoryName) => new TestLogger(capturedEntries, categoryName, lockObject);
+    public ILogger CreateLogger(string categoryName) => new TestLogger(capturedEntries, categoryName);
+
+    public ILogger<T> CreateLogger<T>() => new TestLogger<T>(capturedEntries);
 
     public void Dispose() { }
+}
+
+/// <summary>
+/// Generic test logger that captures log entries for verification in tests.
+/// </summary>
+internal sealed class TestLogger<T> : ILogger<T>
+{
+    private readonly TestLogger _inner;
+
+    public TestLogger(CapturedLogCollection capturedEntries)
+    {
+        _inner = new TestLogger(capturedEntries, typeof(T).FullName ?? typeof(T).Name);
+    }
+
+    public IDisposable? BeginScope<TState>(TState state) where TState : notnull => _inner.BeginScope(state);
+
+    public bool IsEnabled(LogLevel logLevel) => _inner.IsEnabled(logLevel);
+
+    public void Log<TState>(
+        LogLevel logLevel,
+        EventId eventId,
+        TState state,
+        Exception? exception,
+        Func<TState, Exception?, string> formatter) => _inner.Log(logLevel, eventId, state, exception, formatter);
 }
 
 /// <summary>
@@ -29,15 +102,13 @@ internal sealed class TestLoggerFactory : ILoggerFactory
 /// </summary>
 internal sealed class TestLogger : ILogger
 {
-    private readonly List<CapturedLogEntry> capturedEntries;
+    private readonly CapturedLogCollection capturedEntries;
     private readonly string categoryName;
-    private readonly object lockObject;
 
-    public TestLogger(List<CapturedLogEntry> capturedEntries, string categoryName, object lockObject)
+    public TestLogger(CapturedLogCollection capturedEntries, string categoryName)
     {
         this.capturedEntries = capturedEntries;
         this.categoryName = categoryName;
-        this.lockObject = lockObject;
     }
 
     public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
@@ -59,10 +130,7 @@ internal sealed class TestLogger : ILogger
             Exception: exception,
             State: state?.ToString());
 
-        lock (lockObject)
-        {
-            capturedEntries.Add(entry);
-        }
+        capturedEntries.Add(entry);
     }
 }
 

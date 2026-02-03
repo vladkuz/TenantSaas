@@ -3,71 +3,38 @@ using TenantSaas.Abstractions.Invariants;
 using TenantSaas.Abstractions.Logging;
 using TenantSaas.Core.Logging;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace TenantSaas.Core.Enforcement;
 
 /// <summary>
 /// Enforces tenant context invariants at sanctioned boundaries.
 /// </summary>
-public static class BoundaryGuard
+/// <remarks>
+/// This class implements the invariant enforcement contract. Register as a singleton
+/// in DI and inject where boundary enforcement is needed.
+/// </remarks>
+public sealed class BoundaryGuard : IBoundaryGuard
 {
-    private static volatile ILogger logger = NullLogger.Instance;
-    private static volatile ILogEnricher? enricher;
-    private static volatile bool isConfigured;
-    private static readonly object configLock = new();
+    private readonly ILogger logger;
+    private readonly ILogEnricher enricher;
 
     /// <summary>
-    /// Configures logging for enforcement boundary operations.
-    /// Must be called once during application startup to enable structured logging.
-    /// Thread-safe and idempotent - subsequent calls after first configuration are ignored.
+    /// Creates a new BoundaryGuard with the specified dependencies.
     /// </summary>
-    /// <param name="loggerInstance">Logger instance for enforcement events.</param>
-    /// <param name="enricherInstance">Log enricher for structured field extraction.</param>
-    /// <exception cref="ArgumentNullException">Thrown when loggerInstance or enricherInstance is null.</exception>
-    public static void Configure(ILogger loggerInstance, ILogEnricher enricherInstance)
+    /// <param name="logger">Logger instance for enforcement events.</param>
+    /// <param name="enricher">Log enricher for structured field extraction.</param>
+    /// <exception cref="ArgumentNullException">Thrown when any dependency is null.</exception>
+    public BoundaryGuard(ILogger<BoundaryGuard> logger, ILogEnricher enricher)
     {
-        ArgumentNullException.ThrowIfNull(loggerInstance);
-        ArgumentNullException.ThrowIfNull(enricherInstance);
+        ArgumentNullException.ThrowIfNull(logger);
+        ArgumentNullException.ThrowIfNull(enricher);
 
-        if (isConfigured)
-        {
-            return; // Already configured, ignore subsequent calls
-        }
-
-        lock (configLock)
-        {
-            if (isConfigured)
-            {
-                return; // Double-check after acquiring lock
-            }
-
-            logger = loggerInstance;
-            enricher = enricherInstance;
-            isConfigured = true;
-        }
+        this.logger = logger;
+        this.enricher = enricher;
     }
 
-    /// <summary>
-    /// Resets configuration for testing purposes only.
-    /// </summary>
-    internal static void ResetForTesting()
-    {
-        lock (configLock)
-        {
-            logger = NullLogger.Instance;
-            enricher = null;
-            isConfigured = false;
-        }
-    }
-
-    /// <summary>
-    /// Requires that tenant context has been initialized.
-    /// </summary>
-    /// <param name="accessor">Context accessor to check.</param>
-    /// <param name="overrideTraceId">Optional trace ID for correlation when context is missing.</param>
-    /// <returns>Success with context, or failure with invariant violation.</returns>
-    public static EnforcementResult RequireContext(
+    /// <inheritdoc />
+    public EnforcementResult RequireContext(
         ITenantContextAccessor accessor,
         string? overrideTraceId = null)
     {
@@ -90,11 +57,10 @@ public static class BoundaryGuard
                 "Tenant context must be initialized before operations can proceed.");
         }
 
-        // Log success - capture local reference to avoid null check race
-        var currentEnricher = enricher;
-        if (currentEnricher is not null && accessor.Current is not null)
+        // Log success
+        if (accessor.Current is not null)
         {
-            var logEvent = currentEnricher.Enrich(accessor.Current, "ContextInitialized");
+            var logEvent = enricher.Enrich(accessor.Current, "ContextInitialized");
             EnforcementEventSource.ContextInitialized(
                 logger,
                 logEvent.TenantRef,
@@ -107,13 +73,8 @@ public static class BoundaryGuard
         return EnforcementResult.Success(accessor.Current!);
     }
 
-    /// <summary>
-    /// Requires that tenant attribution is unambiguous.
-    /// </summary>
-    /// <param name="result">Attribution resolution result.</param>
-    /// <param name="traceId">Trace identifier for correlation.</param>
-    /// <returns>Success with resolved tenant ID and source, or failure with invariant violation.</returns>
-    public static AttributionEnforcementResult RequireUnambiguousAttribution(
+    /// <inheritdoc />
+    public AttributionEnforcementResult RequireUnambiguousAttribution(
         TenantAttributionResult result,
         string traceId)
     {
@@ -149,7 +110,7 @@ public static class BoundaryGuard
     /// <summary>
     /// Logs attribution result based on outcome type.
     /// </summary>
-    private static void LogAttributionResult(
+    private void LogAttributionResult(
         AttributionEnforcementResult enforcementResult,
         TenantAttributionResult originalResult,
         string traceId)
