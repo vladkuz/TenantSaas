@@ -265,7 +265,7 @@ Naming, structure, API formats, error handling, logging fields, and date/time fo
 
 **Good Examples:**
 - Route: `GET /tenants/{tenantId}`
-- Problem Details `type`: `urn:tenantfence:error:tenant-not-found`
+- Problem Details `type`: `urn:tenantsaas:error:tenant-not-found`
 - Log: `event_name=tenant.resolve_failed`, `tenant_ref=...`, `trace_id=...`
 
 **Anti-Patterns:**
@@ -308,7 +308,6 @@ TenantSaas/
 │   ├── Logging/
 │   │   └── TenantLogFields.cs
 │   └── Errors/
-│       └── ProblemDetailsExtensions.cs
 ├── TenantSaas.Core/
 │   ├── TenantSaas.Core.csproj
 │   ├── Common/
@@ -326,6 +325,7 @@ TenantSaas/
 │   │   └── TenantLogEnricher.cs
 │   └── Errors/
 │       ├── ProblemDetailsFactory.cs
+│       ├── ProblemDetailsExtensions.cs
 │       └── InvariantProblemDetails.cs
 ├── TenantSaas.EfCore/
 │   ├── TenantSaas.EfCore.csproj

@@ -191,7 +191,7 @@ This is **Story 3.4**, the fourth story of Epic 3 (Refuse-by-Default Enforcement
 > Definition: `tenant_ref` is the disclosure-safe tenant identifier used in logs/errors. It is either an opaque public tenant ID or a safe-state token (`unknown`, `sensitive`, `cross_tenant`) when disclosure is unsafe
 
 **From Project Context:**
-> Structured logs must include required fields (`tenant_id`, `trace_id`, `request_id`, `invariant_code`, `event_name`, `severity`)  
+> Structured logs must include required fields (`tenant_ref`, `trace_id`, `request_id`, `invariant_code`, `event_name`, `severity`)  
 > Never log without required structured fields  
 > Never log secrets, credentials, tokens, or PII
 

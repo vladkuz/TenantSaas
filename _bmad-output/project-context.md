@@ -64,7 +64,7 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - JSON fields are `camelCase`; no underscores.
 - Date/time is ISO 8601 / RFC 3339 UTC with `Z` only.
 - Problem Details only for errors; direct resource for success.
-- Structured logs must include required fields (`tenant_id`, `trace_id`, `request_id`, `invariant_code`, `event_name`, `severity`).
+- Structured logs must include required fields (`tenant_ref`, `trace_id`, `request_id`, `invariant_code`, `event_name`, `severity`).
 - Use `invariant_code` (string) over GUID-like IDs.
 
 ### Development Workflow Rules

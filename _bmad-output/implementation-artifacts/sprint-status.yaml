@@ -101,3 +101,6 @@ development_status:
   7-3-provide-an-optional-audit-sink-interface-with-strong-defaults: backlog
   7-4-add-compliance-tests-for-enumeration-resistance-and-tenant-existence-oracle-protection: backlog
   epic-7-retrospective: optional
+
+  # Maintenance / Code Hygiene (Unplanned)
+  0-CR1-code-review-remediation: done
