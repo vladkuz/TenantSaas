@@ -30,10 +30,10 @@ public class TenantContextMiddleware(
             return;
         }
 
-        // TraceId: correlation ID that spans distributed systems (may come from incoming headers)
+        // Extract correlation IDs using standard distributed tracing patterns
+        // TraceId: end-to-end correlation spanning distributed systems (from traceparent, Activity, or headers)
         // RequestId: unique identifier for this specific HTTP request
-        var traceId = httpContext.TraceIdentifier;
-        var requestId = httpContext.TraceIdentifier;
+        var (traceId, requestId) = httpContext.GetCorrelationIds();
 
         // Health check bypass - no tenant required
         if (httpContext.Request.Path.StartsWithSegments("/health"))
@@ -71,11 +71,20 @@ public class TenantContextMiddleware(
 
         if (!enforcementResult.IsSuccess)
         {
-            var problemDetails = EnforcementProblemDetails.FromAttributionEnforcementResult(
-                enforcementResult,
-                httpContext);
+            // Cannot write Problem Details if response has already started (e.g., streaming)
+            if (httpContext.Response.HasStarted)
+            {
+                return;
+            }
+
+            // Convert enforcement failure to standardized RFC 7807 Problem Details
+            var problemDetails = ProblemDetailsFactory.ForTenantAttributionAmbiguous(
+                traceId,
+                requestId,
+                enforcementResult.ConflictingSources);
 
             httpContext.Response.StatusCode = problemDetails.Status ?? 422;
+            httpContext.Response.ContentType = "application/problem+json";
             await httpContext.Response.WriteAsJsonAsync(problemDetails);
             return;
         }
@@ -93,11 +102,19 @@ public class TenantContextMiddleware(
             var contextCheck = BoundaryGuard.RequireContext(accessor);
             if (!contextCheck.IsSuccess)
             {
-                var problemDetails = EnforcementProblemDetails.FromEnforcementResult(
-                    contextCheck,
-                    httpContext);
+                // Cannot write Problem Details if response has already started (e.g., streaming)
+                if (httpContext.Response.HasStarted)
+                {
+                    return;
+                }
+
+                // Convert enforcement failure to standardized RFC 7807 Problem Details
+                var problemDetails = ProblemDetailsFactory.ForContextNotInitialized(
+                    traceId,
+                    requestId);
 
                 httpContext.Response.StatusCode = problemDetails.Status ?? 500;
+                httpContext.Response.ContentType = "application/problem+json";
                 await httpContext.Response.WriteAsJsonAsync(problemDetails);
                 return;
             }

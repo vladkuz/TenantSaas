@@ -42,27 +42,28 @@ public static class SampleApp
             app.UseHttpsRedirection();
         }
 
-        // Add tenant context middleware after auth, before endpoints
+        // Exception handling middleware MUST be first (outermost) to catch all unhandled exceptions
+        // and convert them to standardized RFC 7807 Problem Details responses
+        app.UseMiddleware<ProblemDetailsExceptionMiddleware>();
+
+        // Add tenant context middleware after exception handling, before endpoints
         app.UseMiddleware<TenantContextMiddleware>();
 
         app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
 
-        /// <summary>
-        /// Test endpoint demonstrating multi-source tenant attribution enforcement.
-        /// </summary>
-        /// <remarks>
-        /// Attribution sources (in precedence order):
-        /// 1. Route parameter: {tenantId}
-        /// 2. Header: X-Tenant-Id
-        /// 
-        /// Behavior:
-        /// - Both match → 200 OK (unambiguous, uses higher precedence source)
-        /// - Both provided but conflicting → 422 Unprocessable Entity (ambiguous attribution)
-        /// - Only one provided → 200 OK (unambiguous)
-        /// - Neither provided → 422 Unprocessable Entity (attribution not found)
-        /// 
-        /// This demonstrates Story 3.2 AC#1: ambiguous tenant attribution is refused consistently.
-        /// </remarks>
+        // Test endpoint demonstrating multi-source tenant attribution enforcement.
+        //
+        // Attribution sources (in precedence order):
+        // 1. Route parameter: {tenantId}
+        // 2. Header: X-Tenant-Id
+        //
+        // Behavior:
+        // - Both match → 200 OK (unambiguous, uses higher precedence source)
+        // - Both provided but conflicting → 422 Unprocessable Entity (ambiguous attribution)
+        // - Only one provided → 200 OK (unambiguous)
+        // - Neither provided → 422 Unprocessable Entity (attribution not found)
+        //
+        // This demonstrates Story 3.2 AC#1: ambiguous tenant attribution is refused consistently.
         app.MapGet("/tenants/{tenantId}/data", (string tenantId, ITenantContextAccessor accessor) =>
         {
             var context = accessor.Current;

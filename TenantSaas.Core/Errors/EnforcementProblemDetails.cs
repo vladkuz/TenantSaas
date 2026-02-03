@@ -10,6 +10,11 @@ namespace TenantSaas.Core.Errors;
 /// <summary>
 /// Creates Problem Details from enforcement results.
 /// </summary>
+/// <remarks>
+/// This class is deprecated. Use <see cref="ProblemDetailsFactory"/> instead for all new code.
+/// This class is kept for backward compatibility and will be removed in the next major version.
+/// </remarks>
+[Obsolete("Use ProblemDetailsFactory instead. This class will be removed in the next major version.")]
 public static class EnforcementProblemDetails
 {
     /// <summary>

@@ -1,0 +1,635 @@
+# TenantSaas Integration Guide
+
+This guide helps you integrate TenantSaas into your multi-tenant application.
+
+## Table of Contents
+
+1. [Getting Started](#getting-started)
+2. [Middleware Setup](#middleware-setup)
+3. [Handling Invariant Violations](#handling-invariant-violations)
+4. [Error Handling Best Practices](#error-handling-best-practices)
+5. [Testing Integration](#testing-integration)
+
+---
+
+## Getting Started
+
+TenantSaas provides a trust contract-based framework for building multi-tenant SaaS applications with strong tenant isolation guarantees.
+
+### Core Concepts
+
+- **Tenant Context**: Container for tenant scope, execution kind, and correlation IDs
+- **Invariants**: Named, testable rules enforced at boundaries (e.g., context initialized, attribution unambiguous)
+- **Problem Details**: RFC 7807 standardized error responses with stable machine-readable identifiers
+
+---
+
+## Middleware Setup
+
+### 1. Configure Services
+
+```csharp
+builder.Services.AddSingleton<IMutableTenantContextAccessor, AmbientTenantContextAccessor>();
+builder.Services.AddSingleton<ITenantAttributionResolver, TenantAttributionResolver>();
+```
+
+### 2. Add Middleware
+
+```csharp
+// Add exception handling first (outermost middleware)
+app.UseMiddleware<ProblemDetailsExceptionMiddleware>();
+
+// Add tenant context middleware
+app.UseMiddleware<TenantContextMiddleware>();
+
+// Your application middleware follows
+app.UseRouting();
+app.UseAuthorization();
+app.MapControllers();
+```
+
+**Important:** Order matters! `ProblemDetailsExceptionMiddleware` should be first to catch all unhandled exceptions.
+
+---
+
+## Handling Invariant Violations
+
+All invariant violations in TenantSaas return standardized RFC 7807 Problem Details responses.
+
+### Understanding Problem Details Structure
+
+```json
+{
+  "type": "urn:tenantsaas:error:{invariant-name}",
+  "title": "Human-readable title",
+  "status": 4xx or 5xx,
+  "detail": "Human-readable explanation",
+  "instance": null,
+  "invariant_code": "InvariantCodeName",
+  "trace_id": "end-to-end-correlation-id",
+  "request_id": "request-specific-id",
+  "guidance_link": "https://docs.tenantsaas.dev/errors/{error-name}"
+}
+```
+
+### Client-Side Error Handling
+
+#### C# Client Example
+
+```csharp
+using Microsoft.AspNetCore.Mvc;
+using System.Net.Http.Json;
+
+public class TenantSaasClient
+{
+    private readonly HttpClient _httpClient;
+    private readonly ILogger<TenantSaasClient> _logger;
+
+    public TenantSaasClient(HttpClient httpClient, ILogger<TenantSaasClient> logger)
+    {
+        _httpClient = httpClient;
+        _logger = logger;
+    }
+
+    public async Task<Result<TEntity>> GetEntityAsync(string entityId)
+    {
+        try
+        {
+            var response = await _httpClient.GetAsync($"/api/entities/{entityId}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var entity = await response.Content.ReadFromJsonAsync<TEntity>();
+                return Result<TEntity>.Success(entity!);
+            }
+
+            // Parse Problem Details from error response
+            var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+            return HandleProblemDetails(problemDetails);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error calling TenantSaas API");
+            return Result<TEntity>.Failure("Unexpected error occurred");
+        }
+    }
+
+    private Result<TEntity> HandleProblemDetails(ProblemDetails? problemDetails)
+    {
+        if (problemDetails is null)
+        {
+            return Result<TEntity>.Failure("Unknown error occurred");
+        }
+
+        // Extract invariant code for specific handling
+        var invariantCode = problemDetails.Extensions?["invariant_code"]?.ToString();
+        var traceId = problemDetails.Extensions?["trace_id"]?.ToString();
+
+        // Log for support correlation
+        _logger.LogWarning(
+            "API error: {InvariantCode}, Status: {Status}, TraceId: {TraceId}, Detail: {Detail}",
+            invariantCode,
+            problemDetails.Status,
+            traceId,
+            problemDetails.Detail);
+
+        switch (invariantCode)
+        {
+            case "ContextInitialized":
+                // Missing tenant context - may need to re-authenticate or retry
+                return Result<TEntity>.Failure("Authentication required. Please sign in again.");
+
+            case "TenantAttributionUnambiguous":
+                // Ambiguous attribution - fix request headers/parameters
+                var sources = problemDetails.Extensions?["conflicting_sources"];
+                return Result<TEntity>.Failure(
+                    $"Request has conflicting tenant information: {sources}. Please provide only one tenant identifier.");
+
+            case "TenantScopeRequired":
+                // Operation requires tenant scope but context doesn't have it
+                return Result<TEntity>.Failure("This operation requires a tenant context.");
+
+            case "InternalServerError":
+                // Unhandled server error - provide trace ID for support
+                return Result<TEntity>.Failure(
+                    $"An unexpected error occurred. Please contact support with trace ID: {traceId}");
+
+            default:
+                // Unknown error - return generic message with trace ID
+                return Result<TEntity>.Failure(
+                    $"{problemDetails.Title}. Trace ID: {traceId}");
+        }
+    }
+}
+```
+
+#### JavaScript/TypeScript Client Example
+
+```typescript
+interface ProblemDetails {
+  type: string;
+  title: string;
+  status: number;
+  detail: string;
+  instance: string | null;
+  invariant_code?: string;
+  trace_id?: string;
+  request_id?: string;
+  guidance_link?: string;
+  conflicting_sources?: string[];
+}
+
+class TenantSaasClient {
+  constructor(private baseUrl: string, private logger: Logger) {}
+
+  async getEntity(entityId: string): Promise<Result<Entity>> {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/entities/${entityId}`, {
+        headers: {
+          'Accept': 'application/json',
+          'X-Tenant-Id': this.getTenantId()
+        }
+      });
+
+      if (response.ok) {
+        const entity = await response.json() as Entity;
+        return { success: true, data: entity };
+      }
+
+      // Parse Problem Details
+      const problemDetails = await response.json() as ProblemDetails;
+      return this.handleProblemDetails(problemDetails);
+    } catch (error) {
+      this.logger.error('Unexpected error calling TenantSaas API', error);
+      return { success: false, error: 'Unexpected error occurred' };
+    }
+  }
+
+  private handleProblemDetails(problemDetails: ProblemDetails): Result<Entity> {
+    // Log for debugging and support
+    this.logger.warn('API error', {
+      invariantCode: problemDetails.invariant_code,
+      status: problemDetails.status,
+      traceId: problemDetails.trace_id,
+      detail: problemDetails.detail
+    });
+
+    switch (problemDetails.invariant_code) {
+      case 'ContextInitialized':
+        return {
+          success: false,
+          error: 'Authentication required. Please sign in again.',
+          requiresAuth: true
+        };
+
+      case 'TenantAttributionUnambiguous':
+        return {
+          success: false,
+          error: `Request has conflicting tenant information: ${problemDetails.conflicting_sources?.join(', ')}. Please provide only one tenant identifier.`
+        };
+
+      case 'TenantScopeRequired':
+        return {
+          success: false,
+          error: 'This operation requires a tenant context.'
+        };
+
+      case 'InternalServerError':
+        return {
+          success: false,
+          error: `An unexpected error occurred. Please contact support with trace ID: ${problemDetails.trace_id}`
+        };
+
+      default:
+        return {
+          success: false,
+          error: `${problemDetails.title}. Trace ID: ${problemDetails.trace_id}`
+        };
+    }
+  }
+
+  private getTenantId(): string {
+    // Implement tenant ID retrieval from session, token, or context
+    return localStorage.getItem('tenantId') || '';
+  }
+}
+```
+
+---
+
+## Error Handling Best Practices
+
+### 1. Always Capture trace_id
+
+The `trace_id` is your lifeline for debugging. Always log it and include it in support requests.
+
+```csharp
+_logger.LogError(
+    "Operation failed. TraceId: {TraceId}, InvariantCode: {InvariantCode}",
+    problemDetails.Extensions["trace_id"],
+    problemDetails.Extensions["invariant_code"]);
+```
+
+### 2. Use invariant_code for Specific Handling
+
+Don't rely on HTTP status codes alone - use `invariant_code` for precise error handling:
+
+```csharp
+// ❌ BAD - Multiple errors can have same status
+if (response.StatusCode == 403)
+{
+    // Could be TenantScopeRequired OR BreakGlassRequired
+}
+
+// ✅ GOOD - Precise error identification
+if (invariantCode == "TenantScopeRequired")
+{
+    // Specific handling for missing tenant scope
+}
+```
+
+### 3. Display User-Friendly Messages
+
+Problem Details `detail` field is human-readable but technical. Translate to user-friendly language:
+
+```csharp
+var userMessage = invariantCode switch
+{
+    "ContextInitialized" => "Please sign in to continue.",
+    "TenantAttributionUnambiguous" => "We couldn't identify your organization. Please check your request.",
+    "TenantScopeRequired" => "This operation requires organization context.",
+    _ => "An error occurred. Please try again or contact support."
+};
+```
+
+### 4. Provide Support Context
+
+When showing errors to users, always provide a way to report issues with trace_id:
+
+```html
+<div class="error-message">
+  <p>An error occurred. Please try again.</p>
+  <details>
+    <summary>Technical Details</summary>
+    <p>Error ID: <code>{{traceId}}</code></p>
+    <p>Time: {{timestamp}}</p>
+    <button onclick="copyToClipboard('{{traceId}}')">Copy Error ID</button>
+  </details>
+</div>
+```
+
+### 5. Log Structured Data
+
+Use structured logging to make errors searchable and correlatable:
+
+```csharp
+_logger.LogWarning(
+    "API request failed. Url: {Url}, InvariantCode: {InvariantCode}, TraceId: {TraceId}, RequestId: {RequestId}",
+    request.RequestUri,
+    invariantCode,
+    traceId,
+    requestId);
+```
+
+---
+
+## Logging Error Responses
+
+### Server-Side Logging
+
+When logging Problem Details responses, include all correlation fields:
+
+```csharp
+_logger.LogWarning(
+    "Returning Problem Details response. Path: {Path}, InvariantCode: {InvariantCode}, Status: {Status}, TraceId: {TraceId}, RequestId: {RequestId}",
+    httpContext.Request.Path,
+    invariantCode,
+    problemDetails.Status,
+    traceId,
+    requestId);
+```
+
+### Client-Side Logging
+
+Log errors with enough context for debugging but without sensitive data:
+
+```csharp
+// ✅ GOOD - Structured logging without sensitive data
+_logger.LogError(
+    "API call failed. Endpoint: {Endpoint}, InvariantCode: {InvariantCode}, TraceId: {TraceId}",
+    "/api/entities",
+    invariantCode,
+    traceId);
+
+// ❌ BAD - Logging sensitive information
+_logger.LogError(
+    "Failed for tenant {TenantId}",  // DON'T log tenant IDs
+    tenantId);
+```
+
+---
+
+## Extracting invariant_code and trace_id for Support Tickets
+
+When users report issues, guide them to provide error correlation IDs:
+
+### Support Ticket Template
+
+```
+Subject: Error in TenantSaas Application
+
+Error ID (trace_id): [Extracted from error message]
+Request ID (request_id): [Extracted if available]
+Error Code (invariant_code): [Extracted from error]
+Timestamp: [When error occurred]
+Description: [What the user was trying to do]
+```
+
+### Extraction Example (C#)
+
+```csharp
+public class ErrorReport
+{
+    public string TraceId { get; set; }
+    public string? RequestId { get; set; }
+    public string InvariantCode { get; set; }
+    public string Timestamp { get; set; }
+    public string UserDescription { get; set; }
+
+    public static ErrorReport FromProblemDetails(ProblemDetails pd)
+    {
+        return new ErrorReport
+        {
+            TraceId = pd.Extensions["trace_id"]?.ToString() ?? "unknown",
+            RequestId = pd.Extensions.ContainsKey("request_id")
+                ? pd.Extensions["request_id"]?.ToString()
+                : null,
+            InvariantCode = pd.Extensions["invariant_code"]?.ToString() ?? "unknown",
+            Timestamp = DateTimeOffset.UtcNow.ToString("O"),
+            UserDescription = "" // Filled by user
+        };
+    }
+
+    public string ToSupportTicket()
+    {
+        var ticket = $@"
+Error ID (trace_id): {TraceId}
+Error Code (invariant_code): {InvariantCode}
+Timestamp: {Timestamp}";
+
+        if (RequestId != null)
+        {
+            ticket += $"\nRequest ID (request_id): {RequestId}";
+        }
+
+        return ticket;
+    }
+}
+```
+
+---
+
+## Testing Integration
+
+This section demonstrates how to test your TenantSaas integration with proper error handling validation.
+
+### Required Test Dependencies
+
+Add these NuGet packages to your test project:
+
+```xml
+<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.0" />
+<PackageReference Include="FluentAssertions" Version="8.0.1" />
+<PackageReference Include="Moq" Version="4.20.72" />
+```
+
+### Test Project Setup
+
+Configure your test project to use `WebApplicationFactory`:
+
+```csharp
+// In your test project, reference the main project
+// and ensure Program class is accessible
+public partial class Program { } // Add to Program.cs if not present
+```
+
+### Unit Testing Error Handling
+
+Test that your client properly handles Problem Details responses:
+
+```csharp
+using System.Net;
+using System.Net.Http.Json;
+using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
+using Moq;
+
+[Fact]
+public async Task Client_ReceivesContextNotInitialized_ReturnsAuthenticationRequired()
+{
+    // Arrange - Create mock HTTP response with Problem Details
+    var problemDetails = new ProblemDetails
+    {
+        Type = "urn:tenantsaas:error:context-initialized",
+        Title = "Tenant context not initialized",
+        Status = 401,
+        Detail = "Tenant context must be initialized before operations can proceed.",
+    };
+    problemDetails.Extensions["invariant_code"] = "ContextInitialized";
+    problemDetails.Extensions["trace_id"] = "test-trace-123";
+    problemDetails.Extensions["request_id"] = "test-request-456";
+
+    var handler = new TestHttpMessageHandler(
+        HttpStatusCode.Unauthorized,
+        JsonContent.Create(problemDetails));
+
+    var client = new TenantSaasClient(
+        new HttpClient(handler) { BaseAddress = new Uri("http://localhost") },
+        Mock.Of<ILogger<TenantSaasClient>>());
+
+    // Act
+    var result = await client.GetEntityAsync("entity-1");
+
+    // Assert
+    result.IsSuccess.Should().BeFalse();
+    result.Error.Should().Contain("authentication required", StringComparison.OrdinalIgnoreCase);
+}
+
+/// <summary>
+/// Test HTTP message handler for unit testing HTTP clients.
+/// </summary>
+public class TestHttpMessageHandler : HttpMessageHandler
+{
+    private readonly HttpStatusCode _statusCode;
+    private readonly HttpContent _content;
+
+    public TestHttpMessageHandler(HttpStatusCode statusCode, HttpContent content)
+    {
+        _statusCode = statusCode;
+        _content = content;
+    }
+
+    protected override Task<HttpResponseMessage> SendAsync(
+        HttpRequestMessage request,
+        CancellationToken cancellationToken)
+    {
+        return Task.FromResult(new HttpResponseMessage(_statusCode)
+        {
+            Content = _content
+        });
+    }
+}
+```
+
+### Integration Testing Middleware
+
+Test that middleware correctly returns Problem Details for invariant violations:
+
+```csharp
+using System.Net;
+using System.Net.Http.Json;
+using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Testing;
+
+public class TenantSaasIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
+{
+    private readonly WebApplicationFactory<Program> _factory;
+
+    public TenantSaasIntegrationTests(WebApplicationFactory<Program> factory)
+    {
+        _factory = factory;
+    }
+
+    [Fact]
+    public async Task Request_WithMissingTenantContext_ReturnsProblemDetails()
+    {
+        // Arrange
+        var client = _factory.CreateClient();
+
+        // Act - Request without tenant attribution
+        var response = await client.GetAsync("/api/tenants/test-tenant/data");
+
+        // Assert - Should return 422 (ambiguous attribution when no source provided)
+        response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
+
+        var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+        problemDetails.Should().NotBeNull();
+        problemDetails!.Extensions.Should().ContainKey("invariant_code");
+        problemDetails.Extensions.Should().ContainKey("trace_id");
+        problemDetails.Type.Should().StartWith("urn:tenantsaas:error:");
+    }
+
+    [Fact]
+    public async Task Request_WithValidTenant_Succeeds()
+    {
+        // Arrange
+        var client = _factory.CreateClient();
+
+        // Act - Request with valid tenant in route
+        var response = await client.GetAsync("/tenants/valid-tenant/data");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task HealthEndpoint_BypassesTenantRequirement()
+    {
+        // Arrange
+        var client = _factory.CreateClient();
+
+        // Act
+        var response = await client.GetAsync("/health");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+}
+```
+
+### Testing Error Extraction
+
+Test that your error extraction logic works correctly:
+
+```csharp
+[Fact]
+public void ErrorReport_FromProblemDetails_ExtractsAllFields()
+{
+    // Arrange
+    var problemDetails = new ProblemDetails
+    {
+        Type = "urn:tenantsaas:error:context-initialized",
+        Title = "Tenant context not initialized",
+        Status = 401,
+        Detail = "Test detail"
+    };
+    problemDetails.Extensions["invariant_code"] = "ContextInitialized";
+    problemDetails.Extensions["trace_id"] = "abc-123";
+    problemDetails.Extensions["request_id"] = "req-456";
+
+    // Act
+    var report = ErrorReport.FromProblemDetails(problemDetails);
+
+    // Assert
+    report.TraceId.Should().Be("abc-123");
+    report.RequestId.Should().Be("req-456");
+    report.InvariantCode.Should().Be("ContextInitialized");
+}
+
+---
+
+## References
+
+- [Error Catalog](./error-catalog.md) - Complete list of all error codes and responses
+- [Trust Contract Documentation](./trust-contract.md) - Invariant definitions and policies
+- [RFC 7807: Problem Details for HTTP APIs](https://datatracker.ietf.org/doc/html/rfc7807)
+
+---
+
+## Support
+
+For questions or issues:
+1. Check the [Error Catalog](./error-catalog.md) for specific error codes
+2. Review logs for `trace_id` and `invariant_code`
+3. Create support ticket with correlation IDs
