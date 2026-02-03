@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="TenantSaas.ContractTests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\TenantSaas.Abstractions\TenantSaas.Abstractions.csproj" />
   </ItemGroup>
 

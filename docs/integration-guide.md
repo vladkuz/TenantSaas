@@ -671,3 +671,49 @@ For questions or issues:
 1. Check the [Error Catalog](./error-catalog.md) for specific error codes
 2. Review logs for `trace_id` and `invariant_code`
 3. Create support ticket with correlation IDs
+
+---
+
+## Structured Logging and Correlation
+
+TenantSaas emits structured logs for all enforcement decisions, enabling audit trails and incident correlation.
+
+### Required Structured Fields
+
+All enforcement logs include these required fields:
+
+- `tenant_ref`: Disclosure-safe tenant identifier
+- `trace_id`: End-to-end correlation ID
+- `request_id`: Request-scoped ID (null for non-request execution)
+- `invariant_code`: Invariant code for violations/refusals (null for success)
+- `event_name`: Event type (ContextInitialized, RefusalEmitted, etc.)
+- `severity`: Information, Warning, or Error
+- `execution_kind`: request, background, admin, or scripted
+- `scope_type`: Tenant, NoTenant, or SharedSystem
+
+### Example Correlation Pattern
+
+**Problem Details Response:**
+```json
+{
+  "type": "urn:tenantsaas:error:tenant-attribution-unambiguous",
+  "status": 422,
+  "invariant_code": "TenantAttributionUnambiguous",
+  "trace_id": "abc123",
+  "request_id": "req-456"
+}
+```
+
+**Corresponding Log:**
+```json
+{
+  "event_name": "RefusalEmitted",
+  "trace_id": "abc123",
+  "request_id": "req-456",
+  "invariant_code": "TenantAttributionUnambiguous",
+  "http_status": 422
+}
+```
+
+Join by: `logs.trace_id = problemDetails.trace_id`
+

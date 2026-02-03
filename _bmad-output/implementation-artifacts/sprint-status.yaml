@@ -61,7 +61,7 @@ development_status:
   3-1-enforce-contextinitialized-at-boundary-helpers: done
   3-2-enforce-tenantattributionunambiguous-at-boundaries: done
   3-3-standardize-problem-details-refusals-for-invariant-violations: done
-  3-4-enrich-structured-logs-with-tenant-ref-and-invariant-context: backlog
+  3-4-enrich-structured-logs-with-tenant-ref-and-invariant-context: done
   3-5-require-explicit-break-glass-with-audit-event-emission: backlog
   epic-3-retrospective: optional
 

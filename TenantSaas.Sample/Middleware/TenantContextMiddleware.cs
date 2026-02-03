@@ -1,9 +1,24 @@
 using TenantSaas.Abstractions.Tenancy;
+using TenantSaas.Abstractions.Logging;
 using TenantSaas.Core.Enforcement;
 using TenantSaas.Core.Errors;
 using TenantSaas.Core.Tenancy;
+using TenantSaas.Core.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace TenantSaas.Sample.Middleware;
+
+/// <summary>
+/// Constants for logging when values cannot be determined.
+/// </summary>
+internal static class LoggingDefaults
+{
+    /// <summary>Fallback value when invariant code cannot be extracted.</summary>
+    public const string UnknownInvariantCode = "Unknown";
+    
+    /// <summary>Fallback value when problem type cannot be extracted.</summary>
+    public const string UnknownProblemType = "unknown";
+}
 
 /// <summary>
 /// Middleware for initializing tenant context at the application boundary.
@@ -16,10 +31,14 @@ namespace TenantSaas.Sample.Middleware;
 /// <param name="next">The next middleware in the pipeline.</param>
 /// <param name="accessor">Mutable tenant context accessor for setting/clearing context.</param>
 /// <param name="attributionResolver">Resolver for tenant attribution from request sources.</param>
+/// <param name="logger">Logger for structured enforcement events.</param>
+/// <param name="enricher">Log enricher for structured field extraction.</param>
 public class TenantContextMiddleware(
     RequestDelegate next,
     IMutableTenantContextAccessor accessor,
-    ITenantAttributionResolver attributionResolver)
+    ITenantAttributionResolver attributionResolver,
+    ILogger<TenantContextMiddleware> logger,
+    ILogEnricher enricher)
 {
     public async Task InvokeAsync(HttpContext httpContext)
     {
@@ -43,6 +62,17 @@ public class TenantContextMiddleware(
                 traceId,
                 requestId);
             accessor.Set(healthContext);
+            
+            // Log health check context initialization
+            var healthLogEvent = enricher.Enrich(healthContext, "ContextInitialized");
+            EnforcementEventSource.ContextInitialized(
+                logger,
+                healthLogEvent.TenantRef,
+                healthLogEvent.TraceId,
+                healthLogEvent.RequestId,
+                healthLogEvent.ExecutionKind!,
+                healthLogEvent.ScopeType!);
+            
             try
             {
                 await next(httpContext);
@@ -83,6 +113,19 @@ public class TenantContextMiddleware(
                 requestId,
                 enforcementResult.ConflictingSources);
 
+            // Log refusal before returning Problem Details
+            var invariantCode = problemDetails.Extensions.TryGetValue(
+                ProblemDetailsExtensions.InvariantCodeKey,
+                out var code) ? code?.ToString() ?? LoggingDefaults.UnknownInvariantCode : LoggingDefaults.UnknownInvariantCode;
+            
+            EnforcementEventSource.RefusalEmitted(
+                logger,
+                traceId,
+                requestId,
+                invariantCode,
+                problemDetails.Status ?? 422,
+                problemDetails.Type ?? LoggingDefaults.UnknownProblemType);
+
             httpContext.Response.StatusCode = problemDetails.Status ?? 422;
             httpContext.Response.ContentType = "application/problem+json";
             await httpContext.Response.WriteAsJsonAsync(problemDetails);
@@ -113,11 +156,27 @@ public class TenantContextMiddleware(
                     traceId,
                     requestId);
 
+                // Log refusal before returning Problem Details
+                var contextInvariantCode = problemDetails.Extensions.TryGetValue(
+                    ProblemDetailsExtensions.InvariantCodeKey,
+                    out var contextCode) ? contextCode?.ToString() ?? LoggingDefaults.UnknownInvariantCode : LoggingDefaults.UnknownInvariantCode;
+                
+                EnforcementEventSource.RefusalEmitted(
+                    logger,
+                    traceId,
+                    requestId,
+                    contextInvariantCode,
+                    problemDetails.Status ?? 500,
+                    problemDetails.Type ?? LoggingDefaults.UnknownProblemType);
+
                 httpContext.Response.StatusCode = problemDetails.Status ?? 500;
                 httpContext.Response.ContentType = "application/problem+json";
                 await httpContext.Response.WriteAsJsonAsync(problemDetails);
                 return;
             }
+
+            // Log successful context initialization (already logged by BoundaryGuard)
+            // No additional logging needed here to avoid duplication
 
             await next(httpContext);
         }

@@ -4,9 +4,12 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using TenantSaas.Abstractions.Tenancy;
+using TenantSaas.Abstractions.Logging;
 using TenantSaas.Core.Tenancy;
+using TenantSaas.Core.Logging;
 using TenantSaas.Sample.Middleware;
 using System.Text.Json;
 using static TenantSaas.Core.Errors.ProblemDetailsExtensions;
@@ -25,10 +28,14 @@ public class MiddlewareProblemDetailsTests
         // Arrange
         var accessor = new AmbientTenantContextAccessor();
         var attributionResolver = new TenantAttributionResolver();
+        var logger = NullLogger<TenantContextMiddleware>.Instance;
+        var enricher = new DefaultLogEnricher();
         var middleware = new TenantContextMiddleware(
             next: _ => Task.CompletedTask,
             accessor: accessor,
-            attributionResolver: attributionResolver);
+            attributionResolver: attributionResolver,
+            logger: logger,
+            enricher: enricher);
 
         var context = new DefaultHttpContext();
         context.Request.Path = "/api/tenants";
@@ -69,6 +76,8 @@ public class MiddlewareProblemDetailsTests
         // Arrange
         var accessor = new AmbientTenantContextAccessor();
         var attributionResolver = new TenantAttributionResolver();
+        var logger = NullLogger<TenantContextMiddleware>.Instance;
+        var enricher = new DefaultLogEnricher();
         var nextCalled = false;
 
         var middleware = new TenantContextMiddleware(
@@ -78,7 +87,9 @@ public class MiddlewareProblemDetailsTests
                 return Task.CompletedTask;
             },
             accessor: accessor,
-            attributionResolver: attributionResolver);
+            attributionResolver: attributionResolver,
+            logger: logger,
+            enricher: enricher);
 
         var context = new DefaultHttpContext();
         context.Request.Path = "/health";
@@ -98,6 +109,8 @@ public class MiddlewareProblemDetailsTests
         // Arrange
         var accessor = new AmbientTenantContextAccessor();
         var attributionResolver = new TenantAttributionResolver();
+        var logger = NullLogger<TenantContextMiddleware>.Instance;
+        var enricher = new DefaultLogEnricher();
         var nextCalled = false;
 
         var middleware = new TenantContextMiddleware(
@@ -107,7 +120,9 @@ public class MiddlewareProblemDetailsTests
                 return Task.CompletedTask;
             },
             accessor: accessor,
-            attributionResolver: attributionResolver);
+            attributionResolver: attributionResolver,
+            logger: logger,
+            enricher: enricher);
 
         var context = new DefaultHttpContext();
         context.Request.Path = "/health";
@@ -224,10 +239,14 @@ public class MiddlewareProblemDetailsTests
         // Arrange
         var accessor = new AmbientTenantContextAccessor();
         var attributionResolver = new TenantAttributionResolver();
+        var logger = NullLogger<TenantContextMiddleware>.Instance;
+        var enricher = new DefaultLogEnricher();
         var middleware = new TenantContextMiddleware(
             next: _ => Task.CompletedTask,
             accessor: accessor,
-            attributionResolver: attributionResolver);
+            attributionResolver: attributionResolver,
+            logger: logger,
+            enricher: enricher);
 
         // Create HttpContext with HasStarted = true using mocking
         var (context, responseBodyMock) = CreateHttpContextWithResponseStartedAndBody();

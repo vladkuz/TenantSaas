@@ -369,3 +369,45 @@ When creating support tickets, always include:
 - [RFC 7807: Problem Details for HTTP APIs](https://datatracker.ietf.org/doc/html/rfc7807)
 - [Trust Contract Documentation](./trust-contract.md)
 - [Integration Guide](./integration-guide.md)
+
+---
+
+## Structured Log Schema
+
+All enforcement events are logged with the following structured schema.
+
+### Required Fields
+
+| Field | Type | Description | Example |
+|-------|------|-------------|---------|
+| `tenant_ref` | string | Disclosure-safe tenant identifier | `"tenant-abc"`, `"unknown"`, `"cross_tenant"` |
+| `trace_id` | string | End-to-end correlation ID | `"a1b2c3d4e5f6"` |
+| `request_id` | string? | Request-scoped ID (null for non-request) | `"req-12345"`, `null` |
+| `invariant_code` | string? | Invariant code for violations (null for success) | `"ContextInitialized"`, `null` |
+| `event_name` | string | Event type identifier | `"ContextInitialized"`, `"RefusalEmitted"` |
+| `severity` | string | Log level | `"Information"`, `"Warning"`, `"Error"` |
+| `execution_kind` | string | Execution flow type | `"request"`, `"background"`, `"admin"`, `"scripted"` |
+| `scope_type` | string | Tenant scope type | `"Tenant"`, `"NoTenant"`, `"SharedSystem"` |
+| `detail` | string? | Optional human-readable context | `"Conflicting sources: Route, Header"` |
+
+### Safe-State tenant_ref Values
+
+| Value | Meaning | When Used |
+|-------|---------|-----------|
+| `unknown` | No tenant info available | NoTenant scope, attribution failures |
+| `sensitive` | Tenant exists but unsafe to disclose | Reserved for future use |
+| `cross_tenant` | Cross-tenant operation | SharedSystem scope |
+| Opaque ID | Disclosure-safe public identifier | Tenant scope with resolved ID |
+
+### Event Types
+
+| Event Name | Severity | Description | invariant_code |
+|------------|----------|-------------|----------------|
+| `ContextInitialized` | Information | Tenant context successfully initialized | null |
+| `ContextNotInitialized` | Warning | Context initialization failed | `ContextInitialized` |
+| `AttributionResolved` | Information | Tenant attribution successful | null |
+| `AttributionAmbiguous` | Warning | Tenant attribution failed (ambiguous) | `TenantAttributionUnambiguous` |
+| `InvariantViolated` | Error | Invariant violation detected | Varies by invariant |
+| `RefusalEmitted` | Warning | Problem Details refusal emitted | Varies by invariant |
+| `BreakGlassInvoked` | Warning | Break-glass operation initiated | `BreakGlassExplicitAndAudited` |
+
