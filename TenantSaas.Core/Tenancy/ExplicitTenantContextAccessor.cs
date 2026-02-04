@@ -9,29 +9,46 @@ namespace TenantSaas.Core.Tenancy;
 /// This is the explicit-passing alternative to ambient context.
 /// Context is passed explicitly per operation, not propagated automatically.
 /// </remarks>
-public sealed class ExplicitTenantContextAccessor : ITenantContextAccessor
+public sealed class ExplicitTenantContextAccessor : IMutableTenantContextAccessor
 {
-    private readonly TenantContext? _context;
+    private TenantContext? context;
 
     /// <summary>
     /// Initializes a new instance with no context.
     /// </summary>
     public ExplicitTenantContextAccessor()
     {
-        _context = null;
+        context = null;
     }
 
     private ExplicitTenantContextAccessor(TenantContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
-        _context = context;
+        this.context = context;
     }
 
     /// <inheritdoc />
-    public TenantContext? Current => _context;
+    public TenantContext? Current => context;
 
     /// <inheritdoc />
     public bool IsInitialized => Current is not null;
+
+    /// <summary>
+    /// Sets the tenant context for the current execution flow.
+    /// </summary>
+    public void Set(TenantContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        this.context = context;
+    }
+
+    /// <summary>
+    /// Clears the current tenant context.
+    /// </summary>
+    public void Clear()
+    {
+        context = null;
+    }
 
     /// <summary>
     /// Creates a new accessor instance with the specified context.

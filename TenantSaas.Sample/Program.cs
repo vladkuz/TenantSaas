@@ -20,6 +20,9 @@ public static class SampleApp
         builder.Services.AddSingleton<ITenantContextAccessor>(accessor);
         builder.Services.AddSingleton<IMutableTenantContextAccessor>(accessor);
 
+        // Register tenant context initializer as scoped for request flows
+        builder.Services.AddScoped<ITenantContextInitializer, TenantContextInitializer>();
+
         // Register tenant attribution resolver
         builder.Services.AddSingleton<ITenantAttributionResolver, TenantAttributionResolver>();
 

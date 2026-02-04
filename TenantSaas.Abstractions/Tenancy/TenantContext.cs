@@ -12,11 +12,13 @@ public sealed record TenantContext
         ExecutionKind executionKind,
         string traceId,
         string? requestId,
+        TenantAttributionInputs attributionInputs,
         DateTimeOffset initializedAt)
     {
         ArgumentNullException.ThrowIfNull(scope);
         ArgumentNullException.ThrowIfNull(executionKind);
         ArgumentException.ThrowIfNullOrWhiteSpace(traceId);
+        ArgumentNullException.ThrowIfNull(attributionInputs);
 
         if (executionKind == ExecutionKind.Request)
         {
@@ -27,6 +29,7 @@ public sealed record TenantContext
         ExecutionKind = executionKind;
         TraceId = traceId;
         RequestId = requestId;
+        AttributionInputs = attributionInputs;
         InitializedAt = EnsureUtc(initializedAt);
     }
 
@@ -51,6 +54,11 @@ public sealed record TenantContext
     public string? RequestId { get; }
 
     /// <summary>
+    /// Gets the attribution inputs captured during initialization.
+    /// </summary>
+    public TenantAttributionInputs AttributionInputs { get; }
+
+    /// <summary>
     /// Gets the UTC timestamp when the context was initialized.
     /// </summary>
     public DateTimeOffset InitializedAt { get; }
@@ -59,25 +67,110 @@ public sealed record TenantContext
     /// Creates a context for an HTTP or API request flow.
     /// </summary>
     public static TenantContext ForRequest(TenantScope scope, string traceId, string requestId)
-        => new(scope, ExecutionKind.Request, traceId, requestId, DateTimeOffset.UtcNow);
+        => new(
+            scope,
+            ExecutionKind.Request,
+            traceId,
+            requestId,
+            TenantAttributionInputs.None(),
+            DateTimeOffset.UtcNow);
+
+    /// <summary>
+    /// Creates a context for an HTTP or API request flow with attribution inputs.
+    /// </summary>
+    public static TenantContext ForRequest(
+        TenantScope scope,
+        string traceId,
+        string requestId,
+        TenantAttributionInputs attributionInputs)
+        => new(
+            scope,
+            ExecutionKind.Request,
+            traceId,
+            requestId,
+            attributionInputs,
+            DateTimeOffset.UtcNow);
 
     /// <summary>
     /// Creates a context for a background job or worker flow.
     /// </summary>
     public static TenantContext ForBackground(TenantScope scope, string traceId)
-        => new(scope, ExecutionKind.Background, traceId, requestId: null, DateTimeOffset.UtcNow);
+        => new(
+            scope,
+            ExecutionKind.Background,
+            traceId,
+            requestId: null,
+            TenantAttributionInputs.None(),
+            DateTimeOffset.UtcNow);
+
+    /// <summary>
+    /// Creates a context for a background job or worker flow with attribution inputs.
+    /// </summary>
+    public static TenantContext ForBackground(
+        TenantScope scope,
+        string traceId,
+        TenantAttributionInputs attributionInputs)
+        => new(
+            scope,
+            ExecutionKind.Background,
+            traceId,
+            requestId: null,
+            attributionInputs,
+            DateTimeOffset.UtcNow);
 
     /// <summary>
     /// Creates a context for an administrative operation flow.
     /// </summary>
     public static TenantContext ForAdmin(TenantScope scope, string traceId)
-        => new(scope, ExecutionKind.Admin, traceId, requestId: null, DateTimeOffset.UtcNow);
+        => new(
+            scope,
+            ExecutionKind.Admin,
+            traceId,
+            requestId: null,
+            TenantAttributionInputs.None(),
+            DateTimeOffset.UtcNow);
+
+    /// <summary>
+    /// Creates a context for an administrative operation flow with attribution inputs.
+    /// </summary>
+    public static TenantContext ForAdmin(
+        TenantScope scope,
+        string traceId,
+        TenantAttributionInputs attributionInputs)
+        => new(
+            scope,
+            ExecutionKind.Admin,
+            traceId,
+            requestId: null,
+            attributionInputs,
+            DateTimeOffset.UtcNow);
 
     /// <summary>
     /// Creates a context for a CLI or script execution flow.
     /// </summary>
     public static TenantContext ForScripted(TenantScope scope, string traceId)
-        => new(scope, ExecutionKind.Scripted, traceId, requestId: null, DateTimeOffset.UtcNow);
+        => new(
+            scope,
+            ExecutionKind.Scripted,
+            traceId,
+            requestId: null,
+            TenantAttributionInputs.None(),
+            DateTimeOffset.UtcNow);
+
+    /// <summary>
+    /// Creates a context for a CLI or script execution flow with attribution inputs.
+    /// </summary>
+    public static TenantContext ForScripted(
+        TenantScope scope,
+        string traceId,
+        TenantAttributionInputs attributionInputs)
+        => new(
+            scope,
+            ExecutionKind.Scripted,
+            traceId,
+            requestId: null,
+            attributionInputs,
+            DateTimeOffset.UtcNow);
 
     private static DateTimeOffset EnsureUtc(DateTimeOffset timestamp)
     {

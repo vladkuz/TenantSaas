@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using TenantSaas.Abstractions.Contexts;
+using TenantSaas.Abstractions.Invariants;
 using TenantSaas.Abstractions.Tenancy;
 using TenantSaas.Abstractions.Logging;
 using TenantSaas.Core.Enforcement;
@@ -29,18 +31,47 @@ public class MiddlewareProblemDetailsTests
         var enricher = new DefaultLogEnricher();
         return new BoundaryGuard(logger, enricher);
     }
+
+    private static ITenantContextInitializer CreateInitializer(IMutableTenantContextAccessor accessor)
+    {
+        var logger = NullLogger<TenantContextInitializer>.Instance;
+        return new TenantContextInitializer(accessor, logger);
+    }
+
+    private sealed class FixedAttributionResolver : ITenantAttributionResolver
+    {
+        private readonly TenantId tenantId;
+        private readonly TenantAttributionSource source;
+
+        public FixedAttributionResolver(TenantId tenantId, TenantAttributionSource source)
+        {
+            this.tenantId = tenantId;
+            this.source = source;
+        }
+
+        public TenantAttributionResult Resolve(
+            IReadOnlyDictionary<TenantAttributionSource, TenantId> availableSources,
+            TenantAttributionRules rules,
+            ExecutionKind executionKind,
+            string? endpointKey = null)
+        {
+            return TenantAttributionResult.Succeeded(tenantId, source);
+        }
+    }
+
     [Fact]
     public async Task TenantContextMiddleware_MissingAttribution_ReturnsStandardizedProblemDetails()
     {
         // Arrange
         var accessor = new AmbientTenantContextAccessor();
+        var initializer = CreateInitializer(accessor);
         var attributionResolver = new TenantAttributionResolver();
         var logger = NullLogger<TenantContextMiddleware>.Instance;
         var enricher = new DefaultLogEnricher();
         var boundaryGuard = CreateBoundaryGuard();
         var middleware = new TenantContextMiddleware(
             next: _ => Task.CompletedTask,
-            accessor: accessor,
+            initializer: initializer,
             attributionResolver: attributionResolver,
             boundaryGuard: boundaryGuard,
             logger: logger,
@@ -52,7 +83,7 @@ public class MiddlewareProblemDetailsTests
         context.Response.Body = new MemoryStream(); // Enable response body capture
 
         // Act
-        await middleware.InvokeAsync(context);
+        await middleware.InvokeAsync(context, accessor);
 
         // Assert - Response is Problem Details
         context.Response.StatusCode.Should().Be(422, "Ambiguous attribution returns HTTP 422");
@@ -84,6 +115,7 @@ public class MiddlewareProblemDetailsTests
     {
         // Arrange
         var accessor = new AmbientTenantContextAccessor();
+        var initializer = CreateInitializer(accessor);
         var attributionResolver = new TenantAttributionResolver();
         var logger = NullLogger<TenantContextMiddleware>.Instance;
         var enricher = new DefaultLogEnricher();
@@ -96,7 +128,7 @@ public class MiddlewareProblemDetailsTests
                 nextCalled = true;
                 return Task.CompletedTask;
             },
-            accessor: accessor,
+            initializer: initializer,
             attributionResolver: attributionResolver,
             boundaryGuard: boundaryGuard,
             logger: logger,
@@ -107,7 +139,7 @@ public class MiddlewareProblemDetailsTests
         context.TraceIdentifier = "test-trace-health";
 
         // Act
-        await middleware.InvokeAsync(context);
+        await middleware.InvokeAsync(context, accessor);
 
         // Assert - No Problem Details, next middleware called
         nextCalled.Should().BeTrue("Health check should bypass tenant requirement");
@@ -119,6 +151,7 @@ public class MiddlewareProblemDetailsTests
     {
         // Arrange
         var accessor = new AmbientTenantContextAccessor();
+        var initializer = CreateInitializer(accessor);
         var attributionResolver = new TenantAttributionResolver();
         var logger = NullLogger<TenantContextMiddleware>.Instance;
         var enricher = new DefaultLogEnricher();
@@ -131,7 +164,7 @@ public class MiddlewareProblemDetailsTests
                 nextCalled = true;
                 return Task.CompletedTask;
             },
-            accessor: accessor,
+            initializer: initializer,
             attributionResolver: attributionResolver,
             boundaryGuard: boundaryGuard,
             logger: logger,
@@ -143,7 +176,7 @@ public class MiddlewareProblemDetailsTests
         context.Response.Body = new MemoryStream();
 
         // Act
-        await middleware.InvokeAsync(context);
+        await middleware.InvokeAsync(context, accessor);
 
         // Assert - Health check bypasses attribution, next middleware called
         nextCalled.Should().BeTrue("Health check should bypass tenant requirement and call next");
@@ -251,13 +284,14 @@ public class MiddlewareProblemDetailsTests
     {
         // Arrange
         var accessor = new AmbientTenantContextAccessor();
+        var initializer = CreateInitializer(accessor);
         var attributionResolver = new TenantAttributionResolver();
         var logger = NullLogger<TenantContextMiddleware>.Instance;
         var enricher = new DefaultLogEnricher();
         var boundaryGuard = CreateBoundaryGuard();
         var middleware = new TenantContextMiddleware(
             next: _ => Task.CompletedTask,
-            accessor: accessor,
+            initializer: initializer,
             attributionResolver: attributionResolver,
             boundaryGuard: boundaryGuard,
             logger: logger,
@@ -267,11 +301,60 @@ public class MiddlewareProblemDetailsTests
         var (context, responseBodyMock) = CreateHttpContextWithResponseStartedAndBody();
 
         // Act - Should not throw, just return without writing
-        await middleware.InvokeAsync(context);
+        await middleware.InvokeAsync(context, accessor);
 
         // Assert - No content written to response body
         responseBodyMock.Length.Should().Be(0,
             "No content should be written when response has already started");
+    }
+
+    [Fact]
+    public async Task TenantContextMiddleware_ConflictingInitialization_ReturnsContextInitializedProblemDetails()
+    {
+        // Arrange
+        var accessor = new AmbientTenantContextAccessor();
+        var initializer = CreateInitializer(accessor);
+        var resolvedTenantId = new TenantId("tenant-1");
+        var attributionResolver = new FixedAttributionResolver(
+            resolvedTenantId,
+            TenantAttributionSource.RouteParameter);
+        var logger = NullLogger<TenantContextMiddleware>.Instance;
+        var enricher = new DefaultLogEnricher();
+        var boundaryGuard = CreateBoundaryGuard();
+        var middleware = new TenantContextMiddleware(
+            next: _ => Task.CompletedTask,
+            initializer: initializer,
+            attributionResolver: attributionResolver,
+            boundaryGuard: boundaryGuard,
+            logger: logger,
+            enricher: enricher);
+
+        // Pre-initialize with conflicting scope
+        var existingScope = TenantScope.ForTenant(new TenantId("tenant-2"));
+        initializer.InitializeRequest(
+            existingScope,
+            "trace-existing",
+            "req-existing",
+            TenantAttributionInputs.FromExplicitScope(existingScope));
+
+        var context = new DefaultHttpContext();
+        context.Request.Path = "/tenants/tenant-1/data";
+        context.TraceIdentifier = "trace-conflict";
+        context.Response.Body = new MemoryStream();
+
+        // Act
+        await middleware.InvokeAsync(context, accessor);
+
+        // Assert
+        context.Response.StatusCode.Should().Be(401);
+        context.Response.Body.Position = 0;
+        var responseBody = await new StreamReader(context.Response.Body).ReadToEndAsync();
+        var problemDetails = JsonSerializer.Deserialize<ProblemDetails>(responseBody);
+
+        problemDetails.Should().NotBeNull();
+        problemDetails!.Extensions.Should().ContainKey(InvariantCodeKey);
+        problemDetails.Extensions[InvariantCodeKey]?.ToString()
+            .Should().Be(InvariantCode.ContextInitialized);
     }
 
     private static HttpContext CreateHttpContextWithResponseStarted()

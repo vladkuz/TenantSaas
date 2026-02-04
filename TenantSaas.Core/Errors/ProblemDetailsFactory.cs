@@ -132,6 +132,21 @@ public static class ProblemDetailsFactory
             detail: "Tenant context must be initialized before operations can proceed.");
 
     /// <summary>
+    /// Creates a Problem Details response for conflicting tenant context initialization.
+    /// </summary>
+    /// <param name="traceId">End-to-end correlation identifier.</param>
+    /// <param name="requestId">Request-scoped correlation identifier.</param>
+    /// <returns>HTTP 401 Problem Details response.</returns>
+    public static ProblemDetails ForContextInitializationConflict(
+        string traceId,
+        string? requestId = null)
+        => FromInvariantViolation(
+            InvariantCode.ContextInitialized,
+            traceId,
+            requestId,
+            detail: "Tenant context already initialized with different inputs.");
+
+    /// <summary>
     /// Creates a Problem Details response for ambiguous tenant attribution.
     /// </summary>
     /// <param name="traceId">End-to-end correlation identifier.</param>

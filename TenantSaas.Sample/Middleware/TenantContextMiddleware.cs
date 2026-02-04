@@ -29,28 +29,21 @@ internal static class LoggingDefaults
 /// to prevent context leakage in pooled execution environments.
 /// </remarks>
 /// <param name="next">The next middleware in the pipeline.</param>
-/// <param name="accessor">Mutable tenant context accessor for setting/clearing context.</param>
+/// <param name="initializer">Tenant context initializer for establishing context.</param>
 /// <param name="attributionResolver">Resolver for tenant attribution from request sources.</param>
 /// <param name="boundaryGuard">Boundary guard for invariant enforcement.</param>
 /// <param name="logger">Logger for structured enforcement events.</param>
 /// <param name="enricher">Log enricher for structured field extraction.</param>
 public class TenantContextMiddleware(
     RequestDelegate next,
-    IMutableTenantContextAccessor accessor,
+    ITenantContextInitializer initializer,
     ITenantAttributionResolver attributionResolver,
     IBoundaryGuard boundaryGuard,
     ILogger<TenantContextMiddleware> logger,
     ILogEnricher enricher)
 {
-    public async Task InvokeAsync(HttpContext httpContext)
+    public async Task InvokeAsync(HttpContext httpContext, ITenantContextAccessor accessor)
     {
-        // Skip if already initialized (idempotency)
-        if (accessor.IsInitialized)
-        {
-            await next(httpContext);
-            return;
-        }
-
         // Extract correlation IDs using standard distributed tracing patterns
         // TraceId: end-to-end correlation spanning distributed systems (from traceparent, Activity, or headers)
         // RequestId: unique identifier for this specific HTTP request
@@ -59,11 +52,12 @@ public class TenantContextMiddleware(
         // Health check bypass - no tenant required
         if (httpContext.Request.Path.StartsWithSegments("/health"))
         {
-            var healthContext = TenantContext.ForRequest(
-                TenantScope.ForNoTenant(NoTenantReason.HealthCheck),
+            var healthScope = TenantScope.ForNoTenant(NoTenantReason.HealthCheck);
+            var healthContext = initializer.InitializeRequest(
+                healthScope,
                 traceId,
-                requestId);
-            accessor.Set(healthContext);
+                requestId,
+                TenantAttributionInputs.FromExplicitScope(healthScope));
             
             // Log health check context initialization
             var healthLogEvent = enricher.Enrich(healthContext, "ContextInitialized");
@@ -81,7 +75,7 @@ public class TenantContextMiddleware(
             }
             finally
             {
-                accessor.Clear();
+                initializer.Clear();
             }
             return;
         }
@@ -134,13 +128,43 @@ public class TenantContextMiddleware(
             return;
         }
 
-        // Initialize context with resolved tenant
+        // Initialize context with resolved tenant using the single initialization primitive
         // Safety: ResolvedTenantId is guaranteed non-null when IsSuccess is true
         var scope = TenantScope.ForTenant(enforcementResult.ResolvedTenantId!.Value);
-        var context = TenantContext.ForRequest(scope, traceId, requestId);
+        var attributionInputs = TenantAttributionInputs.FromSources(sources);
+        try
+        {
+            _ = initializer.InitializeRequest(scope, traceId, requestId, attributionInputs);
+        }
+        catch (TenantContextConflictException conflict)
+        {
+            if (httpContext.Response.HasStarted)
+            {
+                return;
+            }
 
-        // Set context and ensure cleanup on all exit paths
-        accessor.Set(context);
+            var problemDetails = ProblemDetailsFactory.ForContextInitializationConflict(
+                conflict.TraceId,
+                conflict.RequestId);
+
+            var invariantCode = problemDetails.Extensions.TryGetValue(
+                ProblemDetailsExtensions.InvariantCodeKey,
+                out var code) ? code?.ToString() ?? LoggingDefaults.UnknownInvariantCode : LoggingDefaults.UnknownInvariantCode;
+
+            EnforcementEventSource.RefusalEmitted(
+                logger,
+                conflict.TraceId,
+                conflict.RequestId,
+                invariantCode,
+                problemDetails.Status ?? 401,
+                problemDetails.Type ?? LoggingDefaults.UnknownProblemType);
+
+            httpContext.Response.StatusCode = problemDetails.Status ?? 401;
+            httpContext.Response.ContentType = "application/problem+json";
+            await httpContext.Response.WriteAsJsonAsync(problemDetails);
+            return;
+        }
+
         try
         {
             // Verify context initialization (defensive check)
@@ -185,7 +209,7 @@ public class TenantContextMiddleware(
         finally
         {
             // Always clear context to prevent leakage in pooled environments
-            accessor.Clear();
+            initializer.Clear();
         }
     }
 

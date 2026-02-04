@@ -25,18 +25,26 @@ public class RefusalCorrelationTests
         var enricher = new DefaultLogEnricher();
         return new BoundaryGuard(logger, enricher);
     }
+
+    private static ITenantContextInitializer CreateInitializer(IMutableTenantContextAccessor accessor)
+    {
+        var logger = NullLogger<TenantContextInitializer>.Instance;
+        return new TenantContextInitializer(accessor, logger);
+    }
+
     [Fact]
     public async Task TenantContextMiddleware_Refusal_LogAndProblemDetailsMatchTraceId()
     {
         // Arrange
         var accessor = new AmbientTenantContextAccessor();
+        var initializer = CreateInitializer(accessor);
         var attributionResolver = new TenantAttributionResolver();
         var logger = NullLogger<TenantContextMiddleware>.Instance;
         var enricher = new DefaultLogEnricher();
         var boundaryGuard = CreateBoundaryGuard();
         var middleware = new TenantContextMiddleware(
             next: _ => Task.CompletedTask,
-            accessor: accessor,
+            initializer: initializer,
             attributionResolver: attributionResolver,
             boundaryGuard: boundaryGuard,
             logger: logger,
@@ -48,7 +56,7 @@ public class RefusalCorrelationTests
         context.Response.Body = new MemoryStream();
 
         // Act
-        await middleware.InvokeAsync(context);
+        await middleware.InvokeAsync(context, accessor);
 
         // Assert - Problem Details includes trace_id
         context.Response.Body.Position = 0;
@@ -69,13 +77,14 @@ public class RefusalCorrelationTests
     {
         // Arrange
         var accessor = new AmbientTenantContextAccessor();
+        var initializer = CreateInitializer(accessor);
         var attributionResolver = new TenantAttributionResolver();
         var logger = NullLogger<TenantContextMiddleware>.Instance;
         var enricher = new DefaultLogEnricher();
         var boundaryGuard = CreateBoundaryGuard();
         var middleware = new TenantContextMiddleware(
             next: _ => Task.CompletedTask,
-            accessor: accessor,
+            initializer: initializer,
             attributionResolver: attributionResolver,
             boundaryGuard: boundaryGuard,
             logger: logger,
@@ -87,7 +96,7 @@ public class RefusalCorrelationTests
         context.Response.Body = new MemoryStream();
 
         // Act
-        await middleware.InvokeAsync(context);
+        await middleware.InvokeAsync(context, accessor);
 
         // Assert - Problem Details includes request_id
         context.Response.Body.Position = 0;
@@ -108,13 +117,14 @@ public class RefusalCorrelationTests
     {
         // Arrange
         var accessor = new AmbientTenantContextAccessor();
+        var initializer = CreateInitializer(accessor);
         var attributionResolver = new TenantAttributionResolver();
         var logger = NullLogger<TenantContextMiddleware>.Instance;
         var enricher = new DefaultLogEnricher();
         var boundaryGuard = CreateBoundaryGuard();
         var middleware = new TenantContextMiddleware(
             next: _ => Task.CompletedTask,
-            accessor: accessor,
+            initializer: initializer,
             attributionResolver: attributionResolver,
             boundaryGuard: boundaryGuard,
             logger: logger,
@@ -126,7 +136,7 @@ public class RefusalCorrelationTests
         context.Response.Body = new MemoryStream();
 
         // Act
-        await middleware.InvokeAsync(context);
+        await middleware.InvokeAsync(context, accessor);
 
         // Assert - Problem Details includes invariant_code
         context.Response.Body.Position = 0;
@@ -147,13 +157,14 @@ public class RefusalCorrelationTests
     {
         // Arrange
         var accessor = new AmbientTenantContextAccessor();
+        var initializer = CreateInitializer(accessor);
         var attributionResolver = new TenantAttributionResolver();
         var logger = NullLogger<TenantContextMiddleware>.Instance;
         var enricher = new DefaultLogEnricher();
         var boundaryGuard = CreateBoundaryGuard();
         var middleware = new TenantContextMiddleware(
             next: _ => Task.CompletedTask,
-            accessor: accessor,
+            initializer: initializer,
             attributionResolver: attributionResolver,
             boundaryGuard: boundaryGuard,
             logger: logger,
@@ -165,7 +176,7 @@ public class RefusalCorrelationTests
         context.Response.Body = new MemoryStream();
 
         // Act
-        await middleware.InvokeAsync(context);
+        await middleware.InvokeAsync(context, accessor);
 
         // Assert - HTTP status matches between response and Problem Details
         context.Response.StatusCode.Should().Be(422, "Ambiguous attribution returns 422");
@@ -186,13 +197,14 @@ public class RefusalCorrelationTests
     {
         // Arrange
         var accessor = new AmbientTenantContextAccessor();
+        var initializer = CreateInitializer(accessor);
         var attributionResolver = new TenantAttributionResolver();
         var logger = NullLogger<TenantContextMiddleware>.Instance;
         var enricher = new DefaultLogEnricher();
         var boundaryGuard = CreateBoundaryGuard();
         var middleware = new TenantContextMiddleware(
             next: _ => Task.CompletedTask,
-            accessor: accessor,
+            initializer: initializer,
             attributionResolver: attributionResolver,
             boundaryGuard: boundaryGuard,
             logger: logger,
@@ -204,7 +216,7 @@ public class RefusalCorrelationTests
         context.Response.Body = new MemoryStream();
 
         // Act
-        await middleware.InvokeAsync(context);
+        await middleware.InvokeAsync(context, accessor);
 
         // Assert - Validate join pattern
         context.Response.Body.Position = 0;
@@ -233,13 +245,14 @@ public class RefusalCorrelationTests
     {
         // Arrange
         var accessor = new AmbientTenantContextAccessor();
+        var initializer = CreateInitializer(accessor);
         var attributionResolver = new TenantAttributionResolver();
         var logger = NullLogger<TenantContextMiddleware>.Instance;
         var enricher = new DefaultLogEnricher();
         var boundaryGuard = CreateBoundaryGuard();
         var middleware = new TenantContextMiddleware(
             next: _ => Task.CompletedTask,
-            accessor: accessor,
+            initializer: initializer,
             attributionResolver: attributionResolver,
             boundaryGuard: boundaryGuard,
             logger: logger,
@@ -251,7 +264,7 @@ public class RefusalCorrelationTests
         context.Response.Body = new MemoryStream();
 
         // Act
-        await middleware.InvokeAsync(context);
+        await middleware.InvokeAsync(context, accessor);
 
         // Assert - Problem Details does NOT expose tenant IDs when disclosure is unsafe
         context.Response.Body.Position = 0;
@@ -276,13 +289,14 @@ public class RefusalCorrelationTests
     {
         // Arrange
         var accessor = new AmbientTenantContextAccessor();
+        var initializer = CreateInitializer(accessor);
         var attributionResolver = new TenantAttributionResolver();
         var logger = NullLogger<TenantContextMiddleware>.Instance;
         var enricher = new DefaultLogEnricher();
         var boundaryGuard = CreateBoundaryGuard();
         var middleware = new TenantContextMiddleware(
             next: _ => Task.CompletedTask,
-            accessor: accessor,
+            initializer: initializer,
             attributionResolver: attributionResolver,
             boundaryGuard: boundaryGuard,
             logger: logger,
@@ -293,7 +307,7 @@ public class RefusalCorrelationTests
         context.TraceIdentifier = "health-trace-007";
 
         // Act
-        await middleware.InvokeAsync(context);
+        await middleware.InvokeAsync(context, accessor);
 
         // Assert - Health check logs should use safe-state tenant_ref "unknown"
         // (Validated by LogEnricherTests; this test demonstrates end-to-end flow)

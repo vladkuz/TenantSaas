@@ -5,10 +5,11 @@ This guide helps you integrate TenantSaas into your multi-tenant application.
 ## Table of Contents
 
 1. [Getting Started](#getting-started)
-2. [Middleware Setup](#middleware-setup)
-3. [Handling Invariant Violations](#handling-invariant-violations)
-4. [Error Handling Best Practices](#error-handling-best-practices)
-5. [Testing Integration](#testing-integration)
+2. [Context Initialization](#context-initialization)
+3. [Middleware Setup](#middleware-setup)
+4. [Handling Invariant Violations](#handling-invariant-violations)
+5. [Error Handling Best Practices](#error-handling-best-practices)
+6. [Testing Integration](#testing-integration)
 
 ---
 
@@ -19,8 +20,100 @@ TenantSaas provides a trust contract-based framework for building multi-tenant S
 ### Core Concepts
 
 - **Tenant Context**: Container for tenant scope, execution kind, and correlation IDs
+- **Context Initialization**: Single required primitive per flow (request, background, admin, scripted)
 - **Invariants**: Named, testable rules enforced at boundaries (e.g., context initialized, attribution unambiguous)
 - **Problem Details**: RFC 7807 standardized error responses with stable machine-readable identifiers
+
+---
+
+## Context Initialization
+
+### Initialization Primitive
+
+TenantSaas provides `ITenantContextInitializer` as the single required entry point for establishing tenant context in each execution flow.
+
+**Key characteristics:**
+- **Idempotent**: Repeated calls with identical inputs return the same context
+- **Validated**: Conflicting inputs throw `InvalidOperationException`
+- **Flow-specific**: Separate methods for Request, Background, Admin, and Scripted flows
+
+### Initialization Methods
+
+```csharp
+public interface ITenantContextInitializer
+{
+    // HTTP/API request flows
+    TenantContext InitializeRequest(
+        TenantScope scope,
+        string traceId,
+        string requestId,
+        TenantAttributionInputs? attributionInputs = null);
+    
+    // Background jobs/workers
+    TenantContext InitializeBackground(
+        TenantScope scope,
+        string traceId,
+        TenantAttributionInputs? attributionInputs = null);
+    
+    // Administrative operations
+    TenantContext InitializeAdmin(
+        TenantScope scope,
+        string traceId,
+        TenantAttributionInputs? attributionInputs = null);
+    
+    // CLI/script execution
+    TenantContext InitializeScripted(
+        TenantScope scope,
+        string traceId,
+        TenantAttributionInputs? attributionInputs = null);
+    
+    // Cleanup (call in finally block)
+    void Clear();
+}
+```
+
+### Example: Request Flow
+
+```csharp
+// In middleware or request handler
+var scope = TenantScope.ForTenant(new TenantId("tenant-123"));
+var attributionInputs = TenantAttributionInputs.FromExplicitScope(scope);
+var context = initializer.InitializeRequest(scope, traceId, requestId, attributionInputs);
+
+try
+{
+    // Process request - context is available via ITenantContextAccessor
+    await ProcessRequest();
+}
+finally
+{
+    // Always clear to prevent context leakage in pooled environments
+    initializer.Clear();
+}
+```
+
+### Example: Background Job
+
+```csharp
+// In background job worker
+public async Task ExecuteAsync(CancellationToken cancellationToken)
+{
+    var scope = TenantScope.ForTenant(new TenantId("tenant-xyz"));
+    var traceId = Activity.Current?.Id ?? Guid.NewGuid().ToString("N");
+    
+    var attributionInputs = TenantAttributionInputs.FromExplicitScope(scope);
+    var context = initializer.InitializeBackground(scope, traceId, attributionInputs);
+    
+    try
+    {
+        await ProcessJob();
+    }
+    finally
+    {
+        initializer.Clear();
+    }
+}
+```
 
 ---
 
@@ -29,7 +122,13 @@ TenantSaas provides a trust contract-based framework for building multi-tenant S
 ### 1. Configure Services
 
 ```csharp
+// Register context accessor
 builder.Services.AddSingleton<IMutableTenantContextAccessor, AmbientTenantContextAccessor>();
+
+// Register context initializer (scoped for request flows)
+builder.Services.AddScoped<ITenantContextInitializer, TenantContextInitializer>();
+
+// Register attribution resolver
 builder.Services.AddSingleton<ITenantAttributionResolver, TenantAttributionResolver>();
 ```
 
@@ -920,4 +1019,3 @@ All enforcement logs include these required fields:
 ```
 
 Join by: `logs.trace_id = problemDetails.trace_id`
-
