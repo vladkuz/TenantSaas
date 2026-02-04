@@ -502,6 +502,75 @@ builder.Services.AddScoped<ITenantFlowFactory, TenantFlowFactory>();
 // created per job/command (e.g., using IServiceScopeFactory).
 ```
 
+### Execution Kind and Scope for Downstream Use
+
+Every `TenantContext` carries first-class fields for **execution kind** and **tenant scope** that must be available to downstream enforcement, logging, and audit mapping.
+
+**Execution Kind Taxonomy:**
+
+| Value | Description | Use Case |
+|-------|-------------|----------|
+| `request` | HTTP or API request flow | Endpoints, controllers |
+| `background` | Background job or worker flow | Hangfire jobs, IHostedService |
+| `admin` | Administrative operation flow | Maintenance tasks, system operations |
+| `scripted` | CLI or script execution flow | Console apps, migrations |
+
+**Tenant Scope Types:**
+
+| Type | Description | Example |
+|------|-------------|---------|
+| `Tenant` | Scoped to a specific tenant | Normal tenant operations |
+| `SharedSystem` | Cross-tenant system operations | Global maintenance, reporting |
+| `NoTenant` | Explicit no-tenant context | Health checks, public endpoints |
+
+**Downstream Guarantees:**
+
+1. **Enforcement**: `BoundaryGuard.RequireContext()` validates that context is initialized and contains valid execution kind and scope. Missing or invalid values result in a `ContextInitialized` refusal with Problem Details.
+
+2. **Logging**: `DefaultLogEnricher.Enrich()` always emits `ExecutionKind` and `ScopeType` in `StructuredLogEvent`. These fields are required for audit trail correlation.
+
+3. **Audit Mapping**: Execution kind and scope inform audit event categorization and routing decisions.
+
+**Example: Accessing execution metadata in business logic**
+
+```csharp
+public class TenantService(ITenantContextAccessor accessor)
+{
+    public string GetOperationCategory()
+    {
+        var context = accessor.Current;
+        if (context is null) throw new InvalidOperationException("Context not initialized");
+
+        // ExecutionKind and Scope are always present on a valid context
+        // Use static members for type-safe comparison
+        return context.ExecutionKind switch
+        {
+            _ when context.ExecutionKind == ExecutionKind.Request => "user-initiated",
+            _ when context.ExecutionKind == ExecutionKind.Background => "automated",
+            _ when context.ExecutionKind == ExecutionKind.Admin => "administrative",
+            _ when context.ExecutionKind == ExecutionKind.Scripted => "scripted",
+            _ => "unknown"
+        };
+    }
+}
+```
+
+**Invariant Enforcement:**
+
+If context is missing or not properly initialized, enforcement boundaries refuse with:
+
+```json
+{
+  "type": "https://tenantsaas.example.com/errors/context-initialized",
+  "title": "Tenant context not initialized",
+  "status": 500,
+  "detail": "Tenant context must be initialized before operations can proceed.",
+  "instance": "/api/example",
+  "invariant_code": "ContextInitialized",
+  "trace_id": "abc123..."
+}
+```
+
 ---
 
 ## Middleware Setup

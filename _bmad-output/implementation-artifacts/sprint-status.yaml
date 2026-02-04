@@ -71,7 +71,7 @@ development_status:
   4-2-support-explicit-context-passing-without-ambient-requirements: done
   4-3-provide-ambient-context-propagation-with-deterministic-async-behavior: done
   4-4-provide-flow-wrappers-for-background-admin-and-scripted-execution: done
-  4-5-capture-execution-kind-and-scope-in-context-for-downstream-use: ready-for-dev
+  4-5-capture-execution-kind-and-scope-in-context-for-downstream-use: done
   epic-4-retrospective: optional
 
   # Epic 5: Contract Test Suite (BACKLOG)
