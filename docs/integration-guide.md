@@ -6,10 +6,11 @@ This guide helps you integrate TenantSaas into your multi-tenant application.
 
 1. [Getting Started](#getting-started)
 2. [Context Initialization](#context-initialization)
-3. [Middleware Setup](#middleware-setup)
-4. [Handling Invariant Violations](#handling-invariant-violations)
-5. [Error Handling Best Practices](#error-handling-best-practices)
-6. [Testing Integration](#testing-integration)
+3. [Ambient vs Explicit Context Propagation](#ambient-vs-explicit-context-propagation)
+4. [Middleware Setup](#middleware-setup)
+5. [Handling Invariant Violations](#handling-invariant-violations)
+6. [Error Handling Best Practices](#error-handling-best-practices)
+7. [Testing Integration](#testing-integration)
 
 ---
 
@@ -177,6 +178,165 @@ var enforcementResult = guard.RequireContext(accessor, explicitContext);
 1. Explicit context (when provided and non-null) always takes precedence
 2. Ambient context (via `ITenantContextAccessor`) is used as fallback
 3. Null explicit context is treated as missing and results in refusal
+
+---
+
+## Ambient vs Explicit Context Propagation
+
+TenantSaas supports two context propagation strategies: **ambient** (automatic) and **explicit** (manual). Both are equally valid and provide the same enforcement guarantees.
+
+### Ambient Context Propagation (Default)
+
+**How it works:**
+- Uses `AsyncLocal<T>` for automatic context flow
+- Context propagates deterministically across async boundaries within the same flow
+- No need to pass context explicitly through method parameters
+
+**Deterministic async behavior:**
+- ✅ Context flows across `await` boundaries
+- ✅ Context flows into `Task.Run` and background continuations
+- ✅ Context flows through nested async calls
+- ✅ Context survives `ConfigureAwait(false)` (AsyncLocal is independent of SynchronizationContext)
+- ✅ Context is visible in parallel tasks (`Task.WhenAll`, `Task.WhenAny`)
+
+**Zero leakage guarantee:**
+- New execution flows start with **empty context**
+- Previous flow context does **not** leak if properly cleared
+- **Middleware must call `Clear()` in a `finally` block** to prevent leakage in pooled environments
+
+**Example: Ambient propagation in action**
+
+```csharp
+// Middleware initializes context once
+public async Task InvokeAsync(HttpContext httpContext)
+{
+    var context = initializer.InitializeRequest(scope, traceId, requestId);
+    
+    try
+    {
+        // Context automatically available in all async calls
+        await _next(httpContext);
+    }
+    finally
+    {
+        initializer.Clear(); // CRITICAL: prevent leakage
+    }
+}
+
+// Deep in the call stack - no explicit passing needed
+public async Task ProcessOrderAsync()
+{
+    // Context available via accessor
+    var enforcementResult = guard.RequireContext(accessor);
+    
+    // Nested async calls see same context automatically
+    await ValidateInventoryAsync();
+    await ChargePaymentAsync();
+}
+
+private async Task ValidateInventoryAsync()
+{
+    // Context still available here
+    var enforcementResult = guard.RequireContext(accessor);
+    
+    // Even Task.Run sees the same context
+    await Task.Run(() => CheckStock());
+}
+```
+
+**When to use ambient:**
+- Standard web applications with request-scoped flows
+- Background jobs with clear start/end boundaries
+- When reducing plumbing is valuable
+- When enforcement outcomes must be consistent across the entire flow
+
+### Explicit Context Passing (Alternative)
+
+**How it works:**
+- Pass `TenantContext` directly through method parameters
+- No ambient storage or accessor required
+- Full control over context lifetime and scope
+
+**Example: Explicit propagation**
+
+```csharp
+public async Task ProcessOrderAsync(TenantContext context)
+{
+    // Pass context explicitly to enforcement boundary
+    var enforcementResult = guard.RequireContext(context);
+    
+    // Must pass context explicitly to nested calls
+    await ValidateInventoryAsync(context);
+    await ChargePaymentAsync(context);
+}
+
+private async Task ValidateInventoryAsync(TenantContext context)
+{
+    // Context passed explicitly
+    var enforcementResult = guard.RequireContext(context);
+    
+    // Task.Run requires explicit capture
+    await Task.Run(() => CheckStock(context));
+}
+```
+
+**When to use explicit:**
+- Framework-free console applications or CLI tools
+- Unit tests without DI container setup
+- When ambient propagation is undesirable for architectural reasons
+- When you want explicit visibility of context flow in method signatures
+
+### Choosing at DI Registration Time
+
+The choice between ambient and explicit mode is made at DI registration:
+
+```csharp
+// Option 1: Ambient mode (default) - uses AsyncLocal propagation
+var accessor = new AmbientTenantContextAccessor();
+builder.Services.AddSingleton<ITenantContextAccessor>(accessor);
+builder.Services.AddSingleton<IMutableTenantContextAccessor>(accessor);
+
+// Option 2: Explicit mode - no automatic propagation
+builder.Services.AddScoped<ITenantContextAccessor, ExplicitTenantContextAccessor>();
+builder.Services.AddScoped<IMutableTenantContextAccessor, ExplicitTenantContextAccessor>();
+```
+
+**Note:** There is no runtime configuration switch. The propagation strategy is determined by which accessor implementation you register.
+
+### Hybrid Mode (Best of Both Worlds)
+
+You can mix ambient and explicit strategies. **Explicit context always takes precedence** when both are available.
+
+```csharp
+// Ambient context exists from middleware
+var ambientContext = accessor.Current;
+
+// But you can override with explicit context for specific operations
+var adminScope = TenantScope.ForSharedSystem();
+var adminContext = TenantContext.ForAdmin(adminScope, traceId);
+
+// Explicit context wins
+var result = guard.RequireContext(accessor, adminContext);
+```
+
+**Precedence rules (deterministic):**
+1. **Explicit context** (if provided and non-null) → always wins
+2. **Ambient context** (via accessor) → fallback if explicit is null
+3. **No context** → refusal with `ContextInitialized` invariant
+
+### Comparison Table
+
+| Feature | Ambient | Explicit |
+|---------|---------|----------|
+| **Plumbing** | Minimal (no method parameters) | Explicit (context in signatures) |
+| **Async propagation** | Automatic (AsyncLocal) | Manual (must pass through) |
+| **Leakage risk** | Requires `Clear()` discipline | Lower (scoped lifetime) |
+| **DI dependency** | Requires `ITenantContextAccessor` | Optional (can pass directly) |
+| **Enforcement guarantees** | Identical | Identical |
+| **Testability** | Requires accessor setup | Direct context injection |
+| **Visibility** | Implicit (hidden in stack) | Explicit (visible in signatures) |
+
+**Key Insight:** Both strategies enforce the same invariants and produce identical refusal behavior. Choose based on your architectural preferences and team conventions.
 
 ---
 
