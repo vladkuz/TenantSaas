@@ -122,18 +122,32 @@ public static partial class EnforcementEventSource
         string problemType);
 
     /// <summary>
-    /// Logs break-glass operation invocation (infrastructure for future Story 3.5).
+    /// Logs successful break-glass invocation with audit event.
     /// </summary>
     [LoggerMessage(
         EventId = 1007,
         Level = LogLevel.Warning,
-        Message = "Break-glass invoked: tenant_ref={TenantRef}, trace_id={TraceId}, request_id={RequestId}, actor={Actor}, reason={Reason}, scope_type={ScopeType}")]
+        Message = "Break-glass invoked: actor={Actor}, reason={Reason}, scope={Scope}, tenant_ref={TenantRef}, trace_id={TraceId}, audit_code={AuditCode}")]
     public static partial void BreakGlassInvoked(
         ILogger logger,
-        string tenantRef,
-        string traceId,
-        string? requestId,
         string actor,
         string reason,
-        string scopeType);
+        string scope,
+        string tenantRef,
+        string traceId,
+        string auditCode);
+
+    /// <summary>
+    /// Logs denied break-glass attempt (security violation).
+    /// </summary>
+    [LoggerMessage(
+        EventId = 1010,
+        Level = LogLevel.Error,
+        Message = "Break-glass attempt denied: trace_id={TraceId}, request_id={RequestId}, invariant_code={InvariantCode}, reason={Reason}")]
+    public static partial void BreakGlassAttemptDenied(
+        ILogger logger,
+        string traceId,
+        string? requestId,
+        string invariantCode,
+        string reason);
 }

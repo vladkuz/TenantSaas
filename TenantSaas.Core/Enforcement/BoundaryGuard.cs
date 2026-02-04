@@ -1,6 +1,8 @@
-using TenantSaas.Abstractions.Tenancy;
+using TenantSaas.Abstractions.BreakGlass;
 using TenantSaas.Abstractions.Invariants;
 using TenantSaas.Abstractions.Logging;
+using TenantSaas.Abstractions.Tenancy;
+using TenantSaas.Abstractions.TrustContract;
 using TenantSaas.Core.Logging;
 using Microsoft.Extensions.Logging;
 
@@ -13,25 +15,14 @@ namespace TenantSaas.Core.Enforcement;
 /// This class implements the invariant enforcement contract. Register as a singleton
 /// in DI and inject where boundary enforcement is needed.
 /// </remarks>
-public sealed class BoundaryGuard : IBoundaryGuard
+/// <param name="logger">Logger instance for enforcement events.</param>
+/// <param name="enricher">Log enricher for structured field extraction.</param>
+/// <param name="auditSink">Optional audit sink for break-glass events (Epic 7 implementation).</param>
+public sealed class BoundaryGuard(
+    ILogger<BoundaryGuard> logger,
+    ILogEnricher enricher,
+    IBreakGlassAuditSink? auditSink = null) : IBoundaryGuard
 {
-    private readonly ILogger logger;
-    private readonly ILogEnricher enricher;
-
-    /// <summary>
-    /// Creates a new BoundaryGuard with the specified dependencies.
-    /// </summary>
-    /// <param name="logger">Logger instance for enforcement events.</param>
-    /// <param name="enricher">Log enricher for structured field extraction.</param>
-    /// <exception cref="ArgumentNullException">Thrown when any dependency is null.</exception>
-    public BoundaryGuard(ILogger<BoundaryGuard> logger, ILogEnricher enricher)
-    {
-        ArgumentNullException.ThrowIfNull(logger);
-        ArgumentNullException.ThrowIfNull(enricher);
-
-        this.logger = logger;
-        this.enricher = enricher;
-    }
 
     /// <inheritdoc />
     public EnforcementResult RequireContext(
@@ -156,5 +147,72 @@ public sealed class BoundaryGuard : IBoundaryGuard
                     notAllowed.Source.GetDisplayName());
                 break;
         }
+    }
+
+    /// <inheritdoc />
+    public async Task<EnforcementResult> RequireBreakGlassAsync(
+        BreakGlassDeclaration? declaration,
+        string traceId,
+        string? requestId = null,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(traceId);
+
+        // Validate declaration
+        var validationResult = BreakGlassValidator.Validate(declaration);
+        if (!validationResult.IsValid)
+        {
+            // Reason is guaranteed non-null when IsValid is false
+            var reason = validationResult.Reason!;
+
+            // Log denial
+            EnforcementEventSource.BreakGlassAttemptDenied(
+                logger,
+                traceId,
+                requestId,
+                InvariantCode.BreakGlassExplicitAndAudited,
+                reason);
+
+            return EnforcementResult.Failure(
+                InvariantCode.BreakGlassExplicitAndAudited,
+                traceId,
+                reason);
+        }
+
+        // Create audit event (will be used for logging and sink)
+        var tenantRef = declaration!.TargetTenantRef
+            ?? TrustContractV1.BreakGlassMarkerCrossTenant;
+
+        // Log successful invocation
+        EnforcementEventSource.BreakGlassInvoked(
+            logger,
+            declaration.ActorId,
+            declaration.Reason,
+            declaration.DeclaredScope,
+            tenantRef,
+            traceId,
+            AuditCode.BreakGlassInvoked);
+
+        // Emit to audit sink if available (fail gracefully)
+        if (auditSink != null)
+        {
+            try
+            {
+                var auditEvent = BreakGlassAuditHelper.CreateAuditEvent(
+                    declaration,
+                    traceId,
+                    invariantCode: null,
+                    operationName: null);
+
+                await auditSink.EmitAsync(auditEvent, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                // Log but don't block - audit sink is optional
+                logger.LogError(ex, "Failed to emit break-glass audit event to sink");
+            }
+        }
+
+        return EnforcementResult.Success();
     }
 }

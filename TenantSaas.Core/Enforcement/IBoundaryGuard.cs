@@ -1,3 +1,4 @@
+using TenantSaas.Abstractions.BreakGlass;
 using TenantSaas.Abstractions.Tenancy;
 
 namespace TenantSaas.Core.Enforcement;
@@ -31,4 +32,26 @@ public interface IBoundaryGuard
     AttributionEnforcementResult RequireUnambiguousAttribution(
         TenantAttributionResult result,
         string traceId);
+
+    /// <summary>
+    /// Requires that break-glass is explicitly declared for privileged operations.
+    /// </summary>
+    /// <param name="declaration">Break-glass declaration with actor, reason, and scope. Null results in refusal.</param>
+    /// <param name="traceId">Trace identifier for correlation.</param>
+    /// <param name="requestId">Request identifier for correlation (optional).</param>
+    /// <param name="cancellationToken">Cancellation token for audit sink operations.</param>
+    /// <returns>
+    /// Success if declaration is valid with all required fields (actor, reason, scope).
+    /// Failure with BreakGlassExplicitAndAudited if declaration is null, incomplete, or invalid.
+    /// </returns>
+    /// <remarks>
+    /// Break-glass must always be explicit and never implicit or default.
+    /// Missing or incomplete declarations (null actor, empty reason, etc.) result in refusal.
+    /// When successful, an audit event is emitted and logged for security review.
+    /// </remarks>
+    Task<EnforcementResult> RequireBreakGlassAsync(
+        BreakGlassDeclaration? declaration,
+        string traceId,
+        string? requestId = null,
+        CancellationToken cancellationToken = default);
 }

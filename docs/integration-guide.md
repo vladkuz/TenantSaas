@@ -463,6 +463,208 @@ Timestamp: {Timestamp}";
 
 ---
 
+## Break-Glass Enforcement
+
+Break-glass is a controlled mechanism for privileged operations that bypasses normal tenant isolation rules. TenantSaas enforces explicit, auditable break-glass declarations.
+
+### When to Use Break-Glass
+
+Use break-glass for:
+- Production incident response (on-call debugging cross-tenant issues)
+- Support operations (authorized staff helping customers)
+- Administrative tasks (data migrations, compliance audits)
+
+**Never use break-glass for:**
+- Normal application features
+- Background jobs with proper tenant context
+- Operations that can be scoped to a single tenant
+
+### Enforcing Break-Glass
+
+```csharp
+using TenantSaas.Abstractions.BreakGlass;
+using TenantSaas.Core.Enforcement;
+
+app.MapPost("/admin/debug/customer-data", async (
+    [FromHeader(Name = "X-BreakGlass-Actor")] string actorId,
+    [FromHeader(Name = "X-BreakGlass-Reason")] string reason,
+    [FromHeader(Name = "X-BreakGlass-Scope")] string declaredScope,
+    [FromHeader(Name = "X-BreakGlass-Target-Tenant")] string? targetTenantRef,
+    [FromServices] IBoundaryGuard boundaryGuard,
+    [FromServices] ITenantContextAccessor accessor) =>
+{
+    // Create break-glass declaration from headers
+    var declaration = new BreakGlassDeclaration(
+        actorId: actorId,
+        reason: reason,
+        declaredScope: declaredScope,
+        targetTenantRef: targetTenantRef,
+        timestamp: DateTimeOffset.UtcNow);
+
+    // Enforce break-glass before proceeding
+    var enforcementResult = await boundaryGuard.RequireBreakGlassAsync(
+        declaration,
+        accessor.Current?.TraceId ?? Guid.NewGuid().ToString());
+
+    if (!enforcementResult.IsSuccess)
+    {
+        // Refusal: missing or invalid declaration
+        return Results.Problem(
+            Core.Errors.ProblemDetailsFactory.ForBreakGlassRequired(
+                enforcementResult.TraceId!,
+                accessor.Current?.RequestId,
+                enforcementResult.Detail));
+    }
+
+    // Break-glass approved - proceed with privileged operation
+    // This will be logged as EventId 1007 (BreakGlassInvoked)
+    var customerData = await GetCustomerDataCrossTenant(targetTenantRef);
+    return Results.Ok(customerData);
+});
+```
+
+### Break-Glass Declaration Requirements
+
+All fields are **required**. Missing or empty fields result in HTTP 403 refusal.
+
+| Field | Description | Example |
+|-------|-------------|---------|
+| `actorId` | Identity of person invoking break-glass (email, employee ID) | `"alice@example.com"` |
+| `reason` | Business justification (incident number, ticket ID) | `"Production incident #12345"` |
+| `declaredScope` | What operation is being performed | `"Debug customer_id=cust-999 checkout failure"` |
+| `targetTenantRef` | Target tenant (or `null` for cross-tenant) | `"tenant-alpha"` or `null` |
+| `timestamp` | When declaration was created | `DateTimeOffset.UtcNow` |
+
+### Break-Glass Client Example
+
+```csharp
+public class AdminClient
+{
+    private readonly HttpClient _httpClient;
+
+    public async Task<Result<CustomerData>> DebugCustomerCheckout(
+        string actorEmail,
+        string incidentNumber,
+        string customerId,
+        string? tenantId)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Post, "/admin/debug/customer-data");
+        
+        // Add break-glass headers
+        request.Headers.Add("X-BreakGlass-Actor", actorEmail);
+        request.Headers.Add("X-BreakGlass-Reason", $"Production incident {incidentNumber}");
+        request.Headers.Add("X-BreakGlass-Scope", $"Debug customer_id={customerId} checkout failure");
+        
+        if (tenantId != null)
+        {
+            request.Headers.Add("X-BreakGlass-Target-Tenant", tenantId);
+        }
+
+        var response = await _httpClient.SendAsync(request);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+            
+            if (problemDetails?.Extensions.ContainsKey("invariant_code") == true &&
+                problemDetails.Extensions["invariant_code"]?.ToString() == "BreakGlassExplicitAndAudited")
+            {
+                return Result.Failure<CustomerData>(
+                    "Break-glass declaration rejected: " + problemDetails.Detail);
+            }
+
+            return Result.Failure<CustomerData>("Unexpected error: " + problemDetails?.Detail);
+        }
+
+        var data = await response.Content.ReadFromJsonAsync<CustomerData>();
+        return Result.Success(data!);
+    }
+}
+```
+
+### Break-Glass Audit Events
+
+All break-glass attempts (successful and failed) are logged with structured audit events:
+
+**Successful Break-Glass** (EventId 1007):
+```
+LogLevel.Warning: "Break-glass invoked: actor={Actor}, reason={Reason}, scope={Scope}, tenant_ref={TenantRef}, trace_id={TraceId}, audit_code=BreakGlassInvoked"
+```
+
+**Denied Break-Glass** (EventId 1010):
+```
+LogLevel.Error: "Break-glass attempt denied: trace_id={TraceId}, request_id={RequestId}, invariant_code=BreakGlassExplicitAndAudited, reason={Reason}"
+```
+
+### Integrating with Audit Sinks (Optional)
+
+For compliance requirements, implement `IBreakGlassAuditSink` to emit break-glass events to external systems:
+
+```csharp
+using TenantSaas.Abstractions.BreakGlass;
+
+public class ComplianceAuditSink : IBreakGlassAuditSink
+{
+    private readonly ILogger<ComplianceAuditSink> _logger;
+    private readonly HttpClient _auditSystemClient;
+
+    public ComplianceAuditSink(
+        ILogger<ComplianceAuditSink> logger,
+        HttpClient auditSystemClient)
+    {
+        _logger = logger;
+        _auditSystemClient = auditSystemClient;
+    }
+
+    public async Task EmitAsync(BreakGlassAuditEvent auditEvent, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var response = await _auditSystemClient.PostAsJsonAsync(
+                "/api/audit-events",
+                new
+                {
+                    event_type = "break_glass_invoked",
+                    actor = auditEvent.Actor,
+                    reason = auditEvent.Reason,
+                    scope = auditEvent.Scope,
+                    tenant_ref = auditEvent.TenantRef,
+                    trace_id = auditEvent.TraceId,
+                    invariant_code = auditEvent.InvariantCode,
+                    operation = auditEvent.OperationName,
+                    audit_code = auditEvent.AuditCode,
+                    timestamp = auditEvent.Timestamp
+                },
+                cancellationToken);
+
+            response.EnsureSuccessStatusCode();
+
+            _logger.LogInformation(
+                "Break-glass audit event sent to compliance system: trace_id={TraceId}, audit_code={AuditCode}",
+                auditEvent.TraceId,
+                auditEvent.AuditCode);
+        }
+        catch (Exception ex)
+        {
+            // Audit sink failures do not block the operation
+            _logger.LogError(ex,
+                "Failed to send break-glass audit event to compliance system: trace_id={TraceId}",
+                auditEvent.TraceId);
+        }
+    }
+}
+
+// Register in DI
+builder.Services.AddHttpClient<IBreakGlassAuditSink, ComplianceAuditSink>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["AuditSystemUrl"]!);
+});
+```
+
+**Important:** Audit sink failures are logged but **do not block** the break-glass operation. Enforcement happens before audit emission.
+
+---
+
 ## Testing Integration
 
 This section demonstrates how to test your TenantSaas integration with proper error handling validation.

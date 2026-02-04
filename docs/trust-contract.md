@@ -36,11 +36,48 @@ Execution kind describes how the context was initiated:
 
 Break-glass declarations are explicit and never implicit or default. Privileged or cross-tenant operations require a declaration with:
 
-- **actorId**: identity of the actor invoking break-glass (required).
-- **reason**: justification for the escalation (required).
-- **declaredScope**: scope being claimed, e.g., `tenant`, `cross-tenant`, `shared-system` (required).
-- **targetTenantRef**: target tenant reference; `null` indicates cross-tenant.
+- **actorId**: identity of the actor invoking break-glass (required, non-empty).
+- **reason**: justification for the escalation (required, non-empty).
+- **declaredScope**: description of the operation being performed (required, non-empty).
+- **targetTenantRef**: target tenant reference; `null` indicates cross-tenant operation.
 - **timestamp**: UTC timestamp for the declaration.
+
+### Enforcement Rules
+
+1. **Explicit Declaration Required**: Break-glass cannot be implicit or default. Operations requiring break-glass must call `IBoundaryGuard.RequireBreakGlassAsync()` with a non-null declaration.
+
+2. **Field Validation**: All required fields (`actorId`, `reason`, `declaredScope`) must be non-null and non-empty. Empty strings or whitespace-only values are rejected.
+
+3. **Refusal on Failure**: Missing or invalid declarations return HTTP 403 with invariant code `BreakGlassExplicitAndAudited` and a specific failure reason:
+   - `"Break-glass declaration is required."` - declaration is `null`
+   - `"Break-glass actor identity is required."` - `actorId` is empty
+   - `"Break-glass reason is required."` - `reason` is empty
+   - `"Break-glass declared scope is required."` - `declaredScope` is empty
+
+4. **Audit Logging**: All break-glass attempts are logged:
+   - **Successful**: EventId 1007 (`BreakGlassInvoked`), `LogLevel.Warning`
+   - **Denied**: EventId 1010 (`BreakGlassAttemptDenied`), `LogLevel.Error`
+
+5. **Optional Audit Sink**: Implementations may provide `IBreakGlassAuditSink` for external audit trails (SIEM, compliance systems). Sink failures are logged but do not block the operation.
+
+6. **Tenant Reference Disclosure**: When `targetTenantRef` is `null`, the audit event uses `cross_tenant` marker per disclosure policy.
+
+### Enforcement Implementation
+
+```csharp
+// Example: Enforcement in a privileged endpoint
+var result = await boundaryGuard.RequireBreakGlassAsync(declaration, traceId);
+if (!result.IsSuccess)
+{
+    // Returns HTTP 403 with BreakGlassExplicitAndAudited invariant
+    return Results.Problem(
+        ProblemDetailsFactory.ForBreakGlassRequired(
+            result.TraceId!, requestId, result.Detail));
+}
+
+// Break-glass approved - proceed with operation
+// Audit event emitted to logs and optional audit sink
+```
 
 Markers:
 

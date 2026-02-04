@@ -192,7 +192,7 @@ All Problem Details responses follow this structure. The `type` field uses a URN
 
 **Invariant Code:** `BreakGlassExplicitAndAudited`
 
-**Description:** Break-glass must be explicitly declared with actor identity and reason.
+**Description:** Break-glass must be explicitly declared with actor identity, reason, and scope.
 
 **HTTP Status:** `403 Forbidden`
 
@@ -203,17 +203,29 @@ All Problem Details responses follow this structure. The `type` field uses a URN
 **Guidance Link:** https://docs.tenantsaas.dev/errors/break-glass-required
 
 **When This Occurs:**
-- Cross-tenant or privileged operation attempted without break-glass declaration
-- Break-glass declaration is missing required fields (actor, reason)
+- Privileged operation attempted without break-glass declaration
+- Break-glass declaration is `null`
+- Break-glass declaration is missing required fields:
+  - `actorId` (identity of person performing operation)
+  - `reason` (business justification, incident number, ticket ID)
+  - `declaredScope` (description of what operation is being performed)
+- Break-glass declaration has empty/whitespace-only values for required fields
 
-**Example Response:**
+**Enforcement:**
+- `IBoundaryGuard.RequireBreakGlassAsync()` validates the declaration before allowing operation to proceed
+- Failed enforcement returns `EnforcementResult.Failure` with this invariant code
+- Failed attempts are logged as EventId 1010 (`BreakGlassAttemptDenied`) with `LogLevel.Error`
+- Successful break-glass is logged as EventId 1007 (`BreakGlassInvoked`) with `LogLevel.Warning`
+- Optional `IBreakGlassAuditSink` receives audit events for compliance integration
+
+**Example Response (Missing Declaration):**
 
 ```json
 {
   "type": "urn:tenantsaas:error:break-glass-explicit-and-audited",
   "title": "Break-glass must be explicit",
   "status": 403,
-  "detail": "Break-glass must be explicitly declared with actor identity and reason.",
+  "detail": "Break-glass declaration is required.",
   "instance": null,
   "invariant_code": "BreakGlassExplicitAndAudited",
   "trace_id": "a1b2c3d4e5f6",
@@ -222,10 +234,50 @@ All Problem Details responses follow this structure. The `type` field uses a URN
 }
 ```
 
+**Example Response (Incomplete Declaration):**
+
+```json
+{
+  "type": "urn:tenantsaas:error:break-glass-explicit-and-audited",
+  "title": "Break-glass must be explicit",
+  "status": 403,
+  "detail": "Break-glass actor identity is required.",
+  "instance": null,
+  "invariant_code": "BreakGlassExplicitAndAudited",
+  "trace_id": "b2c3d4e5f6g7",
+  "request_id": "req-67890",
+  "guidance_link": "https://docs.tenantsaas.dev/errors/break-glass-required"
+}
+```
+
 **Remediation:**
-- Provide explicit break-glass declaration with actor identity and reason
-- Ensure audit event emission is configured for break-glass operations
-- Review cross-tenant operation requirements and authorization
+1. Create a valid `BreakGlassDeclaration` with all required fields:
+   ```csharp
+   var declaration = new BreakGlassDeclaration(
+       actorId: "on-call@example.com",
+       reason: "Production incident #12345",
+       declaredScope: "Debug customer_id=cust-999 checkout failure",
+       targetTenantRef: "tenant-alpha", // or null for cross-tenant
+       timestamp: DateTimeOffset.UtcNow);
+   ```
+
+2. Enforce before executing the privileged operation:
+   ```csharp
+   var result = await boundaryGuard.RequireBreakGlassAsync(declaration, traceId);
+   if (!result.IsSuccess)
+   {
+       return Results.Problem(
+           ProblemDetailsFactory.ForBreakGlassRequired(
+               result.TraceId!, requestId, result.Detail));
+   }
+   ```
+
+3. Review audit logs (EventId 1007, 1010) for break-glass activity
+4. Implement `IBreakGlassAuditSink` if compliance requires external audit trail
+
+**See Also:**
+- [Integration Guide: Break-Glass Enforcement](docs/integration-guide.md#break-glass-enforcement)
+- [Trust Contract: Break-Glass Invariant](docs/trust-contract.md#41-break-glass-must-be-explicit)
 
 ---
 

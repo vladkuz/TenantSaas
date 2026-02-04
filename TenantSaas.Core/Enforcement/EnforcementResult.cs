@@ -61,6 +61,23 @@ public sealed record EnforcementResult
     }
 
     /// <summary>
+    /// Creates a successful enforcement result without a tenant context.
+    /// </summary>
+    /// <remarks>
+    /// Used for enforcement checks that don't validate tenant context
+    /// (e.g., break-glass validation, policy checks).
+    /// </remarks>
+    public static EnforcementResult Success()
+    {
+        return new(
+            isSuccess: true,
+            context: null,
+            invariantCode: null,
+            traceId: null,
+            detail: null);
+    }
+
+    /// <summary>
     /// Creates a failed enforcement result.
     /// </summary>
     public static EnforcementResult Failure(

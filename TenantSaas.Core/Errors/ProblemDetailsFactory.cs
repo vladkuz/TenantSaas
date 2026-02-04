@@ -171,19 +171,21 @@ public static class ProblemDetailsFactory
             detail: "Operation requires an explicit tenant scope.");
 
     /// <summary>
-    /// Creates a Problem Details response for missing break-glass declaration.
+    /// Creates a Problem Details response for missing or invalid break-glass declaration.
     /// </summary>
     /// <param name="traceId">End-to-end correlation identifier.</param>
     /// <param name="requestId">Request-scoped correlation identifier.</param>
+    /// <param name="reason">Specific reason why break-glass is required or why validation failed.</param>
     /// <returns>HTTP 403 Problem Details response.</returns>
     public static ProblemDetails ForBreakGlassRequired(
         string traceId,
-        string? requestId = null)
+        string? requestId = null,
+        string? reason = null)
         => FromInvariantViolation(
             InvariantCode.BreakGlassExplicitAndAudited,
             traceId,
             requestId,
-            detail: "Break-glass must be explicitly declared with actor identity and reason.");
+            detail: reason ?? "Break-glass must be explicitly declared with actor identity and reason.");
 
     /// <summary>
     /// Creates a Problem Details response for unsafe disclosure.
