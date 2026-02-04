@@ -67,8 +67,8 @@ development_status:
 
   # Epic 4: Context Initialization & Propagation (BACKLOG)
   epic-4: in-progress
-  4-1-provide-a-single-required-initialization-primitive-per-flow: in-progress
-  4-2-support-explicit-context-passing-without-ambient-requirements: backlog
+  4-1-provide-a-single-required-initialization-primitive-per-flow: done
+  4-2-support-explicit-context-passing-without-ambient-requirements: done
   4-3-provide-ambient-context-propagation-with-deterministic-async-behavior: backlog
   4-4-provide-flow-wrappers-for-background-admin-and-scripted-execution: backlog
   4-5-capture-execution-kind-and-scope-in-context-for-downstream-use: backlog

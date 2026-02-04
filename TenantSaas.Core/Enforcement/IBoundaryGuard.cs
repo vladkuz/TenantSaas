@@ -24,6 +24,36 @@ public interface IBoundaryGuard
         string? overrideTraceId = null);
 
     /// <summary>
+    /// Requires that tenant context has been initialized using explicit context passing.
+    /// </summary>
+    /// <param name="context">Explicit tenant context to validate. Null is treated as uninitialized.</param>
+    /// <param name="overrideTraceId">Optional trace ID for correlation when context is null. If not provided, a new GUID is generated.</param>
+    /// <returns>Success with context, or failure with ContextInitialized invariant.</returns>
+    /// <remarks>
+    /// This overload enables enforcement without ambient context dependency (ITenantContextAccessor).
+    /// Null context is refused with ContextInitialized invariant.
+    /// For pure explicit mode without accessor dependency, use this overload.
+    /// </remarks>
+    EnforcementResult RequireContext(
+        TenantContext? context,
+        string? overrideTraceId = null);
+
+    /// <summary>
+    /// Requires that tenant context has been initialized, with explicit context taking precedence over ambient.
+    /// </summary>
+    /// <param name="accessor">Ambient context accessor (fallback). Required even when explicit context is provided.</param>
+    /// <param name="explicitContext">Explicit context (priority). If non-null, takes precedence over accessor.</param>
+    /// <returns>Success with context (explicit or ambient), or failure with invariant violation.</returns>
+    /// <remarks>
+    /// When both explicit context and ambient accessor are provided, explicit context takes precedence.
+    /// This allows hybrid usage where explicit context can override ambient for specific operations.
+    /// For pure explicit mode without accessor dependency, use the <see cref="RequireContext(TenantContext?, string?)"/> overload instead.
+    /// </remarks>
+    EnforcementResult RequireContext(
+        ITenantContextAccessor accessor,
+        TenantContext? explicitContext);
+
+    /// <summary>
     /// Requires that tenant attribution is unambiguous.
     /// </summary>
     /// <param name="result">Attribution resolution result.</param>

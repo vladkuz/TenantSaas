@@ -295,8 +295,8 @@ public class ContextInitializedTests
         // Arrange
         var boundaryGuard = CreateBoundaryGuard();
 
-        // Act & Assert
-        var act = () => boundaryGuard.RequireContext(null!);
+        // Act & Assert - explicitly cast to ITenantContextAccessor to avoid ambiguity with new overloads
+        var act = () => boundaryGuard.RequireContext((ITenantContextAccessor)null!);
         act.Should().Throw<ArgumentNullException>()
             .WithParameterName("accessor");
     }

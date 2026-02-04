@@ -198,4 +198,118 @@ public class InitializationEnforcementTests
         accessor.IsInitialized.Should().BeFalse();
         accessor.Current.Should().BeNull();
     }
+
+    #region Explicit Context Passing Tests (Story 4.2)
+
+    [Fact]
+    public void BoundaryGuard_WithExplicitContext_EnforcesSuccessfully()
+    {
+        // Arrange
+        var guard = new BoundaryGuard(
+            NullLogger<BoundaryGuard>.Instance,
+            new DefaultLogEnricher());
+
+        var scope = TenantScope.ForTenant(new TenantId("tenant-1"));
+        var context = TenantContext.ForRequest(
+            scope,
+            "trace-123",
+            "req-456",
+            TenantAttributionInputs.FromExplicitScope(scope));
+
+        // Act - enforce with explicit context (no ambient accessor required)
+        var result = guard.RequireContext(context);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Context.Should().Be(context);
+        result.InvariantCode.Should().BeNull();
+    }
+
+    [Fact]
+    public void BoundaryGuard_WithNullExplicitContext_RefusesWithContextInitializedInvariant()
+    {
+        // Arrange
+        var guard = new BoundaryGuard(
+            NullLogger<BoundaryGuard>.Instance,
+            new DefaultLogEnricher());
+
+        // Act - enforce with null explicit context
+        var result = guard.RequireContext((TenantContext?)null, overrideTraceId: "trace-999");
+
+        // Assert - refusal with ContextInitialized invariant
+        result.IsSuccess.Should().BeFalse();
+        result.InvariantCode.Should().Be(InvariantCode.ContextInitialized);
+        result.Detail.Should().Contain("context must be initialized");
+        result.TraceId.Should().Be("trace-999");
+    }
+
+    [Fact]
+    public void TenantContext_CannotBeCreatedIncomplete_ThrowsOnMissingFields()
+    {
+        // This test documents that TenantContext enforces completeness at construction time.
+        // AC #2 requires refusal for "incomplete" context - since TenantContext validates
+        // all required fields in constructor, the only way to have incomplete is null.
+        // This is a design contract test proving incomplete contexts cannot exist.
+
+        // Arrange & Act & Assert - null scope throws
+        var nullScopeAct = () => TenantContext.ForRequest(null!, "trace-1", "req-1");
+        nullScopeAct.Should().Throw<ArgumentNullException>()
+            .WithParameterName("scope");
+
+        // Arrange & Act & Assert - null/empty traceId throws
+        var nullTraceAct = () => TenantContext.ForRequest(
+            TenantScope.ForTenant(new TenantId("tenant-1")),
+            null!,
+            "req-1");
+        nullTraceAct.Should().Throw<ArgumentException>()
+            .WithParameterName("traceId");
+
+        // Arrange & Act & Assert - Request flow requires requestId
+        var nullRequestIdAct = () => TenantContext.ForRequest(
+            TenantScope.ForTenant(new TenantId("tenant-1")),
+            "trace-1",
+            null!);
+        nullRequestIdAct.Should().Throw<ArgumentException>()
+            .WithParameterName("requestId");
+    }
+
+    [Fact]
+    public void BoundaryGuard_ExplicitContextTakesPrecedenceOverAmbient()
+    {
+        // Arrange
+        var accessor = new AmbientTenantContextAccessor();
+        var initializer = new TenantContextInitializer(
+            accessor,
+            NullLogger<TenantContextInitializer>.Instance);
+        var guard = new BoundaryGuard(
+            NullLogger<BoundaryGuard>.Instance,
+            new DefaultLogEnricher());
+
+        // Set up ambient context for tenant-1
+        var ambientScope = TenantScope.ForTenant(new TenantId("tenant-1"));
+        var ambientContext = initializer.InitializeRequest(
+            ambientScope,
+            "trace-ambient",
+            "req-ambient",
+            TenantAttributionInputs.FromExplicitScope(ambientScope));
+
+        // Create explicit context for tenant-2
+        var explicitScope = TenantScope.ForTenant(new TenantId("tenant-2"));
+        var explicitContext = TenantContext.ForRequest(
+            explicitScope,
+            "trace-explicit",
+            "req-explicit",
+            TenantAttributionInputs.FromExplicitScope(explicitScope));
+
+        // Act - pass both accessor and explicit context
+        var result = guard.RequireContext(accessor, explicitContext);
+
+        // Assert - explicit context takes precedence
+        result.IsSuccess.Should().BeTrue();
+        result.Context.Should().Be(explicitContext);
+        result.Context.Should().NotBe(ambientContext);
+        result.Context!.TraceId.Should().Be("trace-explicit");
+    }
+
+    #endregion
 }

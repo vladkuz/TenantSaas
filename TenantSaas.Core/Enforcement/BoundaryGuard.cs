@@ -65,6 +65,58 @@ public sealed class BoundaryGuard(
     }
 
     /// <inheritdoc />
+    public EnforcementResult RequireContext(
+        TenantContext? context,
+        string? overrideTraceId = null)
+    {
+        if (context is null)
+        {
+            var traceId = overrideTraceId ?? Guid.NewGuid().ToString("N");
+            
+            // Log failure before returning result
+            EnforcementEventSource.ContextNotInitialized(
+                logger,
+                traceId,
+                requestId: null,
+                InvariantCode.ContextInitialized);
+
+            return EnforcementResult.Failure(
+                InvariantCode.ContextInitialized,
+                traceId,
+                "Tenant context must be initialized before operations can proceed.");
+        }
+
+        // Log success
+        var logEvent = enricher.Enrich(context, "ContextInitialized");
+        EnforcementEventSource.ContextInitialized(
+            logger,
+            logEvent.TenantRef,
+            logEvent.TraceId,
+            logEvent.RequestId,
+            logEvent.ExecutionKind ?? "unknown",
+            logEvent.ScopeType ?? "unknown");
+
+        return EnforcementResult.Success(context);
+    }
+
+    /// <inheritdoc />
+    public EnforcementResult RequireContext(
+        ITenantContextAccessor accessor,
+        TenantContext? explicitContext)
+    {
+        ArgumentNullException.ThrowIfNull(accessor);
+
+        // Explicit context takes precedence over ambient
+        if (explicitContext is not null)
+        {
+            return RequireContext(explicitContext);
+        }
+
+        // Fallback to ambient context
+        return RequireContext(accessor);
+    }
+
+    /// <inheritdoc />
     public AttributionEnforcementResult RequireUnambiguousAttribution(
         TenantAttributionResult result,
         string traceId)

@@ -115,6 +115,69 @@ public async Task ExecuteAsync(CancellationToken cancellationToken)
 }
 ```
 
+### Explicit Context Passing (Without Ambient)
+
+For framework-free scenarios or when you want to avoid ambient context dependencies, you can pass `TenantContext` explicitly to enforcement boundaries.
+
+**When to use explicit context:**
+- Framework-free console applications or workers
+- Unit testing without DI container setup
+- Scenarios where ambient propagation is undesirable
+- When you want full control over context lifetime
+
+**Example: Direct enforcement with explicit context**
+
+```csharp
+public class ExplicitContextService
+{
+    private readonly IBoundaryGuard guard;
+
+    public ExplicitContextService(IBoundaryGuard guard)
+    {
+        this.guard = guard;
+    }
+
+    public Result ProcessWithExplicitContext(string tenantId)
+    {
+        // Create context directly (no initializer or accessor required)
+        var scope = TenantScope.ForTenant(new TenantId(tenantId));
+        var context = TenantContext.ForRequest(
+            scope,
+            traceId: Guid.NewGuid().ToString("N"),
+            requestId: Guid.NewGuid().ToString("N"),
+            TenantAttributionInputs.FromExplicitScope(scope));
+
+        // Pass context explicitly to enforcement boundary
+        var enforcementResult = guard.RequireContext(context);
+        
+        if (!enforcementResult.IsSuccess)
+        {
+            // Handle refusal
+            return Result.Failure(enforcementResult.Detail);
+        }
+
+        // Continue with business logic
+        return Result.Success();
+    }
+}
+```
+
+**Example: Hybrid mode (explicit takes precedence)**
+
+```csharp
+// When both ambient and explicit contexts are available,
+// explicit context takes precedence over ambient
+var enforcementResult = guard.RequireContext(accessor, explicitContext);
+
+// The guard will use explicitContext if non-null,
+// otherwise it falls back to accessor.Current
+```
+
+**Precedence rules:**
+1. Explicit context (when provided and non-null) always takes precedence
+2. Ambient context (via `ITenantContextAccessor`) is used as fallback
+3. Null explicit context is treated as missing and results in refusal
+
 ---
 
 ## Middleware Setup
