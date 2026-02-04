@@ -7,10 +7,11 @@ This guide helps you integrate TenantSaas into your multi-tenant application.
 1. [Getting Started](#getting-started)
 2. [Context Initialization](#context-initialization)
 3. [Ambient vs Explicit Context Propagation](#ambient-vs-explicit-context-propagation)
-4. [Middleware Setup](#middleware-setup)
-5. [Handling Invariant Violations](#handling-invariant-violations)
-6. [Error Handling Best Practices](#error-handling-best-practices)
-7. [Testing Integration](#testing-integration)
+4. [Flow Wrappers for Non-Request Execution](#flow-wrappers-for-non-request-execution)
+5. [Middleware Setup](#middleware-setup)
+6. [Handling Invariant Violations](#handling-invariant-violations)
+7. [Error Handling Best Practices](#error-handling-best-practices)
+8. [Testing Integration](#testing-integration)
 
 ---
 
@@ -337,6 +338,169 @@ var result = guard.RequireContext(accessor, adminContext);
 | **Visibility** | Implicit (hidden in stack) | Explicit (visible in signatures) |
 
 **Key Insight:** Both strategies enforce the same invariants and produce identical refusal behavior. Choose based on your architectural preferences and team conventions.
+
+---
+
+## Flow Wrappers for Non-Request Execution
+
+For background jobs, admin tasks, and CLI scripts, TenantSaas provides **flow wrappers** that automatically manage context lifecycle. This eliminates manual `try`/`finally` blocks and ensures consistent cleanup.
+
+### The `ITenantFlowFactory` Interface
+
+```csharp
+public interface ITenantFlowFactory
+{
+    // Background jobs/workers
+    ITenantFlowScope CreateBackgroundFlow(
+        TenantScope scope,
+        string traceId,
+        TenantAttributionInputs? attributionInputs = null);
+    
+    // Administrative operations
+    ITenantFlowScope CreateAdminFlow(
+        TenantScope scope,
+        string traceId,
+        TenantAttributionInputs? attributionInputs = null);
+    
+    // CLI/script execution
+    ITenantFlowScope CreateScriptedFlow(
+        TenantScope scope,
+        string traceId,
+        TenantAttributionInputs? attributionInputs = null);
+}
+
+// The scope returned by the factory
+public interface ITenantFlowScope : IDisposable, IAsyncDisposable
+{
+    TenantContext Context { get; }
+}
+```
+
+### Background Job Pattern
+
+```csharp
+public class TenantJobProcessor(
+    ITenantFlowFactory flowFactory,
+    ITenantService service)
+{
+    public async Task ProcessJobAsync(
+        string tenantId,
+        CancellationToken cancellationToken)
+    {
+        var scope = TenantScope.ForTenant(new TenantId(tenantId));
+        var traceId = Activity.Current?.Id ?? Guid.NewGuid().ToString("N");
+
+        // Flow wrapper handles initialization and cleanup automatically
+        await using var flow = flowFactory.CreateBackgroundFlow(scope, traceId);
+        
+        // Context is available via flow.Context or accessor
+        // ExecutionKind is automatically set to Background
+        await service.DoWorkAsync(cancellationToken);
+        
+        // Context automatically cleared when flow scope is disposed
+    }
+}
+```
+
+### Admin Task Pattern
+
+```csharp
+public class MaintenanceService(ITenantFlowFactory flowFactory)
+{
+    public async Task RunTenantMaintenanceAsync(
+        string tenantId,
+        CancellationToken cancellationToken)
+    {
+        var scope = TenantScope.ForTenant(new TenantId(tenantId));
+        var traceId = Guid.NewGuid().ToString("N");
+
+        await using var flow = flowFactory.CreateAdminFlow(scope, traceId);
+        
+        // ExecutionKind is Admin
+        await CleanupOldDataAsync(cancellationToken);
+        await OptimizeIndexesAsync(cancellationToken);
+        
+        // Cleanup is automatic
+    }
+
+    public async Task RunSystemMaintenanceAsync(
+        CancellationToken cancellationToken)
+    {
+        // SharedSystem scope for cross-tenant operations
+        var scope = TenantScope.ForSharedSystem();
+        var traceId = Guid.NewGuid().ToString("N");
+
+        await using var flow = flowFactory.CreateAdminFlow(scope, traceId);
+        
+        await GlobalCleanupAsync(cancellationToken);
+    }
+}
+```
+
+### CLI Script Pattern
+
+```csharp
+// Program.cs for a CLI tool
+public static async Task<int> Main(string[] args)
+{
+    using var host = CreateHostBuilder(args).Build();
+    var flowFactory = host.Services.GetRequiredService<ITenantFlowFactory>();
+
+    var tenantId = args[0];
+    var scope = TenantScope.ForTenant(new TenantId(tenantId));
+    var traceId = Guid.NewGuid().ToString("N");
+    var cancellationToken = CancellationToken.None;
+
+    await using var flow = flowFactory.CreateScriptedFlow(scope, traceId);
+    
+    // ExecutionKind is Scripted
+    var migrator = host.Services.GetRequiredService<IMigrationService>();
+    await migrator.RunAsync(cancellationToken);
+    
+    return 0;
+}
+```
+
+### Key Guarantees
+
+| Guarantee | Description |
+|-----------|-------------|
+| **Explicit inputs required** | Must provide `TenantScope` and `traceId` - no implicit defaults |
+| **Automatic cleanup** | Context cleared on disposal (both sync and async) |
+| **Idempotent disposal** | Safe to call `Dispose()` multiple times |
+| **Clean flow start** | New flow wrapper clears any prior ambient context |
+| **Parallel isolation** | Concurrent flows remain isolated via AsyncLocal |
+| **Enforcement equivalence** | Same invariant checks as manual initialization |
+
+### Bypassed Wrapper Behavior
+
+If you bypass the flow wrapper and don't initialize context, enforcement boundaries will **refuse**:
+
+```csharp
+public async Task BypassedExample()
+{
+    // No flow wrapper or initializer called
+    // Context is NOT initialized
+    
+    var result = guard.RequireContext(accessor);
+    // result.IsSuccess == false
+    // result.InvariantCode == "ContextInitialized"
+}
+```
+
+### DI Registration
+
+```csharp
+// Register all required services
+builder.Services.AddSingleton<IMutableTenantContextAccessor, AmbientTenantContextAccessor>();
+builder.Services.AddSingleton<ITenantContextAccessor>(sp =>
+    sp.GetRequiredService<IMutableTenantContextAccessor>());
+builder.Services.AddScoped<ITenantContextInitializer, TenantContextInitializer>();
+builder.Services.AddScoped<ITenantFlowFactory, TenantFlowFactory>();
+
+// For background/admin/scripted flows, resolve ITenantFlowFactory from a scope
+// created per job/command (e.g., using IServiceScopeFactory).
+```
 
 ---
 
