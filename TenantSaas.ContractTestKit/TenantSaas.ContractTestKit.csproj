@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+    <!-- Package metadata -->
+    <PackageId>TenantSaas.ContractTestKit</PackageId>
+    <Description>Contract test helpers for verifying TenantSaas trust contract compliance in adopter CI pipelines.</Description>
+    <Authors>TenantSaas Contributors</Authors>
+    <PackageTags>tenancy;multi-tenant;contract-testing;xunit</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/vladkuz/TenantSaas</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Test framework dependencies for adopters -->
+    <PackageReference Include="FluentAssertions" Version="7.0.0" />
+    <PackageReference Include="xunit.abstractions" Version="2.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Reference only public contracts -->
+    <ProjectReference Include="..\TenantSaas.Abstractions\TenantSaas.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>

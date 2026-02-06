@@ -74,9 +74,9 @@ development_status:
   4-5-capture-execution-kind-and-scope-in-context-for-downstream-use: done
   epic-4-retrospective: optional
 
-  # Epic 5: Contract Test Suite (BACKLOG)
-  epic-5: backlog
-  5-1-ship-an-adopter-runnable-contract-test-helper-package: backlog
+  # Epic 5: Contract Test Suite (IN-PROGRESS)
+  epic-5: in-progress
+  5-1-ship-an-adopter-runnable-contract-test-helper-package: done
   5-2-provide-reference-compliance-tests-for-refusal-and-attribution-rules: backlog
   5-3-integrate-contract-tests-into-ci: backlog
   5-4-assert-break-glass-constraints-and-audit-event-emission: backlog

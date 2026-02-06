@@ -28,6 +28,7 @@
     <ProjectReference Include="..\TenantSaas.Sample\TenantSaas.Sample.csproj" />
     <ProjectReference Include="..\TenantSaas.Abstractions\TenantSaas.Abstractions.csproj" />
     <ProjectReference Include="..\TenantSaas.Core\TenantSaas.Core.csproj" />
+    <ProjectReference Include="..\TenantSaas.ContractTestKit\TenantSaas.ContractTestKit.csproj" />
   </ItemGroup>
 
 </Project>
