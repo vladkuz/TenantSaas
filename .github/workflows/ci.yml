@@ -26,5 +26,12 @@ jobs:
       - name: Build
         run: dotnet build --no-restore --configuration Release
 
+      - name: Contract Tests (Enforcement Boundary)
+        run: |
+          dotnet test TenantSaas.ContractTests/TenantSaas.ContractTests.csproj --disable-build-servers -v minimal || {
+            echo "::error title=Contract tests failed::Contract test failure detected; enforcement boundary may be bypassed"
+            exit 1
+          }
+
       - name: Test
-        run: dotnet test --no-build --configuration Release --verbosity minimal
+        run: dotnet test TenantSaas.sln --disable-build-servers -v minimal

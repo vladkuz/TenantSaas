@@ -56,7 +56,43 @@ public sealed class CiWorkflowTests
 
         steps.Should().Contain(step => StepRunContains(step, "dotnet restore"));
         steps.Should().Contain(step => StepRunContains(step, "dotnet build --no-restore --configuration Release"));
-        steps.Should().Contain(step => StepRunContains(step, "dotnet test --no-build --configuration Release --verbosity minimal"));
+        steps.Should().Contain(step => StepRunContains(step, "dotnet test TenantSaas.sln --disable-build-servers -v minimal"));
+    }
+
+    [Fact]
+    public void CiWorkflowShouldRunContractTestsExplicitly()
+    {
+        var root = FindRepoRoot();
+        var workflow = LoadWorkflow(root);
+        var steps = GetSteps(workflow);
+
+        steps.Should().Contain(
+            step => StepRunContains(step, "dotnet test TenantSaas.ContractTests/TenantSaas.ContractTests.csproj --disable-build-servers -v minimal"),
+            "CI must run contract tests explicitly so invariant enforcement failures are unmissable");
+    }
+
+    [Fact]
+    public void CiWorkflowShouldEmitSpecificErrorWhenContractTestsFail()
+    {
+        var root = FindRepoRoot();
+        var workflow = LoadWorkflow(root);
+        var steps = GetSteps(workflow);
+
+        steps.Should().Contain(
+            step => StepRunContains(step, "Contract test failure detected; enforcement boundary may be bypassed"),
+            "CI must surface a clear, documented error when contract test enforcement fails");
+    }
+
+    [Fact]
+    public void CiWorkflowShouldFailWithNonZeroExitWhenContractTestsFail()
+    {
+        var root = FindRepoRoot();
+        var workflow = LoadWorkflow(root);
+        var steps = GetSteps(workflow);
+
+        steps.Should().Contain(
+            step => StepRunContains(step, "|| {") && StepRunContains(step, "exit 1"),
+            "CI must preserve non-zero exit behavior for contract test failures");
     }
 
     [Fact]

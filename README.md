@@ -7,7 +7,7 @@ Tenant isolation enforcement for multi-tenant .NET apps. Operations without expl
 **[Quick Start](#quick-start)** · **[Integration Guide](docs/integration-guide.md)** · **[Trust Contract](docs/trust-contract.md)** · **[Error Catalog](docs/error-catalog.md)**
 
 ```bash
-dotnet restore && dotnet test TenantSaas.sln   # prove invariants hold
+dotnet restore && dotnet test TenantSaas.sln --disable-build-servers -v minimal   # prove invariants hold
 ```
 
 ---
@@ -37,6 +37,62 @@ curl http://localhost:<port>/health   # → {"status":"healthy"}
 ```
 
 Integrate into your own service in ≤30 minutes → [integration guide](docs/integration-guide.md).
+
+## Prerequisites
+
+- .NET SDK 10.0.102 (`dotnet --list-sdks`)
+
+## Local Setup
+
+```bash
+dotnet restore
+dotnet build TenantSaas.sln
+dotnet run --project TenantSaas.Sample/TenantSaas.Sample.csproj
+```
+
+## Verification
+
+Use the same command enforced in CI:
+
+```bash
+dotnet test TenantSaas.sln --disable-build-servers -v minimal
+```
+
+Contract-test bypass detection is surfaced as a hard CI error:
+`Contract test failure detected; enforcement boundary may be bypassed`.
+
+Health-check validation:
+
+```bash
+curl http://localhost:<port>/health
+# {"status":"healthy"}
+```
+
+## CI/CD
+
+GitHub Actions runs on every pull request and on pushes to `main`.
+
+Failure scenarios are explicit and actionable:
+
+- SDK version mismatch
+- Restore failures
+- Build errors
+- Test failures
+
+### Bootstrap Commands (Reference)
+
+```bash
+dotnet new sln -n TenantSaas
+dotnet new classlib -n TenantSaas.Core -f net10.0
+dotnet new classlib -n TenantSaas.EfCore -f net10.0
+dotnet new xunit -n TenantSaas.ContractTests -f net10.0
+dotnet new webapi -n TenantSaas.Sample -f net10.0
+dotnet sln TenantSaas.sln add \
+  TenantSaas.Core/TenantSaas.Core.csproj \
+  TenantSaas.EfCore/TenantSaas.EfCore.csproj \
+  TenantSaas.ContractTests/TenantSaas.ContractTests.csproj \
+  TenantSaas.Sample/TenantSaas.Sample.csproj
+```
 
 ## Contract Tests — Ship Proof, Not Promises
 
@@ -135,6 +191,13 @@ docs/                       # Trust contract, integration guide, error catalog
 | `SDK version [10.0.102] could not be found` | Install .NET SDK 10.0.102 — `dotnet --list-sdks` |
 | NuGet restore fails | Check network/proxy, rerun `dotnet restore` |
 | HTTPS/TLS errors | `dotnet dev-certs https --trust` or use HTTP URL |
+
+### Troubleshooting missing templates or dependencies
+
+- `net10.0 is not a valid value for -f`: install the .NET 10 SDK.
+- `No templates found matching`: install templates and retry.
+- `dotnet new --install Microsoft.DotNet.Common.ProjectTemplates.10.0`
+- `Unable to load the service index for source https://api.nuget.org/v3/index.json`: check network/proxy and rerun `dotnet restore`.
 
 ## License
 

@@ -201,8 +201,11 @@ Add to your test project and run in CI:
 ```yaml
 # GitHub Actions example
 - name: Run Contract Tests
-  run: dotnet test --filter "FullyQualifiedName~ContractCompliance"
+  run: dotnet test TenantSaas.ContractTests/TenantSaas.ContractTests.csproj --disable-build-servers -v minimal
 ```
+
+If this step fails in the reference workflow, CI surfaces:
+`Contract test failure detected; enforcement boundary may be bypassed`.
 
 ## Versioning
 
