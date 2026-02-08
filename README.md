@@ -4,11 +4,75 @@
 
 A trust-first baseline for multi-tenant SaaS systems that enforces tenant-scope invariants at unavoidable integration points.
 
-TenantSaas targets platform engineers, founders, and security reviewers who need explicit, verifiable guarantees — not framework-driven scaffolding. Differentiation comes from invariant-first design, explicit refusal behavior, and runnable contract tests that prove guarantees hold across all execution paths.
+---
 
-## The Problem
+## What Problem Does TenantSaas Solve?
 
-Multi-tenant systems routinely allow actions with ambiguous tenant scope or authority, creating latent cross-tenant risks that are only discovered after incidents. TenantSaas eliminates this class of problems by making tenant context explicit, enforced, and verifiable.
+Multi-tenant SaaS systems share infrastructure across tenants. Every request, background job, and admin operation must know *which tenant* it belongs to — and what happens when that answer is missing or ambiguous. Most systems get this wrong silently:
+
+- A background job runs without tenant context and writes data to the wrong partition.
+- Two attribution sources (header vs. route) disagree, and the system picks one without telling anyone.
+- An admin script touches all tenants because nobody enforced scope.
+- Logs leak real tenant identifiers into shared monitoring pipelines.
+
+These are not edge cases. They are **the default failure mode** of multi-tenant systems that treat tenancy as a convention instead of an invariant. TenantSaas makes these failures impossible by refusing to proceed when the rules are broken.
+
+## What Pain Does It Remove?
+
+| Pain Point | Without TenantSaas | With TenantSaas |
+|-----------|--------------------|-----------------|
+| **Ambiguous tenant context** | Discovered after a cross-tenant incident | Refused at the boundary before execution |
+| **Missing context in background jobs** | Silent — job runs in wrong scope | Fails immediately with actionable error |
+| **Conflicting attribution sources** | Last-write-wins or random precedence | Explicit refusal with RFC 7807 Problem Details |
+| **Privileged operations** | Admin endpoints with implicit god-mode | Break-glass requires actor, reason, and audit trail |
+| **Tenant IDs in logs** | Raw IDs leak into shared observability | Disclosure-safe tokens (`unknown`, `sensitive`, `opaque`) |
+| **Onboarding new engineers** | Tribal knowledge in Slack threads | Trust contract and contract tests are the documentation |
+| **Proving compliance** | "Trust us, we tested it" | Runnable contract tests in CI that prove invariants hold |
+
+## What Exists Today vs. What Is Planned
+
+### ✅ Available Now (MVP)
+
+- **Trust contract v1** — five enforced invariants covering context, attribution, scope, break-glass, and disclosure
+- **Single integration point** — `ITenantContextInitializer` for all execution paths (request, background, admin, scripted)
+- **Enforcement engine** — boundary guard that refuses ambiguous or unattributed operations
+- **Break-glass subsystem** — explicit, auditable elevation for privileged cross-tenant operations
+- **Disclosure policy** — safe-state tokens prevent tenant ID leaks in logs and errors
+- **RFC 7807 error responses** — stable error codes, actionable guidance, and contract rule links
+- **Contract test kit** — `TenantSaas.ContractTestKit` for adopters to verify compliance in their own CI
+- **First-party contract tests** — full coverage across all execution paths
+- **Sample host** — minimal ASP.NET Core app demonstrating end-to-end integration
+- **Documentation** — trust contract, integration guide (≤30 min setup), error catalog
+
+### 🔜 Planned (Post-MVP)
+
+- EF Core tenant-scoped query filters and database-per-tenant patterns
+- Flow wrappers for hosted services, message consumers, and scheduled jobs
+- Observability hooks (metrics, distributed tracing enrichment)
+- Additional attribution adapters (JWT claims, custom resolvers)
+- Reference application with real-world patterns
+- On-call incident workflow documentation
+- Migration guide for retrofitting existing services
+- Ecosystem extensions and community adapters
+
+## Why Is This Different from Other SaaS Templates?
+
+Most multi-tenant libraries and templates give you **scaffolding** — tenant resolution middleware, database-per-tenant helpers, maybe some DI wiring. They help you *build faster*. TenantSaas helps you **not break things**.
+
+| | Typical SaaS Template | TenantSaas |
+|-|----------------------|------------|
+| **Philosophy** | Productivity — get started quickly | Safety — make wrong things impossible |
+| **Tenant context** | Convention (hope you remembered) | Enforced invariant (system refuses otherwise) |
+| **Missing context** | Silent fallback or null | Explicit refusal with error details |
+| **Ambiguous attribution** | Last source wins | Refused — conflicting sources are an error |
+| **Privileged operations** | Admin role = do anything | Break-glass with actor, reason, audit |
+| **Verification** | Unit tests you write yourself | Contract tests shipped as a package, runnable in your CI |
+| **Scope** | Full framework (auth, billing, UI) | Thin baseline — just the trust kernel |
+| **Extension model** | Override anything | Invariants are non-negotiable; extend only at sanctioned boundaries |
+
+TenantSaas is not trying to replace your SaaS template. It is the **trust layer underneath it** — the part that makes sure tenant boundaries are never silently violated, regardless of what you build on top.
+
+---
 
 ## Core Concepts
 
