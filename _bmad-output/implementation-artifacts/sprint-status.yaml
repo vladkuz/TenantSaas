@@ -79,7 +79,7 @@ development_status:
   5-1-ship-an-adopter-runnable-contract-test-helper-package: done
   5-2-provide-reference-compliance-tests-for-refusal-and-attribution-rules: done
   5-3-integrate-contract-tests-into-ci: done
-  5-4-assert-break-glass-constraints-and-audit-event-emission: backlog
+  5-4-assert-break-glass-constraints-and-audit-event-emission: done
   5-5-assert-disclosure-policy-and-error-log-correlation-rules: backlog
   epic-5-retrospective: optional
 
