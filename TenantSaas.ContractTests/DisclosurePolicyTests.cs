@@ -1,9 +1,12 @@
 using FluentAssertions;
+using System.Linq;
+using System.Text.Json;
 using TenantSaas.Abstractions.Contexts;
 using TenantSaas.Abstractions.Disclosure;
 using TenantSaas.Abstractions.Invariants;
 using TenantSaas.Abstractions.Tenancy;
 using TenantSaas.Abstractions.TrustContract;
+using TenantSaas.Core.Errors;
 
 namespace TenantSaas.ContractTests;
 
@@ -169,6 +172,48 @@ public sealed class DisclosurePolicyTests
         var context = CreateContext(isAuthenticated: false, isAuthorizedForTenant: false, isEnumerationRisk: true);
 
         policy.AllowTenantInLogs(context).Should().BeTrue();
+    }
+
+    [Fact]
+    public void DisclosureUnsafe_ErrorResponse_DoesNotExposeTenantIdentifiers()
+    {
+        var policy = new DisclosurePolicy();
+        var context = CreateContext(isAuthorizedForTenant: false, tenantId: "tenant-raw-001");
+
+        var resolvedTenantRef = policy.ResolveTenantRef(context);
+        var allowTenantInErrors = policy.AllowTenantInErrors(context);
+
+        var problemDetails = allowTenantInErrors
+            ? ProblemDetailsFactory.FromInvariantViolation(
+                InvariantCode.DisclosureSafe,
+                traceId: "trace-disclosure-unsafe",
+                requestId: "request-disclosure-unsafe",
+                detail: null,
+                tenantRef: resolvedTenantRef)
+            : ProblemDetailsFactory.FromInvariantViolation(
+                InvariantCode.DisclosureSafe,
+                traceId: "trace-disclosure-unsafe",
+                requestId: "request-disclosure-unsafe",
+                detail: null,
+                tenantRef: null);
+
+        if (problemDetails.Extensions.TryGetValue("tenant_ref", out var tenantRef))
+        {
+            TenantRefSafeState.IsSafeState(tenantRef?.ToString()).Should().BeTrue(
+                "unsafe disclosure must only emit safe-state tenant_ref values");
+        }
+
+        problemDetails.Extensions.Values
+            .Select(value => value?.ToString())
+            .Should().NotContain("tenant-raw-001");
+
+        problemDetails.Type.Should().NotContain("tenant-raw-001");
+        problemDetails.Title.Should().NotContain("tenant-raw-001");
+        problemDetails.Detail.Should().NotContain("tenant-raw-001");
+        problemDetails.Instance?.Should().NotContain("tenant-raw-001");
+
+        var serialized = JsonSerializer.Serialize(problemDetails);
+        serialized.Should().NotContain("tenant-raw-001");
     }
 
     [Fact]

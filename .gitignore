@@ -46,3 +46,9 @@ out/
 .codex/history.jsonl
 .codex/models_cache.json
 .codex/log/codex-tui.log
+.codex/auth.json
+.codex/config.toml
+.codex/history.jsonl
+.codex/models_cache.json
+.codex/version.json
+.codex/log/codex-tui.log

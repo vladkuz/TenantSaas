@@ -122,6 +122,20 @@ public static partial class EnforcementEventSource
         string problemType);
 
     /// <summary>
+    /// Logs refusal emission for non-request execution kinds (no request_id).
+    /// </summary>
+    [LoggerMessage(
+        EventId = 1006,
+        Level = LogLevel.Warning,
+        Message = "Refusal emitted: trace_id={TraceId}, invariant_code={InvariantCode}, http_status={HttpStatus}, problem_type={ProblemType}")]
+    public static partial void RefusalEmitted(
+        ILogger logger,
+        string traceId,
+        string invariantCode,
+        int httpStatus,
+        string problemType);
+
+    /// <summary>
     /// Logs successful break-glass invocation with audit event.
     /// </summary>
     [LoggerMessage(

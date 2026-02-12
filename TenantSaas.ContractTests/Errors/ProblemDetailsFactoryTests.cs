@@ -318,6 +318,23 @@ public class ProblemDetailsFactoryTests
     }
 
     [Fact]
+    public void ForDisclosureUnsafe_DoesNotIncludeTenantRef()
+    {
+        // Arrange
+        const string traceId = "test-trace-disclosure-tenant";
+        const string requestId = "test-request-disclosure-tenant";
+
+        // Act
+        var result = ProblemDetailsFactory.ForDisclosureUnsafe(traceId, requestId);
+
+        // Assert
+        result.Extensions.Should().NotContainKey("tenant_ref");
+        result.Extensions[InvariantCodeKey].Should().Be(InvariantCode.DisclosureSafe);
+        result.Extensions[TraceId].Should().Be(traceId);
+        result.Extensions[RequestId].Should().Be(requestId);
+    }
+
+    [Fact]
     public void FromInvariantViolation_WithEmptyTraceId_ThrowsArgumentException()
     {
         // Arrange
