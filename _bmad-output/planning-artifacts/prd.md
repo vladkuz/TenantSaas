@@ -212,13 +212,13 @@ TenantSaas is a developer-facing foundation package for .NET-first multi-tenant 
 ### Language Support (Language Matrix)
 
 - **MVP support:** .NET
-- **Secondary distribution:** npm package (for complementary tooling or examples)
+- **Secondary distribution:** npm package (deferred post-MVP; no npm artifacts in repo yet)
 - **Out of scope for MVP:** other runtimes/languages
 
 ### Installation Methods
 
 - **NuGet** as the primary installation path.
-- **npm** for any supporting tooling or integration snippets.
+- **npm** for supporting tooling or integration snippets (deferred post-MVP).
 - No IDE/editor extensions in scope for MVP.
 
 ### API Surface
@@ -235,6 +235,11 @@ TenantSaas is a developer-facing foundation package for .NET-first multi-tenant 
 - Minimal integration guide.
 - Runnable verification/contract tests guide.
 - Small API reference (focused on the core surface only).
+
+**Documentation Status (2026-02-13):**
+- Implemented now: `docs/trust-contract.md`, `docs/integration-guide.md`, `docs/error-catalog.md`.
+- Deferred: `docs/verification-guide.md` (Epic 6, Story 6.6) and `docs/api-reference.md` (Epic 6, Story 6.7).
+- Rationale: prioritize core invariants + contract tests first; complete the guide/reference in the documentation epic.
 
 ### Code Examples
 

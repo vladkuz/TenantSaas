@@ -35,7 +35,7 @@ Complexity is medium-to-high due to safety guarantees, cross-context enforcement
 
 ### Technical Constraints & Dependencies
 
-- MVP language: .NET; secondary npm distribution for tooling/examples.
+- MVP language: .NET; secondary npm distribution deferred post-MVP for tooling/examples.
 - No end-user UI; UX work limited to developer ergonomics, docs flow, and error messaging.
 - Small, stable API surface; invariants must be non-bypassable.
 - Single unavoidable integration point for all execution paths.
@@ -205,7 +205,7 @@ Naming, structure, API formats, error handling, logging fields, and date/time fo
 - Per-project `*.Tests` projects only (no tests subfolder).
 
 **File Structure Patterns:**
-- Shared utilities live in `TenantSaas.Core/Common`.
+- Shared utilities live in `TenantSaas.Core` (no `Common/` folder currently).
 - Samples live under dedicated `TenantSaas.Sample` project.
 
 ### Format Patterns
@@ -281,11 +281,9 @@ Naming, structure, API formats, error handling, logging fields, and date/time fo
 TenantSaas/
 ├── README.md
 ├── docs/
-│   ├── trust-contract.md
-│   ├── integration-guide.md
 │   ├── error-catalog.md
-│   ├── verification-guide.md              # Deferred: Epic 6, Story 6.6
-│   └── api-reference.md                   # Deferred: Epic 6, Story 6.7
+│   ├── integration-guide.md
+│   └── trust-contract.md
 ├── TenantSaas.sln
 ├── .gitignore
 ├── Directory.Build.props
@@ -297,62 +295,123 @@ TenantSaas/
 │       └── ci.yml                          # release.yml deferred to Epic 1 completion
 ├── TenantSaas.Abstractions/
 │   ├── TenantSaas.Abstractions.csproj
+│   ├── BreakGlass/
+│   │   ├── AuditCode.cs
+│   │   ├── BreakGlassAuditEvent.cs
+│   │   ├── BreakGlassDeclaration.cs
+│   │   ├── BreakGlassValidationResult.cs
+│   │   ├── BreakGlassValidator.cs
+│   │   └── IBreakGlassAuditSink.cs
+│   ├── Contexts/
+│   │   └── ExecutionKind.cs
+│   ├── Disclosure/
+│   │   ├── DisclosureContext.cs
+│   │   ├── DisclosurePolicy.cs
+│   │   ├── DisclosureValidationResult.cs
+│   │   ├── DisclosureValidator.cs
+│   │   ├── IDisclosurePolicyProvider.cs
+│   │   ├── TenantRef.cs
+│   │   └── TenantRefSafeState.cs
 │   ├── Tenancy/
+│   │   ├── IMutableTenantContextAccessor.cs
+│   │   ├── ITenantAttributionResolver.cs
+│   │   ├── ITenantContextAccessor.cs
+│   │   ├── ITenantContextInitializer.cs
+│   │   ├── ITenantFlowFactory.cs
+│   │   ├── ITenantFlowScope.cs
+│   │   ├── NoTenantReason.cs
+│   │   ├── TenantAttributionInput.cs
+│   │   ├── TenantAttributionInputs.cs
+│   │   ├── TenantAttributionResult.cs
+│   │   ├── TenantAttributionRules.cs
+│   │   ├── TenantAttributionSource.cs
 │   │   ├── TenantContext.cs
-│   │   ├── TenantScope.cs
-│   │   └── ITenantContextAccessor.cs
+│   │   ├── TenantId.cs
+│   │   └── TenantScope.cs
 │   ├── Invariants/
 │   │   ├── InvariantCode.cs
-│   │   └── IInvariantPolicy.cs
+│   │   ├── InvariantDefinition.cs
+│   │   └── RefusalMapping.cs
 │   ├── Logging/
-│   │   └── TenantLogFields.cs
-│   └── Errors/
+│   │   ├── ILogEnricher.cs
+│   │   └── StructuredLogEvent.cs
+│   └── TrustContract/
+│       └── TrustContractV1.cs
 ├── TenantSaas.Core/
 │   ├── TenantSaas.Core.csproj
-│   ├── Common/
-│   │   ├── Guard.cs
-│   │   ├── Result.cs
-│   │   └── Clock.cs
 │   ├── Tenancy/
-│   │   ├── CurrentTenant.cs
-│   │   └── TenantContextResolver.cs
+│   │   ├── AmbientTenantContextAccessor.cs
+│   │   ├── ExplicitTenantContextAccessor.cs
+│   │   ├── TenantAttributionResolver.cs
+│   │   ├── TenantContextConflictException.cs
+│   │   ├── TenantContextInitializer.cs
+│   │   ├── TenantFlowFactory.cs
+│   │   └── TenantFlowScope.cs
 │   ├── Enforcement/
-│   │   ├── InvariantEnforcer.cs
-│   │   ├── BreakGlassPolicy.cs
-│   │   └── InvariantViolation.cs
+│   │   ├── AttributionEnforcementResult.cs
+│   │   ├── BoundaryGuard.cs
+│   │   ├── BreakGlassAuditHelper.cs
+│   │   ├── EnforcementResult.cs
+│   │   └── IBoundaryGuard.cs
 │   ├── Logging/
-│   │   └── TenantLogEnricher.cs
+│   │   ├── DefaultLogEnricher.cs
+│   │   └── EnforcementEventSource.cs
 │   └── Errors/
-│       ├── ProblemDetailsFactory.cs
 │       ├── ProblemDetailsExtensions.cs
-│       └── InvariantProblemDetails.cs
+│       └── ProblemDetailsFactory.cs
 ├── TenantSaas.EfCore/                      # Planned: Epic 6, Story 6.3
 │   └── TenantSaas.EfCore.csproj            # Shell only; adapter not yet implemented
 ├── TenantSaas.ContractTests/
 │   ├── TenantSaas.ContractTests.csproj
-│   ├── Fixtures/
-│   │   ├── TestDbFactory.cs
-│   │   └── TestTenantScope.cs
-│   ├── Invariants/
-│   │   ├── RequiresTenantContextTests.cs
-│   │   ├── BlocksCrossTenantChangesTests.cs
-│   │   └── BreakGlassTests.cs
-│   └── Logging/
-│       └── LogFieldPresenceTests.cs
+│   ├── Enforcement/
+│   │   └── BreakGlassEnforcementTests.cs
+│   ├── Errors/
+│   │   ├── ProblemDetailsFactoryTests.cs
+│   │   └── ProblemDetailsShapeTests.cs
+│   ├── Logging/
+│   │   ├── EnforcementLoggingTests.cs
+│   │   ├── LogEnricherTests.cs
+│   │   └── RefusalCorrelationTests.cs
+│   ├── TestUtilities/
+│   │   └── TestLogCapture.cs
+│   ├── AmbientContextPropagationTests.cs
+│   ├── AttributionEnforcementTests.cs
+│   ├── AttributionRulesTests.cs
+│   ├── BreakGlassContractTests.cs
+│   ├── CiWorkflowTests.cs
+│   ├── ContextInitializedTests.cs
+│   ├── ContextTaxonomyTests.cs
+│   ├── ContractTestKitApiStabilityTests.cs
+│   ├── ContractTestKitFunctionalTests.cs
+│   ├── DisclosurePolicyTests.cs
+│   ├── ExecutionKindAndScopeTests.cs
+│   ├── FlowWrapperTests.cs
+│   ├── HealthEndpointTests.cs
+│   ├── HttpCorrelationExtensionsTests.cs
+│   ├── InitializationEnforcementTests.cs
+│   ├── InvariantRegistryTests.cs
+│   ├── MiddlewareProblemDetailsTests.cs
+│   ├── ReadmeInitializationTests.cs
+│   ├── ReadmeSetupTests.cs
+│   ├── ReferenceComplianceBreakGlassTests.cs
+│   ├── ReferenceComplianceRefusalAttributionTests.cs
+│   └── TenantContextInitializerTests.cs
 ├── TenantSaas.Sample/
 │   ├── TenantSaas.Sample.csproj
 │   ├── Program.cs                         # Minimal API routes defined inline
 │   ├── Middleware/
+│   │   ├── HttpCorrelationExtensions.cs
 │   │   ├── TenantContextMiddleware.cs
 │   │   └── ProblemDetailsExceptionMiddleware.cs
 │   ├── Properties/
 │   │   └── launchSettings.json
 │   ├── appsettings.json
-│   └── appsettings.Development.json
-├── TenantSaas.Sample.BackgroundJobs/       # Planned: post-MVP
-├── docker/                                  # Deferred: optional infrastructure
-└── scripts/                                 # Deferred: optional infrastructure
+│   ├── appsettings.Development.json
+│   └── TenantSaas.Sample.http
 ```
+
+**Deferred Docs:** `docs/verification-guide.md` (Epic 6, Story 6.6) and `docs/api-reference.md` (Epic 6, Story 6.7).
+**Deferred Infrastructure:** `docker/` and `scripts/` are not present in the repo (planned optional infrastructure).
 
 ### Architectural Boundaries
 
@@ -372,7 +431,7 @@ TenantSaas/
 - Sample host is a thin integration example only.
 
 **Data Boundaries:**
-- EF Core integration contained in `TenantSaas.EfCore/EfCore`.
+- EF Core integration contained in `TenantSaas.EfCore` (shell only; implementation deferred).
 - Tenant context resolution is in `TenantSaas.Core/Tenancy`, accessed via abstractions.
 
 ### Requirements to Structure Mapping
@@ -387,7 +446,7 @@ TenantSaas/
 **Cross-Cutting Concerns:**
 - Error handling → `TenantSaas.Core/Errors` + `TenantSaas.Sample/Middleware`
 - Logging → `TenantSaas.Abstractions/Logging` + `TenantSaas.Core/Logging`
-- Break-glass → `TenantSaas.Core/Enforcement/BreakGlassPolicy.cs`
+- Break-glass → `TenantSaas.Abstractions/BreakGlass` + `TenantSaas.Core/Enforcement/BreakGlassAuditHelper.cs`
 
 ### Integration Points
 
@@ -432,17 +491,18 @@ TenantSaas/
 
 ### Implementation Status
 
-> **Last Updated:** 2026-02-03
+> **Last Updated:** 2026-02-13
 
 | Component | Status | Notes |
 |-----------|--------|-------|
-| TenantSaas.Abstractions | ✅ Implemented | Contracts, tenancy, invariants, logging abstractions |
-| TenantSaas.Core | ✅ Implemented | Enforcement, errors, logging, tenancy resolution |
+| TenantSaas.Abstractions | ✅ Implemented | Contracts: Tenancy (`ITenantContextAccessor`, `TenantScope`), Logging (`ILogEnricher`, `StructuredLogEvent`), BreakGlass/Disclosure/TrustContract |
+| TenantSaas.Core | ✅ Implemented | Enforcement (`BoundaryGuard`, `EnforcementResult`), Tenancy (`TenantContextInitializer`, `TenantFlowFactory`), Logging (`DefaultLogEnricher`) |
 | TenantSaas.EfCore | 🔜 Deferred | Shell only; adapter planned in Epic 6, Story 6.3 |
 | TenantSaas.Sample | ✅ Implemented | Minimal API host with middleware; BYO-auth stance |
 | TenantSaas.ContractTests | ✅ Implemented | Contract + E2E tests; intentional Sample coupling for integration verification |
 | docs/verification-guide.md | 🔜 Deferred | Planned in Epic 6, Story 6.6 |
 | docs/api-reference.md | 🔜 Deferred | Planned in Epic 6, Story 6.7 |
+| npm distribution | 🔜 Deferred | Post-MVP secondary tooling/examples distribution |
 | .github/workflows/release.yml | 🔜 Deferred | Planned post-Epic 1 completion |
 | docker/, scripts/ | 🔜 Deferred | Optional infrastructure |
 | Sample Auth (ApiKeyAuthHandler) | ⏭️ Not Planned | BYO-auth stance; adopters bring their own |
