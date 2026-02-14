@@ -40,14 +40,14 @@ tracking_system: file-system
 story_location: /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts
 
 development_status:
-  # Epic 1: Project Bootstrap (DONE - all stories complete)
+  # Epic 1: Project Bootstrap 
   epic-1: done
   1-1-initialize-project-from-the-approved-net-template: done
   1-2-local-development-environment-setup: done
   1-3-ci-pipeline-skeleton-build-smoke-checks: done
   epic-1-retrospective: optional
 
-  # Epic 2: Trust Contract v1 Foundations (DONE - all stories complete)
+  # Epic 2: Trust Contract v1 Foundations 
   epic-2: done
   2-1-define-context-taxonomy-and-execution-kinds: done
   2-2-define-tenant-attribution-sources-precedence-and-ambiguity-rules: done
@@ -56,7 +56,7 @@ development_status:
   2-5-define-disclosure-policy-and-tenant-ref-safe-states: done
   epic-2-retrospective: optional
 
-  # Epic 3: Invariant Enforcement (DONE - all stories complete)
+  # Epic 3: Invariant Enforcement 
   epic-3: done
   3-1-enforce-contextinitialized-at-boundary-helpers: done
   3-2-enforce-tenantattributionunambiguous-at-boundaries: done
@@ -65,8 +65,8 @@ development_status:
   3-5-require-explicit-break-glass-with-audit-event-emission: done
   epic-3-retrospective: optional
 
-  # Epic 4: Context Initialization & Propagation (BACKLOG)
-  epic-4: in-progress
+  # Epic 4: Context Initialization & Propagation 
+  epic-4: done
   4-1-provide-a-single-required-initialization-primitive-per-flow: done
   4-2-support-explicit-context-passing-without-ambient-requirements: done
   4-3-provide-ambient-context-propagation-with-deterministic-async-behavior: done
@@ -74,8 +74,8 @@ development_status:
   4-5-capture-execution-kind-and-scope-in-context-for-downstream-use: done
   epic-4-retrospective: optional
 
-  # Epic 5: Contract Test Suite (IN-PROGRESS)
-  epic-5: in-progress
+  # Epic 5: Contract Test Suite 
+  epic-5: done
   5-1-ship-an-adopter-runnable-contract-test-helper-package: done
   5-2-provide-reference-compliance-tests-for-refusal-and-attribution-rules: done
   5-3-integrate-contract-tests-into-ci: done
@@ -83,7 +83,7 @@ development_status:
   5-5-assert-disclosure-policy-and-error-log-correlation-rules: done
   epic-5-retrospective: optional
 
-  # Epic 6: Documentation & Extension Seams (BACKLOG)
+  # Epic 6: Documentation & Extension Seams 
   epic-6: backlog
   6-1-define-and-document-named-extension-seams: backlog
   6-2-provide-a-boundary-only-integration-guide: backlog
@@ -94,7 +94,7 @@ development_status:
   6-7-publish-the-api-reference: backlog
   epic-6-retrospective: optional
 
-  # Epic 7: Advanced Scenarios (BACKLOG)
+  # Epic 7: Advanced Scenarios 
   epic-7: backlog
   7-1-define-explicit-shared-system-operations-and-allowed-invariants: backlog
   7-2-support-safe-cross-tenant-administrative-workflows: backlog
