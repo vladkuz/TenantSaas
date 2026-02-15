@@ -4,7 +4,7 @@
 
 Tenant isolation enforcement for multi-tenant .NET apps. Operations without explicit tenant scope are refused — not silently allowed.
 
-**[Quick Start](#quick-start)** · **[Integration Guide](docs/integration-guide.md)** · **[Trust Contract](docs/trust-contract.md)** · **[Error Catalog](docs/error-catalog.md)**
+**[Quick Start](#quick-start)** · **[Conceptual Model](docs/conceptual-model.md)** · **[Integration Guide](docs/integration-guide.md)** · **[Trust Contract](docs/trust-contract.md)** · **[Error Catalog](docs/error-catalog.md)**
 
 ```bash
 dotnet restore && dotnet test TenantSaas.sln --disable-build-servers -v minimal   # prove invariants hold

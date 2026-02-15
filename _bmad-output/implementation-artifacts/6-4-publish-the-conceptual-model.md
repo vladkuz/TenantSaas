@@ -1,6 +1,6 @@
 # Story 6.4: Publish the Conceptual Model
 
-Status: ready-for-dev
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -24,14 +24,14 @@ so that I can understand tenancy, scope, and shared-system context quickly.
 
 ## Tasks / Subtasks
 
-- [ ] Create `docs/conceptual-model.md`
-  - [ ] Keep length <=800 words (enforceable by test)
-  - [ ] Link to `docs/trust-contract.md`
-  - [ ] Cover tenancy, scope, shared-system context, and invariants at a high level
-- [ ] Add documentation tests
-  - [ ] Assert file exists and link to trust contract is present
-  - [ ] Enforce word-count limit (<=800 words)
-- [ ] Link conceptual model from README or integration guide (if appropriate)
+- [x] Create `docs/conceptual-model.md`
+  - [x] Keep length <=800 words (enforceable by test)
+  - [x] Link to `docs/trust-contract.md`
+  - [x] Cover tenancy, scope, shared-system context, and invariants at a high level
+- [x] Add documentation tests
+  - [x] Assert file exists and link to trust contract is present
+  - [x] Enforce word-count limit (<=800 words)
+- [x] Link conceptual model from README or integration guide (if appropriate)
 
 ## Developer Context
 
@@ -110,20 +110,34 @@ GPT-5 (Codex)
 - artifact discovery: epics, prd, architecture, project-context
 - validation task: _bmad/core/tasks/validate-workflow.xml not found (skipped)
 - latest-technology check: .NET support policy baseline
+- dev-story workflow (YOLO): added conceptual model doc, added documentation tests, updated README link
+- test runs:
+  - `dotnet test TenantSaas.ContractTests/TenantSaas.ContractTests.csproj --disable-build-servers -v minimal --filter FullyQualifiedName~ConceptualModelDocumentationTests` (red -> green)
+  - `dotnet test TenantSaas.ContractTests/TenantSaas.ContractTests.csproj --disable-build-servers -v minimal` (pass)
+  - `dotnet test TenantSaas.sln --disable-build-servers -v minimal` (pass)
 
 ### Completion Notes List
 
 - Extracted Epic 6 story 6.4 requirements and designed doc + test coverage plan.
 - Added explicit length enforcement and trust-contract linkage.
+- Implemented `docs/conceptual-model.md` with high-level coverage of `TenantScope`, `ExecutionKind`, shared-system context, and invariant boundaries.
+- Added `TenantSaas.ContractTests/ConceptualModelDocumentationTests.cs` to verify document existence, trust-contract link presence, <=800-word limit, required conceptual terms, and README linkage.
+- Updated `README.md` quick-links section to include conceptual model documentation.
+- Story acceptance criteria validated via deterministic contract tests.
 
 ### File List
 
 - _bmad-output/implementation-artifacts/6-4-publish-the-conceptual-model.md
 - _bmad-output/implementation-artifacts/sprint-status.yaml
+- docs/conceptual-model.md
+- README.md
+- TenantSaas.ContractTests/ConceptualModelDocumentationTests.cs
 
 ## Change Log
 
 - 2026-02-14: Story created and marked ready-for-dev.
+- 2026-02-15: Implemented conceptual model documentation, added documentation validation tests, linked conceptual model from README, and moved story to review.
+- 2026-02-15: Code review complete — fixed trust-contract link style (M1), added file guard in test helper (M2), adopted GeneratedRegex (M3). Story → done.
 
 ### References
 
