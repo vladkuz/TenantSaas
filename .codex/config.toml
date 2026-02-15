@@ -1,5 +1,5 @@
 personality = "pragmatic"
-model = "gpt-5.2-codex"
+model = "gpt-5.3-codex"
 model_reasoning_effort = "medium"
 [projects."/home/vlad/Source/TenantSaas"]
 trust_level = "trusted"

@@ -155,11 +155,12 @@ TenantSaas is not a replacement for your SaaS template. It's the trust layer und
 - RFC 7807 error responses with stable codes
 - Contract test kit for adopter CI
 - Sample ASP.NET Core host
+- Optional EF Core reference adapter that enforces `IBoundaryGuard` before operations
 - [Trust contract](docs/trust-contract.md), [integration guide](docs/integration-guide.md), [error catalog](docs/error-catalog.md)
 
 ### 🔜 Planned
 
-- EF Core tenant-scoped query filters and database-per-tenant
+- EF Core tenant-scoped query filters and database-per-tenant guidance beyond the baseline reference adapter
 - Flow wrappers for hosted services and message consumers
 - Observability hooks (metrics, tracing enrichment)
 - Additional attribution adapters (JWT claims, custom resolvers)
@@ -171,7 +172,7 @@ TenantSaas is not a replacement for your SaaS template. It's the trust layer und
 ```
 TenantSaas.Abstractions/   # Contracts, interfaces, trust contract definitions
 TenantSaas.Core/            # Enforcement engine, context propagation, logging
-TenantSaas.EfCore/          # EF Core tenant-scoped extensions (planned)
+TenantSaas.EfCore/          # Optional EF Core reference adapter (storage adapter only)
 TenantSaas.ContractTestKit/ # Test helpers for adopters to verify compliance
 TenantSaas.ContractTests/   # First-party contract test suite
 TenantSaas.Sample/          # Minimal reference host

@@ -1231,6 +1231,42 @@ builder.Services.AddHttpClient<IBreakGlassAuditSink, ComplianceAuditSink>(client
 
 ---
 
+## Building a Storage Adapter
+
+TenantSaas is storage-agnostic by design. The core packages (`TenantSaas.Core`, `TenantSaas.Abstractions`) never reference any ORM or data access library. To integrate with your data layer, build an adapter that calls `IBoundaryGuard.RequireContext` before any data operation.
+
+### Reference Implementation (EF Core)
+
+`TenantSaas.EfCore` ships as an optional reference adapter. It demonstrates the pattern:
+
+```csharp
+// TenantBoundaryDbContextExecutor wraps any DbContext operation
+// with a boundary guard check before execution.
+var executor = new TenantBoundaryDbContextExecutor(boundaryGuard, tenantContextAccessor);
+
+var result = await executor.ExecuteAsync(
+    dbContext,
+    async (ctx, ct) =>
+    {
+        // EF Core operations run only after guard passes
+        return await ctx.Set<Order>().Where(o => o.TenantId == tenantId).ToListAsync(ct);
+    },
+    cancellationToken);
+```
+
+If context is not initialized, the adapter throws `TenantBoundaryViolationException` with the `invariant_code` and `trace_id` from the enforcement result. Convert this to a Problem Details response at your API boundary.
+
+### Building Your Own Adapter
+
+Follow the same pattern for any data access library:
+
+1. Accept `IBoundaryGuard` and `ITenantContextAccessor` via constructor injection.
+2. Call `boundaryGuard.RequireContext(accessor)` before any data operation.
+3. If enforcement fails (`!result.IsSuccess`), refuse the operation — throw or return an error.
+4. Keep the adapter in its own project; never add ORM packages to core.
+
+---
+
 ## Testing Integration
 
 This section demonstrates how to test your TenantSaas integration with proper error handling validation.

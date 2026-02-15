@@ -12,6 +12,7 @@ These seams are customization points; they are not alternate enforcement paths.
 | Invariant evaluation | `IBoundaryGuard` | `TenantSaas.Core` |
 | Refusal mapping | `TrustContractV1.RefusalMappings` | `TenantSaas.Abstractions` |
 | Log enrichment | `ILogEnricher`, `DefaultLogEnricher` | `TenantSaas.Abstractions`, `TenantSaas.Core` |
+| Storage adapter (reference) | `TenantBoundaryDbContextExecutor` | `TenantSaas.EfCore` |
 
 ---
 
@@ -88,6 +89,20 @@ These seams are customization points; they are not alternate enforcement paths.
 - Contract tests:
   - `TenantSaas.ContractTests/ExecutionKindAndScopeTests.cs`
   - `TenantSaas.ContractTests/Logging/EnforcementLoggingTests.cs`
+
+## Storage adapter (reference: EF Core)
+
+- Owning type: `TenantSaas.EfCore/TenantBoundaryDbContextExecutor.cs`
+- Purpose: Optional reference adapter demonstrating how to build a storage layer that respects invariant enforcement via `IBoundaryGuard`.
+- Customizable:
+  - Adopters may replace this adapter with any ORM or data access strategy.
+  - The adapter pattern (call `IBoundaryGuard.RequireContext` before data operations) is the reusable contract.
+- Invariant-protected:
+  - Context must be initialized before any EF Core operation proceeds.
+  - Refusal raises `TenantBoundaryViolationException` with invariant code and trace ID.
+  - Core packages (`TenantSaas.Core`, `TenantSaas.Abstractions`) must never reference EF Core assemblies.
+- Contract tests:
+  - `TenantSaas.ContractTests/EfCoreReferenceAdapterContractTests.cs`
 
 ---
 

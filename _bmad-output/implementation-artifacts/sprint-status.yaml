@@ -87,7 +87,7 @@ development_status:
   epic-6: in-progress
   6-1-define-and-document-named-extension-seams: done
   6-2-provide-a-boundary-only-integration-guide: done
-  6-3-prove-storage-agnostic-core-with-reference-only-adapters: ready-for-dev
+  6-3-prove-storage-agnostic-core-with-reference-only-adapters: done
   6-4-publish-the-conceptual-model: ready-for-dev
   6-5-publish-the-trust-contract: ready-for-dev
   6-6-publish-the-verification-guide: ready-for-dev
