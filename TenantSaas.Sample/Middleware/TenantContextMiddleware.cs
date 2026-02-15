@@ -1,5 +1,6 @@
 using TenantSaas.Abstractions.Tenancy;
 using TenantSaas.Abstractions.Logging;
+using TenantSaas.Abstractions.TrustContract;
 using TenantSaas.Core.Enforcement;
 using TenantSaas.Core.Errors;
 using TenantSaas.Core.Tenancy;
@@ -7,18 +8,6 @@ using TenantSaas.Core.Logging;
 using Microsoft.Extensions.Logging;
 
 namespace TenantSaas.Sample.Middleware;
-
-/// <summary>
-/// Constants for logging when values cannot be determined.
-/// </summary>
-internal static class LoggingDefaults
-{
-    /// <summary>Fallback value when invariant code cannot be extracted.</summary>
-    public const string UnknownInvariantCode = "Unknown";
-    
-    /// <summary>Fallback value when problem type cannot be extracted.</summary>
-    public const string UnknownProblemType = "unknown";
-}
 
 /// <summary>
 /// Middleware for initializing tenant context at the application boundary.
@@ -42,6 +31,10 @@ public class TenantContextMiddleware(
     ILogger<TenantContextMiddleware> logger,
     ILogEnricher enricher)
 {
+    private const string ProblemDetailsContentType = "application/problem+json";
+    private const string TenantIdRouteKey = "tenantId";
+    private const string TenantIdHeaderName = "X-Tenant-Id";
+
     public async Task InvokeAsync(HttpContext httpContext, ITenantContextAccessor accessor)
     {
         // Extract correlation IDs using standard distributed tracing patterns
@@ -60,9 +53,11 @@ public class TenantContextMiddleware(
                 TenantAttributionInputs.FromExplicitScope(healthScope));
             
             // Log health check context initialization
-            var healthLogEvent = enricher.Enrich(healthContext, "ContextInitialized");
+            var healthLogEvent = enricher.Enrich(healthContext, nameof(EnforcementEventSource.ContextInitialized));
             EnforcementEventSource.ContextInitialized(
                 logger,
+                healthLogEvent.EventName,
+                healthLogEvent.Severity,
                 healthLogEvent.TenantRef,
                 healthLogEvent.TraceId,
                 healthLogEvent.RequestId,
@@ -116,14 +111,19 @@ public class TenantContextMiddleware(
             
             EnforcementEventSource.RefusalEmitted(
                 logger,
+                nameof(EnforcementEventSource.RefusalEmitted),
+                LogLevel.Warning.ToString(),
+                TrustContractV1.DisclosureSafeStateUnknown,
                 traceId,
                 requestId,
+                TrustContractV1.ExecutionRequest,
+                LoggingDefaults.UnknownScopeType,
                 invariantCode,
                 problemDetails.Status ?? 422,
                 problemDetails.Type ?? LoggingDefaults.UnknownProblemType);
 
             httpContext.Response.StatusCode = problemDetails.Status ?? 422;
-            httpContext.Response.ContentType = "application/problem+json";
+            httpContext.Response.ContentType = ProblemDetailsContentType;
             await httpContext.Response.WriteAsJsonAsync(problemDetails);
             return;
         }
@@ -153,14 +153,19 @@ public class TenantContextMiddleware(
 
             EnforcementEventSource.RefusalEmitted(
                 logger,
+                nameof(EnforcementEventSource.RefusalEmitted),
+                LogLevel.Warning.ToString(),
+                TrustContractV1.DisclosureSafeStateUnknown,
                 conflict.TraceId,
                 conflict.RequestId,
+                TrustContractV1.ExecutionRequest,
+                LoggingDefaults.UnknownScopeType,
                 invariantCode,
                 problemDetails.Status ?? 401,
                 problemDetails.Type ?? LoggingDefaults.UnknownProblemType);
 
             httpContext.Response.StatusCode = problemDetails.Status ?? 401;
-            httpContext.Response.ContentType = "application/problem+json";
+            httpContext.Response.ContentType = ProblemDetailsContentType;
             await httpContext.Response.WriteAsJsonAsync(problemDetails);
             return;
         }
@@ -189,14 +194,19 @@ public class TenantContextMiddleware(
                 
                 EnforcementEventSource.RefusalEmitted(
                     logger,
+                    nameof(EnforcementEventSource.RefusalEmitted),
+                    LogLevel.Warning.ToString(),
+                    TrustContractV1.DisclosureSafeStateUnknown,
                     traceId,
                     requestId,
+                    TrustContractV1.ExecutionRequest,
+                    LoggingDefaults.UnknownScopeType,
                     contextInvariantCode,
                     problemDetails.Status ?? 500,
                     problemDetails.Type ?? LoggingDefaults.UnknownProblemType);
 
                 httpContext.Response.StatusCode = problemDetails.Status ?? 500;
-                httpContext.Response.ContentType = "application/problem+json";
+                httpContext.Response.ContentType = ProblemDetailsContentType;
                 await httpContext.Response.WriteAsJsonAsync(problemDetails);
                 return;
             }
@@ -227,7 +237,7 @@ public class TenantContextMiddleware(
         var sources = new Dictionary<TenantAttributionSource, TenantId>();
 
         // Extract from route parameter (e.g., /tenants/{tenantId}/...)
-        if (context.Request.RouteValues.TryGetValue("tenantId", out var routeTenantId)
+        if (context.Request.RouteValues.TryGetValue(TenantIdRouteKey, out var routeTenantId)
             && routeTenantId is string routeValue
             && !string.IsNullOrWhiteSpace(routeValue))
         {
@@ -235,7 +245,7 @@ public class TenantContextMiddleware(
         }
 
         // Extract from X-Tenant-Id header
-        if (context.Request.Headers.TryGetValue("X-Tenant-Id", out var headerTenantId)
+        if (context.Request.Headers.TryGetValue(TenantIdHeaderName, out var headerTenantId)
             && !string.IsNullOrWhiteSpace(headerTenantId.ToString()))
         {
             sources[TenantAttributionSource.HeaderValue] = new TenantId(headerTenantId.ToString());

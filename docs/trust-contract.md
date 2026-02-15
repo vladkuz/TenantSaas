@@ -310,3 +310,4 @@ Refusals include a stable invariant code and Problem Details type identifier:
 
 - Code contracts: `TenantSaas.Abstractions.Tenancy`, `TenantSaas.Abstractions.Contexts`, `TenantSaas.Abstractions.BreakGlass`
 - Validation: `TenantSaas.Abstractions.TrustContract.TrustContractV1`
+- Extension seams: [docs/extension-seams.md](./extension-seams.md)

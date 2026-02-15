@@ -31,15 +31,22 @@ public sealed class BoundaryGuard(
     {
         ArgumentNullException.ThrowIfNull(accessor);
 
-        if (!accessor.IsInitialized)
+        var current = accessor.Current;
+
+        if (!accessor.IsInitialized || current is null)
         {
             var traceId = overrideTraceId ?? Guid.NewGuid().ToString("N");
             
             // Log failure before returning result
             EnforcementEventSource.ContextNotInitialized(
                 logger,
+                nameof(EnforcementEventSource.ContextNotInitialized),
+                LogLevel.Warning.ToString(),
+                TrustContractV1.DisclosureSafeStateUnknown,
                 traceId,
                 requestId: null,
+                LoggingDefaults.UnknownExecutionKind,
+                LoggingDefaults.UnknownScopeType,
                 InvariantCode.ContextInitialized);
 
             return EnforcementResult.Failure(
@@ -48,20 +55,9 @@ public sealed class BoundaryGuard(
                 "Tenant context must be initialized before operations can proceed.");
         }
 
-        // Log success
-        if (accessor.Current is not null)
-        {
-            var logEvent = enricher.Enrich(accessor.Current, "ContextInitialized");
-            EnforcementEventSource.ContextInitialized(
-                logger,
-                logEvent.TenantRef,
-                logEvent.TraceId,
-                logEvent.RequestId,
-                logEvent.ExecutionKind ?? "unknown",
-                logEvent.ScopeType ?? "unknown");
-        }
+        LogContextInitialized(current);
 
-        return EnforcementResult.Success(accessor.Current!);
+        return EnforcementResult.Success(current);
     }
 
     /// <inheritdoc />
@@ -76,8 +72,13 @@ public sealed class BoundaryGuard(
             // Log failure before returning result
             EnforcementEventSource.ContextNotInitialized(
                 logger,
+                nameof(EnforcementEventSource.ContextNotInitialized),
+                LogLevel.Warning.ToString(),
+                TrustContractV1.DisclosureSafeStateUnknown,
                 traceId,
                 requestId: null,
+                LoggingDefaults.UnknownExecutionKind,
+                LoggingDefaults.UnknownScopeType,
                 InvariantCode.ContextInitialized);
 
             return EnforcementResult.Failure(
@@ -86,15 +87,7 @@ public sealed class BoundaryGuard(
                 "Tenant context must be initialized before operations can proceed.");
         }
 
-        // Log success
-        var logEvent = enricher.Enrich(context, "ContextInitialized");
-        EnforcementEventSource.ContextInitialized(
-            logger,
-            logEvent.TenantRef,
-            logEvent.TraceId,
-            logEvent.RequestId,
-            logEvent.ExecutionKind ?? "unknown",
-            logEvent.ScopeType ?? "unknown");
+        LogContextInitialized(context);
 
         return EnforcementResult.Success(context);
     }
@@ -112,7 +105,9 @@ public sealed class BoundaryGuard(
             return RequireContext(explicitContext);
         }
 
-        // Fallback to ambient context
+        // Fallback to ambient context.
+        // Safety: RequireContext(accessor) reads accessor.Current exactly once into a
+        // local before the null check, preventing TOCTOU races from mutable accessors.
         return RequireContext(accessor);
     }
 
@@ -161,11 +156,16 @@ public sealed class BoundaryGuard(
         switch (originalResult)
         {
             case TenantAttributionResult.Success successForLog:
+                var tenantRef = DefaultLogEnricher.ToOpaqueTenantRef(successForLog.TenantId.Value);
                 EnforcementEventSource.AttributionResolved(
                     logger,
-                    successForLog.TenantId.Value,
+                    nameof(EnforcementEventSource.AttributionResolved),
+                    LogLevel.Information.ToString(),
+                    tenantRef,
                     traceId,
                     requestId: null,
+                    LoggingDefaults.UnknownExecutionKind,
+                    LoggingDefaults.UnknownScopeType,
                     successForLog.Source.GetDisplayName());
                 break;
 
@@ -175,8 +175,13 @@ public sealed class BoundaryGuard(
                     var conflictingSources = string.Join(", ", enforcementResult.ConflictingSources);
                     EnforcementEventSource.AttributionAmbiguous(
                         logger,
+                        nameof(EnforcementEventSource.AttributionAmbiguous),
+                        LogLevel.Warning.ToString(),
+                        TrustContractV1.DisclosureSafeStateUnknown,
                         traceId,
                         requestId: null,
+                        LoggingDefaults.UnknownExecutionKind,
+                        LoggingDefaults.UnknownScopeType,
                         InvariantCode.TenantAttributionUnambiguous,
                         conflictingSources);
                 }
@@ -185,20 +190,44 @@ public sealed class BoundaryGuard(
             case TenantAttributionResult.NotFound:
                 EnforcementEventSource.AttributionNotFound(
                     logger,
+                    nameof(EnforcementEventSource.AttributionNotFound),
+                    LogLevel.Warning.ToString(),
+                    TrustContractV1.DisclosureSafeStateUnknown,
                     traceId,
                     requestId: null,
+                    LoggingDefaults.UnknownExecutionKind,
+                    LoggingDefaults.UnknownScopeType,
                     InvariantCode.TenantAttributionUnambiguous);
                 break;
 
             case TenantAttributionResult.NotAllowed notAllowed:
                 EnforcementEventSource.AttributionNotAllowed(
                     logger,
+                    nameof(EnforcementEventSource.AttributionNotAllowed),
+                    LogLevel.Warning.ToString(),
+                    TrustContractV1.DisclosureSafeStateUnknown,
                     traceId,
                     requestId: null,
+                    LoggingDefaults.UnknownExecutionKind,
+                    LoggingDefaults.UnknownScopeType,
                     InvariantCode.TenantAttributionUnambiguous,
                     notAllowed.Source.GetDisplayName());
                 break;
         }
+    }
+
+    private void LogContextInitialized(TenantContext context)
+    {
+        var logEvent = enricher.Enrich(context, nameof(EnforcementEventSource.ContextInitialized));
+        EnforcementEventSource.ContextInitialized(
+            logger,
+            logEvent.EventName,
+            logEvent.Severity,
+            logEvent.TenantRef,
+            logEvent.TraceId,
+            logEvent.RequestId,
+            logEvent.ExecutionKind ?? TrustContractV1.DisclosureSafeStateUnknown,
+            logEvent.ScopeType ?? TrustContractV1.DisclosureSafeStateUnknown);
     }
 
     /// <inheritdoc />
@@ -220,8 +249,13 @@ public sealed class BoundaryGuard(
             // Log denial
             EnforcementEventSource.BreakGlassAttemptDenied(
                 logger,
+                nameof(EnforcementEventSource.BreakGlassAttemptDenied),
+                LogLevel.Error.ToString(),
+                TrustContractV1.DisclosureSafeStateUnknown,
                 traceId,
                 requestId,
+                LoggingDefaults.UnknownExecutionKind,
+                LoggingDefaults.UnknownScopeType,
                 InvariantCode.BreakGlassExplicitAndAudited,
                 reason);
 
@@ -236,14 +270,18 @@ public sealed class BoundaryGuard(
             ?? TrustContractV1.BreakGlassMarkerCrossTenant;
 
         // Log successful invocation
-        EnforcementEventSource.BreakGlassInvoked(
-            logger,
-            declaration.ActorId,
-            declaration.Reason,
-            declaration.DeclaredScope,
-            tenantRef,
-            traceId,
-            AuditCode.BreakGlassInvoked);
+            EnforcementEventSource.BreakGlassInvoked(
+                logger,
+                nameof(EnforcementEventSource.BreakGlassInvoked),
+                LogLevel.Warning.ToString(),
+                declaration.ActorId,
+                declaration.Reason,
+                declaration.DeclaredScope,
+                tenantRef,
+                traceId,
+                LoggingDefaults.UnknownExecutionKind,
+                LoggingDefaults.UnknownScopeType,
+                AuditCode.BreakGlassInvoked);
 
         // Emit to audit sink if available (fail gracefully)
         if (auditSink != null)

@@ -48,11 +48,13 @@ public class EnforcementLoggingTests
         logs.Should().ContainSingle(e => e.EventId.Id == 1001, "ContextInitialized event should be logged");
         var logEntry = logs.Single(e => e.EventId.Id == 1001);
         logEntry.LogLevel.Should().Be(LogLevel.Information);
-        logEntry.Message.Should().Contain("tenant-log-001");
+        logEntry.Message.Should().Contain("event_name=ContextInitialized");
+        logEntry.Message.Should().Contain("severity=Information");
+        logEntry.Message.Should().Contain("tenant_ref=opaque:");
         logEntry.Message.Should().Contain("trace-log-001");
         logEntry.Message.Should().Contain("req-log-001");
-        logEntry.Message.Should().Contain("request");
-        logEntry.Message.Should().Contain("Tenant");
+        logEntry.Message.Should().Contain("execution_kind=request");
+        logEntry.Message.Should().Contain("scope_type=Tenant");
     }
 
     [Fact]
@@ -77,7 +79,12 @@ public class EnforcementLoggingTests
         logs.Should().ContainSingle(e => e.EventId.Id == 1002, "ContextNotInitialized event should be logged");
         var logEntry = logs.Single(e => e.EventId.Id == 1002);
         logEntry.LogLevel.Should().Be(LogLevel.Warning);
+        logEntry.Message.Should().Contain("event_name=ContextNotInitialized");
+        logEntry.Message.Should().Contain("severity=Warning");
+        logEntry.Message.Should().Contain("tenant_ref=unknown");
         logEntry.Message.Should().Contain("trace-failure-001");
+        logEntry.Message.Should().Contain("execution_kind=unknown");
+        logEntry.Message.Should().Contain("scope_type=Unknown");
         logEntry.Message.Should().Contain("ContextInitialized");
     }
 
@@ -105,7 +112,9 @@ public class EnforcementLoggingTests
         logs.Should().ContainSingle(e => e.EventId.Id == 1003, "AttributionResolved event should be logged");
         var logEntry = logs.Single(e => e.EventId.Id == 1003);
         logEntry.LogLevel.Should().Be(LogLevel.Information);
-        logEntry.Message.Should().Contain("tenant-log-002");
+        logEntry.Message.Should().Contain("event_name=AttributionResolved");
+        logEntry.Message.Should().Contain("severity=Information");
+        logEntry.Message.Should().Contain("tenant_ref=opaque:");
         logEntry.Message.Should().Contain("trace-log-002");
         logEntry.Message.Should().Contain("Route Parameter");
     }
@@ -139,6 +148,8 @@ public class EnforcementLoggingTests
         logs.Should().ContainSingle(e => e.EventId.Id == 1004, "AttributionAmbiguous event should be logged");
         var logEntry = logs.Single(e => e.EventId.Id == 1004);
         logEntry.LogLevel.Should().Be(LogLevel.Warning);
+        logEntry.Message.Should().Contain("event_name=AttributionAmbiguous");
+        logEntry.Message.Should().Contain("severity=Warning");
         logEntry.Message.Should().Contain("trace-log-003");
         logEntry.Message.Should().Contain("TenantAttributionUnambiguous");
         logEntry.Message.Should().Contain("Route Parameter");
@@ -167,6 +178,8 @@ public class EnforcementLoggingTests
         logs.Should().ContainSingle(e => e.EventId.Id == 1008, "AttributionNotFound event should be logged");
         var logEntry = logs.Single(e => e.EventId.Id == 1008);
         logEntry.LogLevel.Should().Be(LogLevel.Warning);
+        logEntry.Message.Should().Contain("event_name=AttributionNotFound");
+        logEntry.Message.Should().Contain("severity=Warning");
         logEntry.Message.Should().Contain("trace-notfound-001");
         logEntry.Message.Should().Contain("TenantAttributionUnambiguous");
     }
@@ -193,6 +206,8 @@ public class EnforcementLoggingTests
         logs.Should().ContainSingle(e => e.EventId.Id == 1009, "AttributionNotAllowed event should be logged");
         var logEntry = logs.Single(e => e.EventId.Id == 1009);
         logEntry.LogLevel.Should().Be(LogLevel.Warning);
+        logEntry.Message.Should().Contain("event_name=AttributionNotAllowed");
+        logEntry.Message.Should().Contain("severity=Warning");
         logEntry.Message.Should().Contain("trace-notallowed-001");
         logEntry.Message.Should().Contain("TenantAttributionUnambiguous");
         logEntry.Message.Should().Contain("Token Claim");

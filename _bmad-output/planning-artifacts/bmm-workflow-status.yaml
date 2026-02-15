@@ -30,6 +30,6 @@ workflow_status:
   create-ux-design: skipped
   create-architecture: "_bmad-output/planning-artifacts/architecture.md"
   create-epics-and-stories: "_bmad-output/planning-artifacts/epics.md"
-  test-design: optional
-  implementation-readiness: skipped
+  test-design: skipped
+  implementation-readiness: _bmad-output/planning-artifacts/implementation-readiness-report-2026-01-29.md
   sprint-planning: "_bmad-output/implementation-artifacts/sprint-status.yaml"

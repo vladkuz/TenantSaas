@@ -84,14 +84,14 @@ development_status:
   epic-5-retrospective: optional
 
   # Epic 6: Documentation & Extension Seams 
-  epic-6: backlog
-  6-1-define-and-document-named-extension-seams: backlog
-  6-2-provide-a-boundary-only-integration-guide: backlog
-  6-3-prove-storage-agnostic-core-with-reference-only-adapters: backlog
-  6-4-publish-the-conceptual-model: backlog
-  6-5-publish-the-trust-contract: backlog
-  6-6-publish-the-verification-guide: backlog
-  6-7-publish-the-api-reference: backlog
+  epic-6: in-progress
+  6-1-define-and-document-named-extension-seams: done
+  6-2-provide-a-boundary-only-integration-guide: ready-for-dev
+  6-3-prove-storage-agnostic-core-with-reference-only-adapters: ready-for-dev
+  6-4-publish-the-conceptual-model: ready-for-dev
+  6-5-publish-the-trust-contract: ready-for-dev
+  6-6-publish-the-verification-guide: ready-for-dev
+  6-7-publish-the-api-reference: ready-for-dev
   epic-6-retrospective: optional
 
   # Epic 7: Advanced Scenarios 

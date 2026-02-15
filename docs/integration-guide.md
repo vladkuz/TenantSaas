@@ -36,7 +36,7 @@ TenantSaas provides `ITenantContextInitializer` as the single required entry poi
 
 **Key characteristics:**
 - **Idempotent**: Repeated calls with identical inputs return the same context
-- **Validated**: Conflicting inputs throw `InvalidOperationException`
+- **Validated**: Conflicting inputs throw `TenantContextConflictException`
 - **Flow-specific**: Separate methods for Request, Background, Admin, and Scripted flows
 
 ### Initialization Methods
@@ -1420,6 +1420,7 @@ public void ErrorReport_FromProblemDetails_ExtractsAllFields()
 
 - [Error Catalog](./error-catalog.md) - Complete list of all error codes and responses
 - [Trust Contract Documentation](./trust-contract.md) - Invariant definitions and policies
+- [Extension Seams](./extension-seams.md) - Named extension points and boundary rules
 - [RFC 7807: Problem Details for HTTP APIs](https://datatracker.ietf.org/doc/html/rfc7807)
 
 ---

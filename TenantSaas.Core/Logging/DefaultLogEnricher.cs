@@ -1,3 +1,7 @@
+using System.Security.Cryptography;
+using System.Text;
+using Microsoft.Extensions.Logging;
+using TenantSaas.Abstractions.Disclosure;
 using TenantSaas.Abstractions.Logging;
 using TenantSaas.Abstractions.Tenancy;
 
@@ -9,15 +13,16 @@ namespace TenantSaas.Core.Logging;
 /// </summary>
 public sealed class DefaultLogEnricher : ILogEnricher
 {
+    private const string UnknownScopeType = "Unknown";
     /// <summary>
     /// Known successful event names that should be logged at Information level.
     /// Using explicit allow-list to avoid false positives from substring matching.
     /// </summary>
     private static readonly HashSet<string> SuccessEventNames = new(StringComparer.OrdinalIgnoreCase)
     {
-        "ContextInitialized",
-        "AttributionResolved",
-        "BreakGlassApproved"
+        nameof(EnforcementEventSource.ContextInitialized),
+        nameof(EnforcementEventSource.AttributionResolved),
+        EnforcementEventNames.BreakGlassApproved
     };
 
     /// <inheritdoc/>
@@ -47,24 +52,33 @@ public sealed class DefaultLogEnricher : ILogEnricher
     /// <summary>
     /// Resolves disclosure-safe tenant_ref per Story 2.5 policy.
     /// Returns safe-state tokens (unknown, sensitive, cross_tenant) when tenant ID is unsafe to disclose.
-    /// Never returns raw tenant IDs that could be reversed or enumerated.
+    /// For tenant scope, returns an opaque, non-reversible identifier.
     /// </summary>
     private static string GetSafeTenantRef(TenantScope scope)
     {
         return scope switch
         {
             // NoTenant scope → safe-state token "unknown"
-            TenantScope.NoTenant => "unknown",
+            TenantScope.NoTenant => TenantRefSafeState.Unknown,
 
             // SharedSystem scope → safe-state token "cross_tenant"
-            TenantScope.SharedSystem => "cross_tenant",
+            TenantScope.SharedSystem => TenantRefSafeState.CrossTenant,
 
-            // Tenant scope → opaque public ID (for now, using Value; future: hash or public ID mapping)
-            TenantScope.Tenant tenant => tenant.Id.Value,
+            // Tenant scope → opaque public ID (non-reversible hash of tenant identifier)
+            TenantScope.Tenant tenant => ToOpaqueTenantRef(tenant.Id.Value),
 
             // Unknown scope type → safe-state token "unknown"
-            _ => "unknown"
+            _ => TenantRefSafeState.Unknown
         };
+    }
+
+    internal static string ToOpaqueTenantRef(string tenantId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(tenantId);
+
+        var bytes = Encoding.UTF8.GetBytes(tenantId);
+        var hash = Convert.ToHexString(SHA256.HashData(bytes));
+        return $"{TenantRefSafeState.Opaque}:{hash}";
     }
 
     /// <summary>
@@ -76,17 +90,17 @@ public sealed class DefaultLogEnricher : ILogEnricher
         // Invariant violations or refusals → Warning severity
         if (invariantCode is not null)
         {
-            return "Warning";
+            return LogLevel.Warning.ToString();
         }
 
         // Explicit success events → Information
         if (SuccessEventNames.Contains(eventName))
         {
-            return "Information";
+            return LogLevel.Information.ToString();
         }
 
         // Unknown events default to Warning (safer than Information for audit purposes)
-        return "Warning";
+        return LogLevel.Warning.ToString();
     }
 
     /// <summary>
@@ -96,10 +110,10 @@ public sealed class DefaultLogEnricher : ILogEnricher
     {
         return scope switch
         {
-            TenantScope.Tenant => "Tenant",
-            TenantScope.NoTenant => "NoTenant",
-            TenantScope.SharedSystem => "SharedSystem",
-            _ => "Unknown"
+            TenantScope.Tenant => nameof(TenantScope.Tenant),
+            TenantScope.NoTenant => nameof(TenantScope.NoTenant),
+            TenantScope.SharedSystem => nameof(TenantScope.SharedSystem),
+            _ => UnknownScopeType
         };
     }
 }

@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -23,14 +24,14 @@ namespace TenantSaas.ContractTests.Logging;
 /// </summary>
 public class RefusalCorrelationTests
 {
-    private static IBoundaryGuard CreateBoundaryGuard()
+    private static BoundaryGuard CreateBoundaryGuard()
     {
         var logger = NullLogger<BoundaryGuard>.Instance;
         var enricher = new DefaultLogEnricher();
         return new BoundaryGuard(logger, enricher);
     }
 
-    private static ITenantContextInitializer CreateInitializer(IMutableTenantContextAccessor accessor)
+    private static TenantContextInitializer CreateInitializer(IMutableTenantContextAccessor accessor)
     {
         var logger = NullLogger<TenantContextInitializer>.Instance;
         return new TenantContextInitializer(accessor, logger);
@@ -144,6 +145,30 @@ public class RefusalCorrelationTests
         var refusalLogs = logs.ToList().WithEventId(1006).ToList();
         refusalLogs.Should().ContainSingle();
         refusalLogs[0].Message.Should().Contain($"invariant_code={invariantCode}");
+    }
+
+    [Fact]
+    public async Task TenantContextMiddleware_Refusal_LogsIncludeRequiredStructuredFields()
+    {
+        // Arrange
+        var (middleware, logs, accessor) = CreateMiddlewareWithCapturedLogs();
+        var context = new DefaultHttpContext();
+        context.Request.Path = "/api/tenants";
+        context.TraceIdentifier = "required-fields-001";
+        context.Response.Body = new MemoryStream();
+
+        // Act
+        await middleware.InvokeAsync(context, accessor);
+
+        // Assert - refusal log includes required structured fields
+        var refusalLogs = logs.ToList().WithEventId(1006).ToList();
+        refusalLogs.Should().ContainSingle();
+        var message = refusalLogs[0].Message;
+        message.Should().Contain("event_name=RefusalEmitted");
+        message.Should().Contain("severity=Warning");
+        message.Should().Contain("tenant_ref=unknown");
+        message.Should().Contain("execution_kind=request");
+        message.Should().Contain("scope_type=Unknown");
     }
 
     [Fact]
@@ -320,7 +345,12 @@ public class RefusalCorrelationTests
             requestId: null);
         EnforcementEventSource.RefusalEmitted(
             logger,
+            nameof(EnforcementEventSource.RefusalEmitted),
+            LogLevel.Warning.ToString(),
+            logEvent.TenantRef,
             context.TraceId,
+            context.ExecutionKind.Value,
+            logEvent.ScopeType ?? LoggingDefaults.UnknownScopeType,
             logEvent.InvariantCode ?? InvariantCode.ContextInitialized,
             httpStatus: problemDetails.Status ?? 500,
             problemType: problemDetails.Type ?? "unknown");
@@ -331,9 +361,11 @@ public class RefusalCorrelationTests
         problemDetails.Extensions[TraceId].Should().Be(logEvent.TraceId);
         problemDetails.Extensions[InvariantCodeKey].Should().Be(logEvent.InvariantCode);
 
-        var refusalLogs = capturedLogs.ToList().WithEventId(1006).ToList();
+        var refusalLogs = capturedLogs.ToList().WithEventId(1011).ToList();
         refusalLogs.Should().ContainSingle();
         refusalLogs[0].Message.Should().NotContain("request_id=");
+        refusalLogs[0].Message.Should().Contain("event_name=RefusalEmitted");
+        refusalLogs[0].Message.Should().Contain("severity=Warning");
     }
 
     [Fact]

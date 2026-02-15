@@ -24,7 +24,8 @@ public class LogEnricherTests
         var logEvent = enricher.Enrich(context, "ContextInitialized");
 
         // Assert - tenant_ref is disclosure-safe (opaque public ID, not raw internal ID)
-        logEvent.TenantRef.Should().Be("tenant-123", "Tenant scope should log opaque tenant ID");
+        logEvent.TenantRef.Should().StartWith("opaque:", "Tenant scope should log an opaque tenant reference");
+        logEvent.TenantRef.Should().NotBe("tenant-123", "Tenant scope should not log raw tenant identifiers");
         logEvent.TraceId.Should().Be("trace-001");
         logEvent.RequestId.Should().Be("req-001");
         logEvent.EventName.Should().Be("ContextInitialized");
@@ -184,9 +185,8 @@ public class LogEnricherTests
 
         // Assert - tenant_ref should be disclosure-safe (for now, using Value; future: hash or public ID mapping)
         // This test validates the enricher follows disclosure policy requirements
-        logEvent.TenantRef.Should().NotBeNullOrWhiteSpace("tenant_ref must be present");
-        // Note: In production, sensitive tenant IDs should be mapped to opaque public IDs
-        // This test documents the current behavior; Story 2.5 defines the disclosure policy contract
+        logEvent.TenantRef.Should().StartWith("opaque:", "tenant_ref must be opaque and non-reversible");
+        logEvent.TenantRef.Should().NotContain(sensitiveId.Value, "tenant_ref must not expose raw tenant identifiers");
     }
 
     [Fact]
@@ -226,10 +226,10 @@ public class LogEnricherTests
             TenantScope.ForSharedSystem(), "t2");
         enricher.Enrich(sharedContext, "Test").TenantRef.Should().Be("cross_tenant");
 
-        // Tenant → opaque ID (currently uses raw Value; future: mapping)
+        // Tenant → opaque ID (non-reversible hash)
         var tenantContext = TenantContext.ForRequest(
             TenantScope.ForTenant(new TenantId("tenant-public-id")), "t3", "r3");
-        enricher.Enrich(tenantContext, "Test").TenantRef.Should().Be("tenant-public-id");
+        enricher.Enrich(tenantContext, "Test").TenantRef.Should().StartWith("opaque:");
 
         // Note: "sensitive" is reserved for future use when:
         // - Tenant exists but should not be disclosed
