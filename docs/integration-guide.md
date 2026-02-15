@@ -2,8 +2,18 @@
 
 This guide helps you integrate TenantSaas into your multi-tenant application.
 
+## Boundary-Only Integration Summary
+
+TenantSaas integration is intentionally boundary-only. You wire the trust contract boundaries and configuration; you do not rewrite domain or business logic.
+
+- Single unavoidable integration point: `ITenantContextInitializer` (or `ITenantFlowFactory` for background/admin/scripted flows).
+- Boundary-only wiring: middleware, initializer, guards, and attribution inputs.
+- No domain logic changes required.
+- Refuse-by-default posture remains intact; missing boundaries fail fast with contract identifiers.
+
 ## Table of Contents
 
+0. [Boundary-Only Integration Summary](#boundary-only-integration-summary)
 1. [Getting Started](#getting-started)
 2. [Context Initialization](#context-initialization)
 3. [Ambient vs Explicit Context Propagation](#ambient-vs-explicit-context-propagation)
@@ -12,6 +22,7 @@ This guide helps you integrate TenantSaas into your multi-tenant application.
 6. [Handling Invariant Violations](#handling-invariant-violations)
 7. [Error Handling Best Practices](#error-handling-best-practices)
 8. [Testing Integration](#testing-integration)
+   - [Boundary Verification (Contract Tests)](#boundary-verification-contract-tests)
 
 ---
 
@@ -1223,6 +1234,32 @@ builder.Services.AddHttpClient<IBreakGlassAuditSink, ComplianceAuditSink>(client
 ## Testing Integration
 
 This section demonstrates how to test your TenantSaas integration with proper error handling validation.
+
+### Boundary Verification (Contract Tests)
+
+Run the contract tests to verify your boundary-only wiring. These tests exercise the configured boundaries and surface failures with trust contract identifiers (`invariant_code`).
+
+**Contract tests to run (existing in `TenantSaas.ContractTests`):**
+
+- `ContextInitializedTests`
+- `InitializationEnforcementTests`
+- `TenantContextInitializerTests`
+- `AttributionRulesTests`
+- `AttributionEnforcementTests`
+- `MiddlewareProblemDetailsTests`
+
+**Missing boundary configuration examples (expected failures):**
+
+| Missing boundary configuration | Expected failure signal | Trust contract identifier |
+| --- | --- | --- |
+| Context initializer or flow wrapper not invoked | Problem Details with `invariant_code` = `ContextInitialized` and detail "Tenant context not initialized" | `ContextInitialized` |
+| Attribution inputs not supplied or ambiguous | Problem Details with `invariant_code` = `TenantAttributionUnambiguous` | `TenantAttributionUnambiguous` |
+| Tenant scope missing for a tenant-scoped operation | Problem Details with `invariant_code` = `TenantScopeRequired` | `TenantScopeRequired` |
+
+**Compliance guidance:**
+
+- Run: `dotnet test TenantSaas.ContractTests/TenantSaas.ContractTests.csproj --disable-build-servers -v minimal`
+- Success indicates boundary wiring is correct; failures map directly to the trust contract identifiers above.
 
 ### Required Test Dependencies
 

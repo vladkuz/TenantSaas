@@ -1,6 +1,6 @@
 # Story 6.2: Provide a Boundary-Only Integration Guide
 
-Status: ready-for-dev
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -32,15 +32,15 @@ so that adoption cost stays low.
 
 ## Tasks / Subtasks
 
-- [ ] Audit `docs/integration-guide.md` for boundary-only steps
-  - [ ] Ensure steps focus on initialization, boundaries, and configuration (no domain rewrites)
-  - [ ] Add explicit “no domain logic changes required” statement
-- [ ] Add a verification section that maps failures to contract rules
-  - [ ] Include “missing boundary configuration” examples with expected failure messages
-- [ ] Add documentation tests
-  - [ ] Verify `docs/integration-guide.md` exists and is referenced by tests
-  - [ ] Assert required boundary-only language and verification section is present
-- [ ] Ensure compliance test guidance points to existing contract tests
+- [x] Audit `docs/integration-guide.md` for boundary-only steps
+  - [x] Ensure steps focus on initialization, boundaries, and configuration (no domain rewrites)
+  - [x] Add explicit “no domain logic changes required” statement
+- [x] Add a verification section that maps failures to contract rules
+  - [x] Include “missing boundary configuration” examples with expected failure messages
+- [x] Add documentation tests
+  - [x] Verify `docs/integration-guide.md` exists and is referenced by tests
+  - [x] Assert required boundary-only language and verification section is present
+- [x] Ensure compliance test guidance points to existing contract tests
 
 ## Developer Context
 
@@ -110,8 +110,8 @@ so that adoption cost stays low.
 
 ## Story Completion Status
 
-- Status set to **ready-for-dev**
-- Completion note: Integration guide updates and documentation tests planned; ready for implementation.
+- Status set to **done**
+- Completion note: Code review passed — ToC updated, test assertions strengthened for AC2/AC3 invariant codes, trailing newline fixed.
 
 ## Dev Agent Record
 
@@ -125,19 +125,27 @@ GPT-5 (Codex)
 - artifact discovery: epics, prd, architecture, project-context
 - validation task: _bmad/core/tasks/validate-workflow.xml not found (skipped)
 - latest-technology check: .NET support policy + Swashbuckle baseline
+- tests: dotnet test TenantSaas.ContractTests/TenantSaas.ContractTests.csproj --disable-build-servers -v minimal
+- tests: dotnet test TenantSaas.sln --disable-build-servers -v minimal
 
 ### Completion Notes List
 
 - Extracted Epic 6 story 6.2 requirements and aligned guide expectations with boundary-only adoption.
 - Planned doc tests to lock guide content and verification steps.
+- Updated docs/integration-guide.md with boundary-only summary and contract-test verification mapping.
+- Added IntegrationGuideDocumentationTests to assert guide presence and required boundary-only/verification language.
+- Tests passed: dotnet test TenantSaas.ContractTests/TenantSaas.ContractTests.csproj --disable-build-servers -v minimal; dotnet test TenantSaas.sln --disable-build-servers -v minimal.
 
 ### File List
 
 - _bmad-output/implementation-artifacts/6-2-provide-a-boundary-only-integration-guide.md
 - _bmad-output/implementation-artifacts/sprint-status.yaml
+- TenantSaas.ContractTests/IntegrationGuideDocumentationTests.cs
+- docs/integration-guide.md
 
 ## Change Log
 
+- 2026-02-15: Updated integration guide for boundary-only adoption and added documentation tests.
 - 2026-02-14: Story created and marked ready-for-dev.
 
 ### References
