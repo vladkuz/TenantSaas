@@ -1,6 +1,6 @@
 # Story 6.5: Publish the Trust Contract
 
-Status: ready-for-dev
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -28,14 +28,14 @@ so that invariants, refusals, and disclosure rules are unambiguous.
 
 ## Tasks / Subtasks
 
-- [ ] Audit `docs/trust-contract.md` for completeness
-  - [ ] Ensure all invariants in `TrustContractV1` are documented
-  - [ ] Ensure refusal mappings are documented with stable identifiers
-  - [ ] Ensure disclosure policy rules and safe states are explicitly listed
-- [ ] Add documentation tests
-  - [ ] Verify `docs/trust-contract.md` exists
-  - [ ] Verify all invariants and refusal mappings are present
-  - [ ] Fail if any required invariant or refusal mapping is missing
+- [x] Audit `docs/trust-contract.md` for completeness
+  - [x] Ensure all invariants in `TrustContractV1` are documented
+  - [x] Ensure refusal mappings are documented with stable identifiers
+  - [x] Ensure disclosure policy rules and safe states are explicitly listed
+- [x] Add documentation tests
+  - [x] Verify `docs/trust-contract.md` exists
+  - [x] Verify all invariants and refusal mappings are present
+  - [x] Fail if any required invariant or refusal mapping is missing
 
 ## Developer Context
 
@@ -97,8 +97,8 @@ so that invariants, refusals, and disclosure rules are unambiguous.
 
 ## Story Completion Status
 
-- Status set to **ready-for-dev**
-- Completion note: Trust contract verification plan prepared; ready for implementation.
+- Status set to **review**
+- Completion note: Trust contract documentation completeness and enforcement tests implemented.
 
 ## Dev Agent Record
 
@@ -112,20 +112,33 @@ GPT-5 (Codex)
 - artifact discovery: epics, prd, architecture, project-context
 - validation task: _bmad/core/tasks/validate-workflow.xml not found (skipped)
 - latest-technology check: .NET support policy baseline
+- dev-story execution (YOLO): added trust contract documentation validation tests
+- red phase: `TrustContractDoc_ListsAllRefusalMappingsWithStableIdentifiers` failed due to missing "Refusal Mapping Registry" section
+- green phase: updated `docs/trust-contract.md` with explicit refusal mapping registry and guidance URIs
+- regression: contract tests and full solution tests passing
 
 ### Completion Notes List
 
 - Extracted Epic 6 story 6.5 requirements and aligned with `TrustContractV1`.
 - Planned doc tests to enforce invariant and refusal mapping completeness.
+- Implemented `TrustContractDocumentationTests` to enforce doc existence, invariant coverage, refusal mapping coverage, and disclosure safe-state coverage.
+- Added explicit refusal mapping registry in `docs/trust-contract.md` with invariant code, status, problem type, title, and guidance URI per mapping.
+- Verified test commands:
+  - `dotnet test TenantSaas.ContractTests/TenantSaas.ContractTests.csproj --disable-build-servers -v minimal`
+  - `dotnet test TenantSaas.sln --disable-build-servers -v minimal`
 
 ### File List
 
 - _bmad-output/implementation-artifacts/6-5-publish-the-trust-contract.md
 - _bmad-output/implementation-artifacts/sprint-status.yaml
+- docs/trust-contract.md
+- TenantSaas.ContractTests/TrustContractDocumentationTests.cs
 
 ## Change Log
 
 - 2026-02-14: Story created and marked ready-for-dev.
+- 2026-02-15: Added trust contract documentation enforcement tests and completed refusal mapping registry documentation; story moved to review.
+- 2026-02-15: Code review (Claude Opus 4.6): fixed BreakGlassExplicitAndAudited description drift in doc, removed redundant HTTP Status table, added Title+Description assertions to tests. 4 issues found, 4 fixed. All 429 tests pass. Story moved to done.
 
 ### References
 

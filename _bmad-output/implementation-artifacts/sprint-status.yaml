@@ -89,7 +89,7 @@ development_status:
   6-2-provide-a-boundary-only-integration-guide: done
   6-3-prove-storage-agnostic-core-with-reference-only-adapters: done
   6-4-publish-the-conceptual-model: done
-  6-5-publish-the-trust-contract: ready-for-dev
+  6-5-publish-the-trust-contract: done
   6-6-publish-the-verification-guide: ready-for-dev
   6-7-publish-the-api-reference: ready-for-dev
   epic-6-retrospective: optional

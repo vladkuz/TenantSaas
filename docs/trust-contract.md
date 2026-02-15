@@ -194,7 +194,7 @@ Defined invariants for v1:
 - **ContextInitialized**: Tenant context must be initialized before operations can proceed. (Category: Initialization)
 - **TenantAttributionUnambiguous**: Tenant attribution from available sources must be unambiguous. (Category: Attribution)
 - **TenantScopeRequired**: Operation requires an explicit tenant scope. (Category: Scope)
-- **BreakGlassExplicitAndAudited**: Break-glass must be explicit with actor identity and reason. (Category: Authorization)
+- **BreakGlassExplicitAndAudited**: Break-glass must be explicitly declared with actor identity and reason. (Category: Authorization)
 - **DisclosureSafe**: Tenant information disclosure must follow safe disclosure policy. (Category: Disclosure)
 
 Lookups:
@@ -216,6 +216,18 @@ Lookup:
 
 - `TrustContractV1.GetRefusalMapping(invariantCode)` returns the mapping or throws.
 - `TrustContractV1.TryGetRefusalMapping(invariantCode, out mapping)` returns false if missing.
+
+## Refusal Mapping Registry
+
+All invariant refusal mappings in `TrustContractV1.RefusalMappings` are listed below with stable identifiers:
+
+| Invariant Code | Status | Problem Type | Title | Guidance URI |
+| --- | --- | --- | --- | --- |
+| `ContextInitialized` | 401 | `urn:tenantsaas:error:context-initialized` | Tenant context not initialized | `https://docs.tenantsaas.dev/errors/context-not-initialized` |
+| `TenantAttributionUnambiguous` | 422 | `urn:tenantsaas:error:tenant-attribution-unambiguous` | Tenant attribution is ambiguous | `https://docs.tenantsaas.dev/errors/attribution-ambiguous` |
+| `TenantScopeRequired` | 403 | `urn:tenantsaas:error:tenant-scope-required` | Tenant scope required | `https://docs.tenantsaas.dev/errors/tenant-scope-required` |
+| `BreakGlassExplicitAndAudited` | 403 | `urn:tenantsaas:error:break-glass-explicit-and-audited` | Break-glass must be explicit | `https://docs.tenantsaas.dev/errors/break-glass-required` |
+| `DisclosureSafe` | 500 | `urn:tenantsaas:error:disclosure-safe` | Tenant disclosure policy violation | `https://docs.tenantsaas.dev/errors/disclosure-unsafe` |
 
 ## Problem Details Factory
 
@@ -262,16 +274,6 @@ Conditional extensions:
 - Code: `TenantSaas.Core.Errors.ProblemDetailsFactory`
 - Extension keys: `TenantSaas.Core.Errors.ProblemDetailsExtensions`
 - Contract tests: `TenantSaas.ContractTests.Errors.ProblemDetailsFactoryTests`, `TenantSaas.ContractTests.Errors.ProblemDetailsShapeTests`
-
-### HTTP Status → Invariant Mapping
-
-| Invariant | Status | Problem Type |
-| --- | --- | --- |
-| ContextInitialized | 401 | `urn:tenantsaas:error:context-initialized` |
-| TenantAttributionUnambiguous | 422 | `urn:tenantsaas:error:tenant-attribution-unambiguous` |
-| TenantScopeRequired | 403 | `urn:tenantsaas:error:tenant-scope-required` |
-| BreakGlassExplicitAndAudited | 403 | `urn:tenantsaas:error:break-glass-explicit-and-audited` |
-| DisclosureSafe | 500 | `urn:tenantsaas:error:disclosure-safe` |
 
 ### Problem Details Type Identifier Format
 
