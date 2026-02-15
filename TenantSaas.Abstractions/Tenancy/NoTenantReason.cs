@@ -5,6 +5,26 @@ namespace TenantSaas.Abstractions.Tenancy;
 /// </summary>
 public sealed record NoTenantReason
 {
+    /// <summary>
+    /// Canonical value for public or unauthenticated operations.
+    /// </summary>
+    public const string PublicValue = "public";
+
+    /// <summary>
+    /// Canonical value for system initialization and bootstrap workflows.
+    /// </summary>
+    public const string BootstrapValue = "bootstrap";
+
+    /// <summary>
+    /// Canonical value for health and readiness probes.
+    /// </summary>
+    public const string HealthCheckValue = "health-check";
+
+    /// <summary>
+    /// Canonical value for maintenance operations.
+    /// </summary>
+    public const string SystemMaintenanceValue = "system-maintenance";
+
     private static readonly List<NoTenantReason> Registry = [];
     private static readonly StringComparer ValueComparer = StringComparer.OrdinalIgnoreCase;
     private static readonly Lock Sync = new();
@@ -13,10 +33,10 @@ public sealed record NoTenantReason
     {
         Registry.AddRange(
         [
-            new NoTenantReason("public", "Public", "Public or unauthenticated operations."),
-            new NoTenantReason("bootstrap", "Bootstrap", "System initialization and bootstrap workflows."),
-            new NoTenantReason("health-check", "HealthCheck", "Health and readiness probes."),
-            new NoTenantReason("system-maintenance", "SystemMaintenance", "Maintenance operations.")
+            new NoTenantReason(PublicValue, "Public", "Public or unauthenticated operations."),
+            new NoTenantReason(BootstrapValue, "Bootstrap", "System initialization and bootstrap workflows."),
+            new NoTenantReason(HealthCheckValue, "HealthCheck", "Health and readiness probes."),
+            new NoTenantReason(SystemMaintenanceValue, "SystemMaintenance", "Maintenance operations.")
         ]);
     }
 
@@ -49,22 +69,22 @@ public sealed record NoTenantReason
     /// <summary>
     /// Public or unauthenticated operations.
     /// </summary>
-    public static NoTenantReason Public => FindByValue("public");
+    public static NoTenantReason Public => FindByValue(PublicValue);
 
     /// <summary>
     /// System initialization and bootstrap workflows.
     /// </summary>
-    public static NoTenantReason Bootstrap => FindByValue("bootstrap");
+    public static NoTenantReason Bootstrap => FindByValue(BootstrapValue);
 
     /// <summary>
     /// Health and readiness probes.
     /// </summary>
-    public static NoTenantReason HealthCheck => FindByValue("health-check");
+    public static NoTenantReason HealthCheck => FindByValue(HealthCheckValue);
 
     /// <summary>
     /// Maintenance operations.
     /// </summary>
-    public static NoTenantReason SystemMaintenance => FindByValue("system-maintenance");
+    public static NoTenantReason SystemMaintenance => FindByValue(SystemMaintenanceValue);
 
     /// <summary>
     /// Gets the full list of allowed reasons.

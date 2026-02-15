@@ -5,6 +5,23 @@ namespace TenantSaas.Abstractions.Contexts;
 /// </summary>
 public sealed record ExecutionKind
 {
+    /// <summary>
+    /// Canonical value for request execution kind.
+    /// </summary>
+    public const string RequestValue = "request";
+    /// <summary>
+    /// Canonical value for background execution kind.
+    /// </summary>
+    public const string BackgroundValue = "background";
+    /// <summary>
+    /// Canonical value for admin execution kind.
+    /// </summary>
+    public const string AdminValue = "admin";
+    /// <summary>
+    /// Canonical value for scripted execution kind.
+    /// </summary>
+    public const string ScriptedValue = "scripted";
+
     private static readonly List<ExecutionKind> Registry = [];
     private static readonly StringComparer ValueComparer = StringComparer.OrdinalIgnoreCase;
     private static readonly Lock Sync = new();
@@ -13,10 +30,10 @@ public sealed record ExecutionKind
     {
         Registry.AddRange(
         [
-            new ExecutionKind("request", "Request", "HTTP or API request flow."),
-            new ExecutionKind("background", "Background", "Background job or worker flow."),
-            new ExecutionKind("admin", "Admin", "Administrative operation flow."),
-            new ExecutionKind("scripted", "Scripted", "CLI or script execution flow.")
+            new ExecutionKind(RequestValue, "Request", "HTTP or API request flow."),
+            new ExecutionKind(BackgroundValue, "Background", "Background job or worker flow."),
+            new ExecutionKind(AdminValue, "Admin", "Administrative operation flow."),
+            new ExecutionKind(ScriptedValue, "Scripted", "CLI or script execution flow.")
         ]);
     }
 
@@ -49,22 +66,22 @@ public sealed record ExecutionKind
     /// <summary>
     /// HTTP or API request flow.
     /// </summary>
-    public static ExecutionKind Request => FindByValue("request");
+    public static ExecutionKind Request => FindByValue(RequestValue);
 
     /// <summary>
     /// Background job or worker flow.
     /// </summary>
-    public static ExecutionKind Background => FindByValue("background");
+    public static ExecutionKind Background => FindByValue(BackgroundValue);
 
     /// <summary>
     /// Administrative operation flow.
     /// </summary>
-    public static ExecutionKind Admin => FindByValue("admin");
+    public static ExecutionKind Admin => FindByValue(AdminValue);
 
     /// <summary>
     /// CLI or script execution flow.
     /// </summary>
-    public static ExecutionKind Scripted => FindByValue("scripted");
+    public static ExecutionKind Scripted => FindByValue(ScriptedValue);
 
     /// <summary>
     /// Gets the full list of execution kinds.

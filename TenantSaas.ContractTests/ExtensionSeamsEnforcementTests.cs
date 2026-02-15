@@ -67,11 +67,11 @@ public sealed class ExtensionSeamsEnforcementTests
 
         result.IsSuccess.Should().BeFalse();
         result.InvariantCode.Should().Be(InvariantCode.TenantAttributionUnambiguous);
-        result.ConflictingSources.Should().Contain(new[]
-        {
+        result.ConflictingSources.Should().Contain(
+        [
             TenantAttributionSource.RouteParameter.GetDisplayName(),
             TenantAttributionSource.HeaderValue.GetDisplayName()
-        });
+        ]);
     }
 
     private sealed class BypassAttemptAccessor : ITenantContextAccessor

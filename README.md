@@ -20,7 +20,7 @@ dotnet restore && dotnet test TenantSaas.sln --disable-build-servers -v minimal 
 | **Missing context in background jobs** | Silent — job runs in wrong scope | Fails immediately with actionable error |
 | **Conflicting attribution sources** | Last-write-wins or random precedence | Explicit refusal with RFC 7807 error |
 | **Privileged operations** | Admin endpoints with implicit god-mode | Break-glass requires actor, reason, and audit trail |
-| **Tenant IDs in logs** | Raw IDs leak into shared observability | Disclosure-safe tokens (`unknown`, `sensitive`, `opaque`) |
+| **Tenant IDs in logs** | Raw IDs leak into shared observability | Disclosure-safe values (`unknown`, `sensitive`, `cross_tenant`, `opaque:<hash>`) |
 | **Onboarding new engineers** | Tribal knowledge in Slack threads | Trust contract and contract tests *are* the documentation |
 | **Proving compliance** | "Trust us, we tested it" | Runnable contract tests in CI prove invariants hold |
 

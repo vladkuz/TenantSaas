@@ -37,7 +37,12 @@ public sealed class ContextTaxonomyTests
         var values = ExecutionKind.All.Select(kind => kind.Value).ToArray();
 
         values.Should().BeEquivalentTo(
-            ["request", "background", "admin", "scripted"],
+            [
+                ExecutionKind.RequestValue,
+                ExecutionKind.BackgroundValue,
+                ExecutionKind.AdminValue,
+                ExecutionKind.ScriptedValue
+            ],
             options => options.WithStrictOrdering());
 
         ExecutionKind.All.Should().OnlyContain(kind => !string.IsNullOrWhiteSpace(kind.Description));

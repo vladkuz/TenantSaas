@@ -47,7 +47,7 @@ public sealed record DisclosureContext
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        string? tenantId = context.Scope switch
+        var tenantId = context.Scope switch
         {
             TenantScope.Tenant tenantScope => tenantScope.Id.Value,
             _ => null

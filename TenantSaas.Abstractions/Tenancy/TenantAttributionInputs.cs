@@ -51,7 +51,7 @@ public sealed record TenantAttributionInputs(IReadOnlyList<TenantAttributionInpu
     /// Creates an empty attribution input set.
     /// </summary>
     public static TenantAttributionInputs None()
-        => new(Array.Empty<TenantAttributionInput>());
+        => new([]);
 
     /// <summary>
     /// Creates attribution inputs from explicit initialization scope.

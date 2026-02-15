@@ -23,10 +23,10 @@ namespace TenantSaas.Core.Tenancy;
 /// </remarks>
 public sealed class AmbientTenantContextAccessor : IMutableTenantContextAccessor
 {
-    private static readonly AsyncLocal<TenantContext?> _current = new();
+    private static readonly AsyncLocal<TenantContext?> current = new();
 
     /// <inheritdoc />
-    public TenantContext? Current => _current.Value;
+    public TenantContext? Current => current.Value;
 
     /// <inheritdoc />
     public bool IsInitialized => Current is not null;
@@ -37,7 +37,7 @@ public sealed class AmbientTenantContextAccessor : IMutableTenantContextAccessor
     public void Set(TenantContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
-        _current.Value = context;
+        current.Value = context;
     }
 
     /// <summary>
@@ -45,6 +45,6 @@ public sealed class AmbientTenantContextAccessor : IMutableTenantContextAccessor
     /// </summary>
     public void Clear()
     {
-        _current.Value = null;
+        current.Value = null;
     }
 }

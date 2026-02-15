@@ -136,28 +136,28 @@ public sealed class ExecutionKindAndScopeTests
     public void ExecutionKind_Request_Should_MatchTaxonomy()
     {
         // Assert - verify value aligns with trust contract taxonomy
-        ExecutionKind.Request.Value.Should().Be("request");
+        ExecutionKind.Request.Value.Should().Be(ExecutionKind.RequestValue);
         ExecutionKind.Request.DisplayName.Should().Be("Request");
     }
 
     [Fact]
     public void ExecutionKind_Background_Should_MatchTaxonomy()
     {
-        ExecutionKind.Background.Value.Should().Be("background");
+        ExecutionKind.Background.Value.Should().Be(ExecutionKind.BackgroundValue);
         ExecutionKind.Background.DisplayName.Should().Be("Background");
     }
 
     [Fact]
     public void ExecutionKind_Admin_Should_MatchTaxonomy()
     {
-        ExecutionKind.Admin.Value.Should().Be("admin");
+        ExecutionKind.Admin.Value.Should().Be(ExecutionKind.AdminValue);
         ExecutionKind.Admin.DisplayName.Should().Be("Admin");
     }
 
     [Fact]
     public void ExecutionKind_Scripted_Should_MatchTaxonomy()
     {
-        ExecutionKind.Scripted.Value.Should().Be("scripted");
+        ExecutionKind.Scripted.Value.Should().Be(ExecutionKind.ScriptedValue);
         ExecutionKind.Scripted.DisplayName.Should().Be("Scripted");
     }
 
@@ -166,7 +166,13 @@ public sealed class ExecutionKindAndScopeTests
     {
         // Trust contract defines exactly 4 execution kinds
         ExecutionKind.All.Should().HaveCount(4);
-        ExecutionKind.All.Select(k => k.Value).Should().Contain(new[] { "request", "background", "admin", "scripted" });
+        ExecutionKind.All.Select(k => k.Value).Should().Contain(
+        [
+            ExecutionKind.RequestValue,
+            ExecutionKind.BackgroundValue,
+            ExecutionKind.AdminValue,
+            ExecutionKind.ScriptedValue
+        ]);
     }
 
     #endregion
@@ -414,7 +420,7 @@ public sealed class ExecutionKindAndScopeTests
         var logEvent = enricher.Enrich(context, "TestEvent");
 
         // Assert - downstream logs must include ExecutionKind and ScopeType per AC#1
-        logEvent.ExecutionKind.Should().Be("request");
+        logEvent.ExecutionKind.Should().Be(ExecutionKind.RequestValue);
         logEvent.ScopeType.Should().Be("Tenant");
     }
 
@@ -430,7 +436,7 @@ public sealed class ExecutionKindAndScopeTests
         var logEvent = enricher.Enrich(context, "TestEvent");
 
         // Assert
-        logEvent.ExecutionKind.Should().Be("background");
+        logEvent.ExecutionKind.Should().Be(ExecutionKind.BackgroundValue);
         logEvent.ScopeType.Should().Be("Tenant");
     }
 
@@ -446,7 +452,7 @@ public sealed class ExecutionKindAndScopeTests
         var logEvent = enricher.Enrich(context, "TestEvent");
 
         // Assert
-        logEvent.ExecutionKind.Should().Be("admin");
+        logEvent.ExecutionKind.Should().Be(ExecutionKind.AdminValue);
         logEvent.ScopeType.Should().Be("SharedSystem");
     }
 
@@ -462,7 +468,7 @@ public sealed class ExecutionKindAndScopeTests
         var logEvent = enricher.Enrich(context, "TestEvent");
 
         // Assert
-        logEvent.ExecutionKind.Should().Be("scripted");
+        logEvent.ExecutionKind.Should().Be(ExecutionKind.ScriptedValue);
         logEvent.ScopeType.Should().Be("NoTenant");
     }
 

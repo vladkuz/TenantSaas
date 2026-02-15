@@ -11,8 +11,8 @@ namespace TenantSaas.Core.Tenancy;
 /// </remarks>
 internal sealed class TenantFlowScope : ITenantFlowScope
 {
-    private readonly IMutableTenantContextAccessor _accessor;
-    private bool _disposed;
+    private readonly IMutableTenantContextAccessor accessor;
+    private bool disposed;
 
     /// <summary>
     /// Initializes a new tenant flow scope with the given context.
@@ -25,7 +25,7 @@ internal sealed class TenantFlowScope : ITenantFlowScope
         ArgumentNullException.ThrowIfNull(accessor);
 
         Context = context;
-        _accessor = accessor;
+        this.accessor = accessor;
     }
 
     /// <inheritdoc />
@@ -34,15 +34,15 @@ internal sealed class TenantFlowScope : ITenantFlowScope
     /// <inheritdoc />
     public void Dispose()
     {
-        if (_disposed)
+        if (disposed)
         {
             return;
         }
 
-        _disposed = true;
-        if (ReferenceEquals(_accessor.Current, Context))
+        disposed = true;
+        if (ReferenceEquals(accessor.Current, Context))
         {
-            _accessor.Clear();
+            accessor.Clear();
         }
     }
 

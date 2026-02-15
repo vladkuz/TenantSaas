@@ -1,5 +1,7 @@
 using System.Collections.Frozen;
 using TenantSaas.Abstractions.BreakGlass;
+using TenantSaas.Abstractions.Contexts;
+using TenantSaas.Abstractions.Disclosure;
 using TenantSaas.Abstractions.Invariants;
 
 namespace TenantSaas.Abstractions.TrustContract;
@@ -32,7 +34,7 @@ public static class TrustContractV1
     /// <summary>
     /// Cross-tenant marker for break-glass audit events.
     /// </summary>
-    public const string BreakGlassMarkerCrossTenant = "cross_tenant";
+    public const string BreakGlassMarkerCrossTenant = TenantRefSafeState.CrossTenant;
 
     /// <summary>
     /// Privileged operation marker for break-glass declarations.
@@ -42,42 +44,42 @@ public static class TrustContractV1
     /// <summary>
     /// Disclosure safe-state token for unresolved tenants.
     /// </summary>
-    public const string DisclosureSafeStateUnknown = "unknown";
+    public const string DisclosureSafeStateUnknown = TenantRefSafeState.Unknown;
 
     /// <summary>
     /// Disclosure safe-state token for sensitive tenants.
     /// </summary>
-    public const string DisclosureSafeStateSensitive = "sensitive";
+    public const string DisclosureSafeStateSensitive = TenantRefSafeState.Sensitive;
 
     /// <summary>
     /// Disclosure safe-state token for cross-tenant operations.
     /// </summary>
-    public const string DisclosureSafeStateCrossTenant = "cross_tenant";
+    public const string DisclosureSafeStateCrossTenant = TenantRefSafeState.CrossTenant;
 
     /// <summary>
     /// Disclosure safe-state token indicating an opaque tenant identifier.
     /// </summary>
-    public const string DisclosureSafeStateOpaque = "opaque";
+    public const string DisclosureSafeStateOpaque = TenantRefSafeState.Opaque;
 
     /// <summary>
     /// HTTP or API request flow.
     /// </summary>
-    public const string ExecutionRequest = "request";
+    public const string ExecutionRequest = ExecutionKind.RequestValue;
 
     /// <summary>
     /// Background job or worker flow.
     /// </summary>
-    public const string ExecutionBackground = "background";
+    public const string ExecutionBackground = ExecutionKind.BackgroundValue;
 
     /// <summary>
     /// Administrative operation flow.
     /// </summary>
-    public const string ExecutionAdmin = "admin";
+    public const string ExecutionAdmin = ExecutionKind.AdminValue;
 
     /// <summary>
     /// CLI or script execution flow.
     /// </summary>
-    public const string ExecutionScripted = "scripted";
+    public const string ExecutionScripted = ExecutionKind.ScriptedValue;
 
     /// <summary>
     /// Tenant attribution from a URL route parameter.

@@ -30,7 +30,7 @@ public class LogEnricherTests
         logEvent.RequestId.Should().Be("req-001");
         logEvent.EventName.Should().Be("ContextInitialized");
         logEvent.Severity.Should().Be("Information");
-        logEvent.ExecutionKind.Should().Be("request");
+        logEvent.ExecutionKind.Should().Be(ExecutionKind.RequestValue);
         logEvent.ScopeType.Should().Be("Tenant");
     }
 
@@ -67,7 +67,7 @@ public class LogEnricherTests
         logEvent.TenantRef.Should().Be("cross_tenant", "SharedSystem scope should log safe-state token 'cross_tenant'");
         logEvent.TraceId.Should().Be("trace-003");
         logEvent.RequestId.Should().BeNull("Background execution should not have request_id");
-        logEvent.ExecutionKind.Should().Be("background");
+        logEvent.ExecutionKind.Should().Be(ExecutionKind.BackgroundValue);
         logEvent.ScopeType.Should().Be("SharedSystem");
     }
 
@@ -168,7 +168,7 @@ public class LogEnricherTests
         // Assert - background execution should not have request_id
         logEvent.RequestId.Should().BeNull("Background execution should not include request_id");
         logEvent.TraceId.Should().Be("trace-bg-001", "Background execution should still have trace_id");
-        logEvent.ExecutionKind.Should().Be("background");
+        logEvent.ExecutionKind.Should().Be(ExecutionKind.BackgroundValue);
     }
 
     [Fact]
