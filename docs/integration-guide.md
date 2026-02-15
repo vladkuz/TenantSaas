@@ -1275,6 +1275,8 @@ This section demonstrates how to test your TenantSaas integration with proper er
 
 Run the contract tests to verify your boundary-only wiring. These tests exercise the configured boundaries and surface failures with trust contract identifiers (`invariant_code`).
 
+> For step-by-step verification with expected signals and troubleshooting, see the [Verification Guide](verification-guide.md).
+
 **Contract tests to run (existing in `TenantSaas.ContractTests`):**
 
 - `ContextInitializedTests`

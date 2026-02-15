@@ -1,6 +1,6 @@
 # Story 6.6: Publish the Verification Guide
 
-Status: ready-for-dev
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -28,14 +28,14 @@ so that I can run and interpret contract tests quickly.
 
 ## Tasks / Subtasks
 
-- [ ] Create `docs/verification-guide.md`
-  - [ ] Include exact commands for contract tests and solution tests
-  - [ ] Explain how to interpret failures (Problem Details + invariant codes)
-  - [ ] Include troubleshooting for common failures
-- [ ] Add documentation tests
-  - [ ] Verify `docs/verification-guide.md` exists
-  - [ ] Assert required sections/commands appear
-- [ ] Link the verification guide from README and/or integration guide
+- [x] Create `docs/verification-guide.md`
+  - [x] Include exact commands for contract tests and solution tests
+  - [x] Explain how to interpret failures (Problem Details + invariant codes)
+  - [x] Include troubleshooting for common failures
+- [x] Add documentation tests
+  - [x] Verify `docs/verification-guide.md` exists
+  - [x] Assert required sections/commands appear
+- [x] Link the verification guide from README and/or integration guide
 
 ## Developer Context
 
@@ -98,8 +98,8 @@ so that I can run and interpret contract tests quickly.
 
 ## Story Completion Status
 
-- Status set to **ready-for-dev**
-- Completion note: Verification guide doc and test plan prepared; ready for implementation.
+- Status set to **done**
+- Completion note: Verification guide published, documentation tests added, README links updated, code review fixes applied.
 
 ## Dev Agent Record
 
@@ -113,20 +113,39 @@ GPT-5 (Codex)
 - artifact discovery: epics, prd, architecture, project-context
 - validation task: _bmad/core/tasks/validate-workflow.xml not found (skipped)
 - latest-technology check: .NET support policy baseline
+- dev-story workflow (YOLO): implemented Story 6.6 documentation and tests
+- test run: `dotnet test TenantSaas.ContractTests/TenantSaas.ContractTests.csproj --disable-build-servers -v minimal` (pass)
+- test run: `dotnet test TenantSaas.sln --disable-build-servers -v minimal` (pass)
+- code review (CR): 3 MEDIUM, 2 LOW issues found and fixed
+- post-fix test run: 435/435 pass
 
 ### Completion Notes List
 
 - Extracted Epic 6 story 6.6 requirements and defined guide structure and validation checks.
 - Included deterministic test commands and failure interpretation signals.
+- Added `docs/verification-guide.md` with deterministic contract/solution test commands and expected failure signals (`Problem Details`, `invariant_code`, `trace_id`).
+- Added `TenantSaas.ContractTests/VerificationGuideDocumentationTests.cs` to verify guide existence, required command/failure interpretation content, troubleshooting guidance, and README linkage.
+- Updated `README.md` to reference `docs/verification-guide.md` in documentation navigation sections.
+- [CR] Added trust contract identifier table to verification guide (M1).
+- [CR] Added test for update guidance section and trust contract identifiers (M2, +2 tests).
+- [CR] Added cross-reference from integration guide to verification guide (M3).
+- [CR] Fixed imprecise SDK prerequisites wording (L1).
+- [CR] Added cross-references to related docs in verification guide (L2).
 
 ### File List
 
 - _bmad-output/implementation-artifacts/6-6-publish-the-verification-guide.md
 - _bmad-output/implementation-artifacts/sprint-status.yaml
+- docs/verification-guide.md
+- TenantSaas.ContractTests/VerificationGuideDocumentationTests.cs
+- README.md
+- docs/integration-guide.md
 
 ## Change Log
 
 - 2026-02-14: Story created and marked ready-for-dev.
+- 2026-02-15: Implemented verification guide, added documentation tests, linked guide in README, and moved story to review.
+- 2026-02-15: Code review — fixed 5 issues (trust contract identifiers, AC2 test gap, integration guide cross-ref, SDK wording, doc cross-refs). Status → done.
 
 ### References
 

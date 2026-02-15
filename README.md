@@ -4,7 +4,7 @@
 
 Tenant isolation enforcement for multi-tenant .NET apps. Operations without explicit tenant scope are refused — not silently allowed.
 
-**[Quick Start](#quick-start)** · **[Conceptual Model](docs/conceptual-model.md)** · **[Integration Guide](docs/integration-guide.md)** · **[Trust Contract](docs/trust-contract.md)** · **[Error Catalog](docs/error-catalog.md)**
+**[Quick Start](#quick-start)** · **[Conceptual Model](docs/conceptual-model.md)** · **[Integration Guide](docs/integration-guide.md)** · **[Trust Contract](docs/trust-contract.md)** · **[Verification Guide](docs/verification-guide.md)** · **[Error Catalog](docs/error-catalog.md)**
 
 ```bash
 dotnet restore && dotnet test TenantSaas.sln --disable-build-servers -v minimal   # prove invariants hold
@@ -125,7 +125,7 @@ Five enforced invariants:
 | `BreakGlassExplicitAndAudited` | Privileged actions need actor + reason + audit trail |
 | `DisclosureSafe` | Logs and errors use disclosure-safe tenant references |
 
-Full details: [trust contract](docs/trust-contract.md) · [error catalog](docs/error-catalog.md)
+Full details: [trust contract](docs/trust-contract.md) · [verification guide](docs/verification-guide.md) · [error catalog](docs/error-catalog.md)
 
 ## How It's Different
 
@@ -156,7 +156,7 @@ TenantSaas is not a replacement for your SaaS template. It's the trust layer und
 - Contract test kit for adopter CI
 - Sample ASP.NET Core host
 - Optional EF Core reference adapter that enforces `IBoundaryGuard` before operations
-- [Trust contract](docs/trust-contract.md), [integration guide](docs/integration-guide.md), [error catalog](docs/error-catalog.md)
+- [Trust contract](docs/trust-contract.md), [integration guide](docs/integration-guide.md), [verification guide](docs/verification-guide.md), [error catalog](docs/error-catalog.md)
 
 ### 🔜 Planned
 
@@ -176,7 +176,7 @@ TenantSaas.EfCore/          # Optional EF Core reference adapter (storage adapte
 TenantSaas.ContractTestKit/ # Test helpers for adopters to verify compliance
 TenantSaas.ContractTests/   # First-party contract test suite
 TenantSaas.Sample/          # Minimal reference host
-docs/                       # Trust contract, integration guide, error catalog
+docs/                       # Trust contract, integration guide, verification guide, error catalog
 ```
 
 ## Non-Goals
