@@ -1,6 +1,6 @@
 # Story 6.7: Publish the API Reference
 
-Status: ready-for-dev
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -28,14 +28,14 @@ so that I can integrate with confidence and avoid hidden surface area.
 
 ## Tasks / Subtasks
 
-- [ ] Create `docs/api-reference.md`
-  - [ ] Enumerate all public types and entry points across `TenantSaas.Abstractions`, `TenantSaas.Core`, and `TenantSaas.Sample` API surface
-  - [ ] Include extension seams (from Story 6.1) and trust contract identifiers
-  - [ ] Provide a stable structure for future updates
-- [ ] Add documentation tests
-  - [ ] Verify `docs/api-reference.md` exists
-  - [ ] Assert key public namespaces/types are documented
-  - [ ] Fail if any known public surface area is missing
+- [x] Create `docs/api-reference.md`
+  - [x] Enumerate all public types and entry points across `TenantSaas.Abstractions`, `TenantSaas.Core`, and `TenantSaas.Sample` API surface
+  - [x] Include extension seams (from Story 6.1) and trust contract identifiers
+  - [x] Provide a stable structure for future updates
+- [x] Add documentation tests
+  - [x] Verify `docs/api-reference.md` exists
+  - [x] Assert key public namespaces/types are documented
+  - [x] Fail if any known public surface area is missing
 
 ## Developer Context
 
@@ -113,20 +113,33 @@ GPT-5 (Codex)
 - artifact discovery: epics, prd, architecture, project-context
 - validation task: _bmad/core/tasks/validate-workflow.xml not found (skipped)
 - latest-technology check: .NET support policy baseline
+- dev-story workflow executed in YOLO mode with explicit story path input
+- red phase: `dotnet test TenantSaas.ContractTests/TenantSaas.ContractTests.csproj --disable-build-servers -v minimal --filter ApiReferenceDocumentationTests` (failed as expected before doc creation)
+- green/refactor validation: `dotnet test TenantSaas.ContractTests/TenantSaas.ContractTests.csproj --disable-build-servers -v minimal --filter ApiReferenceDocumentationTests`
+- regression validation: `dotnet test TenantSaas.ContractTests/TenantSaas.ContractTests.csproj --disable-build-servers -v minimal`
+- regression validation: `dotnet test TenantSaas.sln --disable-build-servers -v minimal`
 
 ### Completion Notes List
 
 - Extracted Epic 6 story 6.7 requirements and defined API reference scope and validation checks.
 - Ensured alignment with extension seams and trust contract identifiers.
+- Added `docs/api-reference.md` with stable sections for `TenantSaas.Abstractions`, `TenantSaas.Core`, and `TenantSaas.Sample`.
+- Added strict documentation enforcement tests in `TenantSaas.ContractTests/ApiReferenceDocumentationTests.cs`.
+- Verified API reference includes extension seams and trust contract identifiers required by ACs.
+- Full contract-tests suite and solution tests passed after implementation.
 
 ### File List
 
 - _bmad-output/implementation-artifacts/6-7-publish-the-api-reference.md
 - _bmad-output/implementation-artifacts/sprint-status.yaml
+- docs/api-reference.md
+- TenantSaas.ContractTests/ApiReferenceDocumentationTests.cs
 
 ## Change Log
 
 - 2026-02-14: Story created and marked ready-for-dev.
+- 2026-02-15: Implemented API reference documentation and enforcement tests; story moved to review.
+- 2026-02-15: Code review fixed 4 issues (H1 missing test markers, M1 type categorization, M2 scope note, L1 substring ambiguity); all 437 tests pass; story moved to done.
 
 ### References
 

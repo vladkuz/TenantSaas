@@ -84,14 +84,14 @@ development_status:
   epic-5-retrospective: optional
 
   # Epic 6: Documentation & Extension Seams 
-  epic-6: in-progress
+  epic-6: done
   6-1-define-and-document-named-extension-seams: done
   6-2-provide-a-boundary-only-integration-guide: done
   6-3-prove-storage-agnostic-core-with-reference-only-adapters: done
   6-4-publish-the-conceptual-model: done
   6-5-publish-the-trust-contract: done
   6-6-publish-the-verification-guide: done
-  6-7-publish-the-api-reference: ready-for-dev
+  6-7-publish-the-api-reference: done
   epic-6-retrospective: optional
 
   # Epic 7: Advanced Scenarios 
