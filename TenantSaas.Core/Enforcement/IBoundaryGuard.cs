@@ -79,6 +79,27 @@ public interface IBoundaryGuard
         string invariantCode);
 
     /// <summary>
+    /// Requires explicit preconditions for cross-tenant administrative workflows.
+    /// </summary>
+    /// <param name="context">Initialized tenant context for the current operation.</param>
+    /// <param name="operationName">Declared cross-tenant administrative operation scope.</param>
+    /// <param name="declaration">Explicit break-glass declaration.</param>
+    /// <param name="traceId">Trace identifier for correlation.</param>
+    /// <param name="requestId">Request identifier for correlation (optional).</param>
+    /// <param name="cancellationToken">Cancellation token for audit sink operations.</param>
+    /// <returns>
+    /// Success when shared-system operation scope is declared and break-glass is valid.
+    /// Failure with stable invariant codes when any required precondition is missing.
+    /// </returns>
+    Task<EnforcementResult> RequireCrossTenantAdministrativeWorkflowAsync(
+        TenantContext context,
+        string operationName,
+        BreakGlassDeclaration? declaration,
+        string traceId,
+        string? requestId = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Requires that break-glass is explicitly declared for privileged operations.
     /// </summary>
     /// <param name="declaration">Break-glass declaration with actor, reason, and scope. Null results in refusal.</param>

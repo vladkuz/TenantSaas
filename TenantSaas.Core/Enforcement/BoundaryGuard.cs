@@ -297,6 +297,60 @@ public sealed class BoundaryGuard(
         string traceId,
         string? requestId = null,
         CancellationToken cancellationToken = default)
+        => await RequireBreakGlassInternalAsync(
+            declaration,
+            traceId,
+            requestId,
+            tenantRefOverride: null,
+            operationName: null,
+            cancellationToken);
+
+    /// <inheritdoc />
+    public async Task<EnforcementResult> RequireCrossTenantAdministrativeWorkflowAsync(
+        TenantContext context,
+        string operationName,
+        BreakGlassDeclaration? declaration,
+        string traceId,
+        string? requestId = null,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentException.ThrowIfNullOrWhiteSpace(traceId);
+
+        if (string.IsNullOrWhiteSpace(operationName))
+        {
+            return FailSharedSystemOperation(
+                context,
+                InvariantCode.SharedSystemOperationAllowed,
+                "Cross-tenant administrative workflow requires declared operation scope and break-glass authorization.");
+        }
+
+        var operationEnforcement = RequireSharedSystemOperation(
+            context,
+            operationName,
+            InvariantCode.BreakGlassExplicitAndAudited);
+
+        if (!operationEnforcement.IsSuccess)
+        {
+            return operationEnforcement;
+        }
+
+        return await RequireBreakGlassInternalAsync(
+            declaration,
+            traceId,
+            requestId,
+            tenantRefOverride: TrustContractV1.BreakGlassMarkerCrossTenant,
+            operationName: operationName,
+            cancellationToken);
+    }
+
+    private async Task<EnforcementResult> RequireBreakGlassInternalAsync(
+        BreakGlassDeclaration? declaration,
+        string traceId,
+        string? requestId,
+        string? tenantRefOverride,
+        string? operationName,
+        CancellationToken cancellationToken)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(traceId);
 
@@ -326,23 +380,26 @@ public sealed class BoundaryGuard(
                 reason);
         }
 
+        var validDeclaration = declaration!;
+
         // Create audit event (will be used for logging and sink)
-        var tenantRef = declaration!.TargetTenantRef
+        var tenantRef = tenantRefOverride
+            ?? validDeclaration.TargetTenantRef
             ?? TrustContractV1.BreakGlassMarkerCrossTenant;
 
         // Log successful invocation
-            EnforcementEventSource.BreakGlassInvoked(
-                logger,
-                nameof(EnforcementEventSource.BreakGlassInvoked),
-                LogLevel.Warning.ToString(),
-                declaration.ActorId,
-                declaration.Reason,
-                declaration.DeclaredScope,
-                tenantRef,
-                traceId,
-                LoggingDefaults.UnknownExecutionKind,
-                LoggingDefaults.UnknownScopeType,
-                AuditCode.BreakGlassInvoked);
+        EnforcementEventSource.BreakGlassInvoked(
+            logger,
+            nameof(EnforcementEventSource.BreakGlassInvoked),
+            LogLevel.Warning.ToString(),
+            validDeclaration.ActorId,
+            validDeclaration.Reason,
+            validDeclaration.DeclaredScope,
+            tenantRef,
+            traceId,
+            LoggingDefaults.UnknownExecutionKind,
+            LoggingDefaults.UnknownScopeType,
+            AuditCode.BreakGlassInvoked);
 
         // Emit to audit sink if available (fail gracefully)
         if (auditSink != null)
@@ -350,10 +407,11 @@ public sealed class BoundaryGuard(
             try
             {
                 var auditEvent = BreakGlassAuditHelper.CreateAuditEvent(
-                    declaration,
+                    validDeclaration,
                     traceId,
                     invariantCode: null,
-                    operationName: null);
+                    operationName: operationName,
+                    tenantRefOverride: tenantRefOverride);
 
                 await auditSink.EmitAsync(auditEvent, cancellationToken);
             }

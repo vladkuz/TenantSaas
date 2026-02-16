@@ -84,6 +84,46 @@ Markers:
 - **cross_tenant**: marker for cross-tenant audit events (`TrustContractV1.BreakGlassMarkerCrossTenant`).
 - **privileged**: marker for privileged operations (`TrustContractV1.BreakGlassMarkerPrivileged`).
 
+### Cross-Tenant Administrative Workflows
+
+Cross-tenant administrative workflows require both break-glass declaration and explicit operation scope declaration. These workflows enforce additional safeguards:
+
+1. **Explicit Operation Scope Required**: The operation being performed must be declared via an allowlisted operation name (e.g., `cross-tenant-admin-read`, `cross-tenant-admin-write`).
+
+2. **Shared-System Scope Required**: Cross-tenant workflows must execute in `SharedSystem` scope. Operations in tenant-scoped contexts are refused.
+
+3. **Break-Glass Declaration Required**: A valid break-glass declaration with all required fields must be provided.
+
+4. **Disclosure-Safe Audit Trail**: Audit events and logs always use the `cross_tenant` marker, even when `targetTenantRef` contains a specific tenant identifier, ensuring sensitive tenant information never leaks.
+
+Enforcement:
+
+```csharp
+// Example: Cross-tenant administrative workflow
+var result = await boundaryGuard.RequireCrossTenantAdministrativeWorkflowAsync(
+    context,
+    TrustContractV1.SharedSystemOperationCrossTenantAdminRead,
+    declaration,
+    traceId);
+
+if (!result.IsSuccess)
+{
+    // Returns HTTP 403 with appropriate invariant code
+    return Results.Problem(
+        ProblemDetailsFactory.FromInvariantViolation(
+            result.InvariantCode!, result.TraceId!, requestId, result.Detail));
+}
+
+// Cross-tenant workflow authorized - proceed with operation
+```
+
+Allowlisted Cross-Tenant Operations:
+
+- **cross-tenant-admin-read** (`TrustContractV1.SharedSystemOperationCrossTenantAdminRead`): Read-only cross-tenant administrative operations (e.g., investigation, reporting).
+- **cross-tenant-admin-write** (`TrustContractV1.SharedSystemOperationCrossTenantAdminWrite`): Write-enabled cross-tenant administrative operations (e.g., emergency remediation, bulk updates).
+
+These operations map to the `BreakGlassExplicitAndAudited` invariant and require both break-glass authorization and shared-system scope.
+
 ## Break-Glass Audit Event Schema
 
 Break-glass audit events are stable and include the following fields:

@@ -5,6 +5,7 @@ using TenantSaas.Abstractions.Invariants;
 using TenantSaas.Abstractions.Logging;
 using TenantSaas.Abstractions.TrustContract;
 using TenantSaas.ContractTestKit;
+using TenantSaas.ContractTests.TestUtilities;
 using TenantSaas.Core.Enforcement;
 using TenantSaas.Core.Errors;
 using TenantSaas.Core.Logging;
@@ -93,17 +94,4 @@ public sealed class ReferenceComplianceBreakGlassTests(TrustContractFixture fixt
         auditSink.Event.Timestamp.Offset.Should().Be(TimeSpan.Zero);
     }
 
-    private sealed class CaptureAuditSink : IBreakGlassAuditSink
-    {
-        public BreakGlassAuditEvent? Event { get; private set; }
-
-        public int EmitCount { get; private set; }
-
-        public Task EmitAsync(BreakGlassAuditEvent auditEvent, CancellationToken cancellationToken)
-        {
-            EmitCount++;
-            Event = auditEvent;
-            return Task.CompletedTask;
-        }
-    }
 }

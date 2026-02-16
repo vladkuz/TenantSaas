@@ -21,12 +21,14 @@ public static class BreakGlassAuditHelper
         BreakGlassDeclaration declaration,
         string traceId,
         string? invariantCode = null,
-        string? operationName = null)
+        string? operationName = null,
+        string? tenantRefOverride = null)
     {
         ArgumentNullException.ThrowIfNull(declaration);
         ArgumentException.ThrowIfNullOrWhiteSpace(traceId);
 
-        var tenantRef = declaration.TargetTenantRef
+        var tenantRef = tenantRefOverride
+            ?? declaration.TargetTenantRef
             ?? TrustContractV1.BreakGlassMarkerCrossTenant;
 
         return new BreakGlassAuditEvent(

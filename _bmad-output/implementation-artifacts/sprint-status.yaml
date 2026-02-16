@@ -97,7 +97,7 @@ development_status:
   # Epic 7: On-Call and Cross-Scope Scenarios Are Safe
   epic-7: in-progress
   7-1-define-explicit-shared-system-operations-and-allowed-invariants: review
-  7-2-support-safe-cross-tenant-administrative-workflows: ready-for-dev
+  7-2-support-safe-cross-tenant-administrative-workflows: done
   7-3-provide-an-optional-audit-sink-interface-with-strong-defaults: ready-for-dev
   7-4-add-compliance-tests-for-enumeration-resistance-and-tenant-existence-oracle-protection: ready-for-dev
   epic-7-retrospective: optional

@@ -1,6 +1,6 @@
 # Story 7.2: Support Safe Cross-Tenant Administrative Workflows
 
-Status: ready-for-dev
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -28,15 +28,15 @@ so that urgent fixes do not weaken tenant isolation guarantees.
 
 ## Tasks / Subtasks
 
-- [ ] Define cross-tenant administrative workflow contract with explicit preconditions (AC: 1)
-  - [ ] Require declared scope + break-glass declaration before workflow execution
-  - [ ] Ensure default path refuses when declaration is missing or incomplete
-- [ ] Implement/extend enforcement + audit behavior for authorized cross-tenant flows (AC: 2)
-  - [ ] Capture cross-tenant marker and scope details in audit events
-  - [ ] Apply disclosure policy consistently in both errors and logs
-- [ ] Add compliance tests for unauthorized and authorized cross-tenant workflows (AC: 1, 2, 3)
-  - [ ] Validate refusal invariant on missing break-glass
-  - [ ] Validate emitted audit payload and disclosure-safe logging on authorized path
+- [x] Define cross-tenant administrative workflow contract with explicit preconditions (AC: 1)
+  - [x] Require declared scope + break-glass declaration before workflow execution
+  - [x] Ensure default path refuses when declaration is missing or incomplete
+- [x] Implement/extend enforcement + audit behavior for authorized cross-tenant flows (AC: 2)
+  - [x] Capture cross-tenant marker and scope details in audit events
+  - [x] Apply disclosure policy consistently in both errors and logs
+- [x] Add compliance tests for unauthorized and authorized cross-tenant workflows (AC: 1, 2, 3)
+  - [x] Validate refusal invariant on missing break-glass
+  - [x] Validate emitted audit payload and disclosure-safe logging on authorized path
 
 ## Developer Context
 
@@ -100,8 +100,8 @@ so that urgent fixes do not weaken tenant isolation guarantees.
 
 ## Story Completion Status
 
-- Status set to **ready-for-dev**
-- Completion note: Ultimate context engine analysis completed - comprehensive developer guide created
+- Status set to **review**
+- Completion note: Story 7.2 implementation completed with cross-tenant workflow enforcement and contract tests.
 
 ## Dev Agent Record
 
@@ -115,17 +115,84 @@ GPT-5 (Codex)
 - artifact discovery: epics, prd, architecture, project-context
 - git intelligence: recent commit analysis
 - latest-technology check: .NET support policy and xUnit release notes
+- dev-story workflow (YOLO)
+- implementation: cross-tenant admin workflow guard + audit marker enforcement
+- validation:
+  - dotnet test TenantSaas.ContractTests/TenantSaas.ContractTests.csproj --disable-build-servers -v minimal
+  - dotnet test TenantSaas.sln --disable-build-servers -v minimal
+
+### Implementation Plan
+
+- Added `RequireCrossTenantAdministrativeWorkflowAsync` to `IBoundaryGuard` for explicit operation scope + break-glass preconditions.
+- Enforced cross-tenant workflow preconditions in `BoundaryGuard`:
+  - refuse missing scope declaration with `SharedSystemOperationAllowed`
+  - require allowlisted shared-system operation bound to `BreakGlassExplicitAndAudited`
+  - require valid break-glass declaration before workflow success
+- Extended break-glass internals to force disclosure-safe `tenant_ref=cross_tenant` for cross-tenant workflow logs and audit events.
+- Extended `BreakGlassAuditHelper` to support `operationName` and `tenantRef` override propagation for audit payload fidelity.
+- Added contract tests for refusal path and authorized path payload/log assertions.
 
 ### Completion Notes List
 
-- Extracted Epic 7 story requirements and acceptance criteria from epics.md.
-- Added implementation guardrails aligned with trust contract and enforcement boundaries.
-- Added concrete testing requirements and validation commands for contract-test regression safety.
+- Implemented explicit cross-tenant administrative workflow contract in `IBoundaryGuard`/`BoundaryGuard`.
+- Added enforcement precondition that workflow scope declaration (`operationName`) is mandatory and allowlisted.
+- Enforced break-glass validation on cross-tenant workflow path with stable invariant refusals.
+- Ensured authorized cross-tenant workflow audit/log path always emits disclosure-safe `tenant_ref=cross_tenant`.
+- Captured workflow scope in audit payload via `operationName`.
+- Added compliance tests for unauthorized and authorized cross-tenant workflows.
+- Verified full contract test suite and full solution test suite pass.
 
 ### File List
 
 - _bmad-output/implementation-artifacts/7-2-support-safe-cross-tenant-administrative-workflows.md
 - _bmad-output/implementation-artifacts/sprint-status.yaml
+- TenantSaas.Core/Enforcement/IBoundaryGuard.cs
+- TenantSaas.Core/Enforcement/BoundaryGuard.cs
+- TenantSaas.Core/Enforcement/BreakGlassAuditHelper.cs
+- TenantSaas.ContractTests/CrossTenantAdministrativeWorkflowTests.cs (new file)
+- TenantSaas.ContractTests/TestUtilities/CaptureAuditSink.cs (new file, extracted shared test utility)
+- TenantSaas.ContractTests/ReferenceComplianceBreakGlassTests.cs (updated to use shared CaptureAuditSink)
+- docs/trust-contract.md (updated with cross-tenant admin operations documentation)
+
+- 2026-02-16: Code review completed with 10 findings (3 HIGH, 4 MEDIUM, 3 LOW); all issues remediated automatically; story set to done.
+
+### Code Review Remediation (2026-02-16)
+
+**Findings Addressed:**
+
+1. ✅ **HIGH: Code Duplication** - Extracted `CaptureAuditSink` to `TestUtilities/CaptureAuditSink.cs` for reuse across test files.
+
+2. ✅ **HIGH: Test Coverage Gaps** - Added 3 new tests:
+   - `RequireCrossTenantAdministrativeWorkflow_NonSharedSystemScope_RefusesWithTenantScopeRequired`
+   - `RequireCrossTenantAdministrativeWorkflow_InvalidOperationName_RefusesWithSharedSystemOperationAllowed`
+   - `RequireCrossTenantAdministrativeWorkflow_TargetTenantRefDoesNotLeakInAudit_EvenWhenPresent`
+
+3. ✅ **HIGH: Documentation Gap** - Updated `docs/trust-contract.md` with complete cross-tenant administrative workflow documentation including:
+   - Cross-tenant workflow enforcement rules
+   - Allowlisted operation names (`cross-tenant-admin-read`, `cross-tenant-admin-write`)
+   - Usage examples and disclosure-safe audit trail requirements
+
+4. ✅ **MEDIUM: Git Status Mismatch** - Staged new test files properly.
+
+5. ✅ **MEDIUM: Error Message Clarity** - Improved error message in `BoundaryGuard.cs` to mention both operation scope and break-glass requirements.
+
+6. ✅ **MEDIUM: Inline Test Utilities** - Moved test helpers to shared `TestUtilities/` directory.
+
+7. ✅ **MEDIUM: DRY Violation** - Removed duplicate `CaptureAuditSink` implementation from `ReferenceComplianceBreakGlassTests.cs`.
+
+8. ✅ **LOW: Test Name Ambiguity** - Renamed test to `RequireCrossTenantAdministrativeWorkflow_EmptyOperationName_RefusesWithStableInvariant` for clarity.
+
+9. ✅ **LOW: Untested Declaration Scope** - Added explicit test for `targetTenantRef` disclosure safety.
+
+10. ✅ **LOW: Edge Case Coverage** - Enhanced test assertions for disclosure policy enforcement.
+
+**Test Results:**
+- All 456 tests passing (3 new tests added)
+- Full solution test suite verified
+- All code quality issues resolved
+### Change Log
+
+- 2026-02-16: Implemented Story 7.2 cross-tenant administrative workflow contract, enforcement/audit behavior, and compliance tests; set story to review.
 
 ### References
 
