@@ -10,6 +10,7 @@ public sealed class InvariantRegistryTests
     [InlineData(InvariantCode.ContextInitialized)]
     [InlineData(InvariantCode.TenantAttributionUnambiguous)]
     [InlineData(InvariantCode.TenantScopeRequired)]
+    [InlineData(InvariantCode.SharedSystemOperationAllowed)]
     [InlineData(InvariantCode.BreakGlassExplicitAndAudited)]
     [InlineData(InvariantCode.DisclosureSafe)]
     public void InvariantRegistry_Contains_All_Invariants(string code)
@@ -27,6 +28,7 @@ public sealed class InvariantRegistryTests
     [InlineData(InvariantCode.ContextInitialized, "Initialization")]
     [InlineData(InvariantCode.TenantAttributionUnambiguous, "Attribution")]
     [InlineData(InvariantCode.TenantScopeRequired, "Scope")]
+    [InlineData(InvariantCode.SharedSystemOperationAllowed, "Scope")]
     [InlineData(InvariantCode.BreakGlassExplicitAndAudited, "Authorization")]
     [InlineData(InvariantCode.DisclosureSafe, "Disclosure")]
     public void InvariantRegistry_Categories_Are_Consistent(string code, string expectedCategory)
@@ -44,6 +46,7 @@ public sealed class InvariantRegistryTests
             InvariantCode.ContextInitialized,
             InvariantCode.TenantAttributionUnambiguous,
             InvariantCode.TenantScopeRequired,
+            InvariantCode.SharedSystemOperationAllowed,
             InvariantCode.BreakGlassExplicitAndAudited,
             InvariantCode.DisclosureSafe
         };
@@ -78,6 +81,7 @@ public sealed class InvariantRegistryTests
     [InlineData(InvariantCode.ContextInitialized)]
     [InlineData(InvariantCode.TenantAttributionUnambiguous)]
     [InlineData(InvariantCode.TenantScopeRequired)]
+    [InlineData(InvariantCode.SharedSystemOperationAllowed)]
     [InlineData(InvariantCode.BreakGlassExplicitAndAudited)]
     [InlineData(InvariantCode.DisclosureSafe)]
     public void RefusalMappingRegistry_Contains_All_Mappings(string invariantCode)
@@ -108,6 +112,7 @@ public sealed class InvariantRegistryTests
         TrustContractV1.GetRefusalMapping(InvariantCode.ContextInitialized).HttpStatusCode.Should().Be(401);
         TrustContractV1.GetRefusalMapping(InvariantCode.TenantAttributionUnambiguous).HttpStatusCode.Should().Be(422);
         TrustContractV1.GetRefusalMapping(InvariantCode.TenantScopeRequired).HttpStatusCode.Should().Be(403);
+        TrustContractV1.GetRefusalMapping(InvariantCode.SharedSystemOperationAllowed).HttpStatusCode.Should().Be(403);
         TrustContractV1.GetRefusalMapping(InvariantCode.BreakGlassExplicitAndAudited).HttpStatusCode.Should().Be(403);
         TrustContractV1.GetRefusalMapping(InvariantCode.DisclosureSafe).HttpStatusCode.Should().Be(500);
     }
@@ -263,10 +268,11 @@ public sealed class InvariantRegistryTests
     [Fact]
     public void InvariantCode_All_Contains_All_Defined_Codes()
     {
-        InvariantCode.All.Should().HaveCount(5);
+        InvariantCode.All.Should().HaveCount(6);
         InvariantCode.All.Should().Contain(InvariantCode.ContextInitialized);
         InvariantCode.All.Should().Contain(InvariantCode.TenantAttributionUnambiguous);
         InvariantCode.All.Should().Contain(InvariantCode.TenantScopeRequired);
+        InvariantCode.All.Should().Contain(InvariantCode.SharedSystemOperationAllowed);
         InvariantCode.All.Should().Contain(InvariantCode.BreakGlassExplicitAndAudited);
         InvariantCode.All.Should().Contain(InvariantCode.DisclosureSafe);
     }

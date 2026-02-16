@@ -145,6 +145,67 @@ public sealed class BoundaryGuard(
         return enforcementResult;
     }
 
+    /// <inheritdoc />
+    public EnforcementResult RequireSharedSystemOperation(
+        TenantContext context,
+        string operationName,
+        string invariantCode)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentException.ThrowIfNullOrWhiteSpace(operationName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(invariantCode);
+
+        if (context.Scope is not TenantScope.SharedSystem)
+        {
+            return FailSharedSystemOperation(
+                context,
+                InvariantCode.TenantScopeRequired,
+                $"Shared-system operation '{operationName}' requires shared-system scope.");
+        }
+
+        if (!TrustContractV1.TryGetAllowedSharedSystemInvariants(operationName, out var allowedInvariants))
+        {
+            return FailSharedSystemOperation(
+                context,
+                InvariantCode.SharedSystemOperationAllowed,
+                $"Shared-system operation '{operationName}' is not allowlisted.");
+        }
+
+        if (!allowedInvariants!.Contains(invariantCode))
+        {
+            return FailSharedSystemOperation(
+                context,
+                InvariantCode.SharedSystemOperationAllowed,
+                $"Shared-system operation '{operationName}' does not allow attempted_invariant={invariantCode}.");
+        }
+
+        return EnforcementResult.Success(context);
+    }
+
+    private EnforcementResult FailSharedSystemOperation(
+        TenantContext context,
+        string invariantCode,
+        string detail)
+    {
+        var logEvent = enricher.Enrich(context, nameof(EnforcementEventSource.InvariantViolated), invariantCode);
+        EnforcementEventSource.InvariantViolated(
+            logger,
+            logEvent.EventName,
+            LogLevel.Warning.ToString(),
+            logEvent.TenantRef,
+            context.TraceId,
+            context.RequestId,
+            logEvent.ExecutionKind ?? LoggingDefaults.UnknownExecutionKind,
+            logEvent.ScopeType ?? LoggingDefaults.UnknownScopeType,
+            invariantCode,
+            detail);
+
+        return EnforcementResult.Failure(
+            invariantCode,
+            context.TraceId,
+            detail);
+    }
+
     /// <summary>
     /// Logs attribution result based on outcome type.
     /// </summary>

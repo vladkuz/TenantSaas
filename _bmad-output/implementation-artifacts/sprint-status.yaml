@@ -1,4 +1,4 @@
-# generated: 2026-01-29
+# generated: 2026-02-15
 # project: TenantSaas
 # project_key: tenant-saas
 # tracking_system: file-system
@@ -33,21 +33,21 @@
 # - SM typically creates next story after previous one is 'done' to incorporate learnings
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
-generated: 2026-01-29
+generated: 2026-02-15
 project: TenantSaas
 project_key: tenant-saas
 tracking_system: file-system
 story_location: /home/vlad/Source/TenantSaas/_bmad-output/implementation-artifacts
 
 development_status:
-  # Epic 1: Project Bootstrap 
+  # Epic 1: Bootstrap a Runnable Baseline (Greenfield Setup)
   epic-1: done
   1-1-initialize-project-from-the-approved-net-template: done
   1-2-local-development-environment-setup: done
   1-3-ci-pipeline-skeleton-build-smoke-checks: done
   epic-1-retrospective: optional
 
-  # Epic 2: Trust Contract v1 Foundations 
+  # Epic 2: Teams Can Understand and Trust the Contract
   epic-2: done
   2-1-define-context-taxonomy-and-execution-kinds: done
   2-2-define-tenant-attribution-sources-precedence-and-ambiguity-rules: done
@@ -56,7 +56,7 @@ development_status:
   2-5-define-disclosure-policy-and-tenant-ref-safe-states: done
   epic-2-retrospective: optional
 
-  # Epic 3: Invariant Enforcement 
+  # Epic 3: Unsafe Operations Are Blocked by Default
   epic-3: done
   3-1-enforce-contextinitialized-at-boundary-helpers: done
   3-2-enforce-tenantattributionunambiguous-at-boundaries: done
@@ -65,7 +65,7 @@ development_status:
   3-5-require-explicit-break-glass-with-audit-event-emission: done
   epic-3-retrospective: optional
 
-  # Epic 4: Context Initialization & Propagation 
+  # Epic 4: Tenancy Is Initialized and Propagated Reliably
   epic-4: done
   4-1-provide-a-single-required-initialization-primitive-per-flow: done
   4-2-support-explicit-context-passing-without-ambient-requirements: done
@@ -74,7 +74,7 @@ development_status:
   4-5-capture-execution-kind-and-scope-in-context-for-downstream-use: done
   epic-4-retrospective: optional
 
-  # Epic 5: Contract Test Suite 
+  # Epic 5: Teams Can Prove Compliance in CI
   epic-5: done
   5-1-ship-an-adopter-runnable-contract-test-helper-package: done
   5-2-provide-reference-compliance-tests-for-refusal-and-attribution-rules: done
@@ -83,7 +83,7 @@ development_status:
   5-5-assert-disclosure-policy-and-error-log-correlation-rules: done
   epic-5-retrospective: optional
 
-  # Epic 6: Documentation & Extension Seams 
+  # Epic 6: Adoption Is Fast and Portable
   epic-6: done
   6-1-define-and-document-named-extension-seams: done
   6-2-provide-a-boundary-only-integration-guide: done
@@ -94,14 +94,10 @@ development_status:
   6-7-publish-the-api-reference: done
   epic-6-retrospective: optional
 
-  # Epic 7: Advanced Scenarios 
-  epic-7: backlog
-  7-1-define-explicit-shared-system-operations-and-allowed-invariants: backlog
-  7-2-support-safe-cross-tenant-administrative-workflows: backlog
-  7-3-provide-an-optional-audit-sink-interface-with-strong-defaults: backlog
-  7-4-add-compliance-tests-for-enumeration-resistance-and-tenant-existence-oracle-protection: backlog
+  # Epic 7: On-Call and Cross-Scope Scenarios Are Safe
+  epic-7: in-progress
+  7-1-define-explicit-shared-system-operations-and-allowed-invariants: review
+  7-2-support-safe-cross-tenant-administrative-workflows: ready-for-dev
+  7-3-provide-an-optional-audit-sink-interface-with-strong-defaults: ready-for-dev
+  7-4-add-compliance-tests-for-enumeration-resistance-and-tenant-existence-oracle-protection: ready-for-dev
   epic-7-retrospective: optional
-
-  # Maintenance / Code Hygiene (Unplanned)
-  0-CR1-code-review-remediation: done
-  0-CR3-code-review-remediation-docs-alignment: done

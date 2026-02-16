@@ -64,6 +64,21 @@ public interface IBoundaryGuard
         string traceId);
 
     /// <summary>
+    /// Requires that a shared-system operation is explicitly allowlisted and mapped to the evaluated invariant.
+    /// </summary>
+    /// <param name="context">Initialized tenant context for the current operation.</param>
+    /// <param name="operationName">Declared shared-system operation identifier.</param>
+    /// <param name="invariantCode">Invariant being enforced for this operation.</param>
+    /// <returns>
+    /// Success when the context is shared-system scope and operation/invariant mapping is allowed.
+    /// Failure with TenantScopeRequired or SharedSystemOperationAllowed when mapping rules are violated.
+    /// </returns>
+    EnforcementResult RequireSharedSystemOperation(
+        TenantContext context,
+        string operationName,
+        string invariantCode);
+
+    /// <summary>
     /// Requires that break-glass is explicitly declared for privileged operations.
     /// </summary>
     /// <param name="declaration">Break-glass declaration with actor, reason, and scope. Null results in refusal.</param>

@@ -290,6 +290,29 @@ public class ProblemDetailsFactoryTests
     }
 
     [Fact]
+    public void ForSharedSystemOperationNotAllowed_Returns403WithStableExtensions()
+    {
+        // Arrange
+        const string traceId = "test-trace-shared-op";
+        const string requestId = "test-request-shared-op";
+
+        // Act
+        var result = ProblemDetailsFactory.ForSharedSystemOperationNotAllowed(
+            traceId,
+            requestId,
+            "cross-tenant-maintenance",
+            InvariantCode.DisclosureSafe);
+
+        // Assert
+        result.Status.Should().Be(403);
+        result.Extensions[InvariantCodeKey].Should().Be(InvariantCode.SharedSystemOperationAllowed);
+        result.Extensions[TraceId].Should().Be(traceId);
+        result.Extensions[RequestId].Should().Be(requestId);
+        result.Extensions["operation_name"].Should().Be("cross-tenant-maintenance");
+        result.Extensions["attempted_invariant"].Should().Be(InvariantCode.DisclosureSafe);
+    }
+
+    [Fact]
     public void ForBreakGlassRequired_Returns403()
     {
         // Arrange

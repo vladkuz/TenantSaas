@@ -32,6 +32,21 @@ public static class TrustContractV1
     public const string ScopeNoTenant = "no-tenant";
 
     /// <summary>
+    /// Shared-system operation: read-only tenant-existence checks.
+    /// </summary>
+    public const string SharedSystemOperationTenantExistenceCheck = "tenant-existence-check";
+
+    /// <summary>
+    /// Shared-system operation: read-only cross-tenant administration.
+    /// </summary>
+    public const string SharedSystemOperationCrossTenantAdminRead = "cross-tenant-admin-read";
+
+    /// <summary>
+    /// Shared-system operation: mutating cross-tenant administration.
+    /// </summary>
+    public const string SharedSystemOperationCrossTenantAdminWrite = "cross-tenant-admin-write";
+
+    /// <summary>
     /// Cross-tenant marker for break-glass audit events.
     /// </summary>
     public const string BreakGlassMarkerCrossTenant = TenantRefSafeState.CrossTenant;
@@ -138,6 +153,11 @@ public static class TrustContractV1
                 name: "Tenant Scope Required",
                 description: "Operation requires an explicit tenant scope.",
                 category: "Scope"),
+            [InvariantCode.SharedSystemOperationAllowed] = new InvariantDefinition(
+                InvariantCode.SharedSystemOperationAllowed,
+                name: "Shared-System Operation Allowed",
+                description: "Shared-system operation must be explicitly allowlisted and mapped to a permitted invariant.",
+                category: "Scope"),
             [InvariantCode.BreakGlassExplicitAndAudited] = new InvariantDefinition(
                 InvariantCode.BreakGlassExplicitAndAudited,
                 name: "Break-Glass Explicit and Audited",
@@ -168,6 +188,10 @@ public static class TrustContractV1
                 InvariantCode.TenantScopeRequired,
                 title: "Tenant scope required",
                 guidanceUri: "https://docs.tenantsaas.dev/errors/tenant-scope-required"),
+            [InvariantCode.SharedSystemOperationAllowed] = RefusalMapping.ForForbidden(
+                InvariantCode.SharedSystemOperationAllowed,
+                title: "Shared-system operation not allowed",
+                guidanceUri: "https://docs.tenantsaas.dev/errors/shared-system-operation-not-allowed"),
             [InvariantCode.BreakGlassExplicitAndAudited] = RefusalMapping.ForForbidden(
                 InvariantCode.BreakGlassExplicitAndAudited,
                 title: "Break-glass must be explicit",
@@ -176,6 +200,28 @@ public static class TrustContractV1
                 InvariantCode.DisclosureSafe,
                 title: "Tenant disclosure policy violation",
                 guidanceUri: "https://docs.tenantsaas.dev/errors/disclosure-unsafe")
+        }.ToFrozenDictionary(StringComparer.Ordinal);
+
+    /// <summary>
+    /// Explicit shared-system operation taxonomy with allowed invariant mapping.
+    /// </summary>
+    public static readonly FrozenDictionary<string, FrozenSet<string>> SharedSystemOperationInvariantAllowlist =
+        new Dictionary<string, FrozenSet<string>>(StringComparer.Ordinal)
+        {
+            [SharedSystemOperationTenantExistenceCheck] = new HashSet<string>(StringComparer.Ordinal)
+            {
+                InvariantCode.DisclosureSafe
+            }.ToFrozenSet(StringComparer.Ordinal),
+            [SharedSystemOperationCrossTenantAdminRead] = new HashSet<string>(StringComparer.Ordinal)
+            {
+                InvariantCode.BreakGlassExplicitAndAudited,
+                InvariantCode.DisclosureSafe
+            }.ToFrozenSet(StringComparer.Ordinal),
+            [SharedSystemOperationCrossTenantAdminWrite] = new HashSet<string>(StringComparer.Ordinal)
+            {
+                InvariantCode.BreakGlassExplicitAndAudited,
+                InvariantCode.DisclosureSafe
+            }.ToFrozenSet(StringComparer.Ordinal)
         }.ToFrozenDictionary(StringComparer.Ordinal);
 
     /// <summary>
@@ -295,6 +341,14 @@ public static class TrustContractV1
     /// </summary>
     public static bool TryGetRefusalMapping(string invariantCode, out RefusalMapping? mapping)
         => RefusalMappings.TryGetValue(invariantCode, out mapping);
+
+    /// <summary>
+    /// Tries to get allowed invariants for a shared-system operation.
+    /// </summary>
+    public static bool TryGetAllowedSharedSystemInvariants(
+        string operationName,
+        out FrozenSet<string>? allowedInvariants)
+        => SharedSystemOperationInvariantAllowlist.TryGetValue(operationName, out allowedInvariants);
 }
 
 /// <summary>

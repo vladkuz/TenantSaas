@@ -186,6 +186,39 @@ public static class ProblemDetailsFactory
             detail: "Operation requires an explicit tenant scope.");
 
     /// <summary>
+    /// Creates a Problem Details response for a disallowed shared-system operation.
+    /// </summary>
+    /// <param name="traceId">End-to-end correlation identifier.</param>
+    /// <param name="requestId">Request-scoped correlation identifier.</param>
+    /// <param name="operationName">Declared shared-system operation name.</param>
+    /// <param name="attemptedInvariant">Invariant attempted for this operation.</param>
+    /// <returns>HTTP 403 Problem Details response with operation metadata.</returns>
+    public static ProblemDetails ForSharedSystemOperationNotAllowed(
+        string traceId,
+        string? requestId = null,
+        string? operationName = null,
+        string? attemptedInvariant = null)
+    {
+        var extensions = new Dictionary<string, object?>();
+        if (!string.IsNullOrWhiteSpace(operationName))
+        {
+            extensions["operation_name"] = operationName;
+        }
+
+        if (!string.IsNullOrWhiteSpace(attemptedInvariant))
+        {
+            extensions["attempted_invariant"] = attemptedInvariant;
+        }
+
+        return FromInvariantViolation(
+            InvariantCode.SharedSystemOperationAllowed,
+            traceId,
+            requestId,
+            detail: "Shared-system operation is not allowed for the requested invariant.",
+            extensions: extensions);
+    }
+
+    /// <summary>
     /// Creates a Problem Details response for missing or invalid break-glass declaration.
     /// </summary>
     /// <param name="traceId">End-to-end correlation identifier.</param>

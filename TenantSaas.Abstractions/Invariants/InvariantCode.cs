@@ -21,6 +21,11 @@ public static class InvariantCode
     public const string TenantScopeRequired = "TenantScopeRequired";
 
     /// <summary>
+    /// Shared-system operation must be explicitly allowlisted to a permitted invariant.
+    /// </summary>
+    public const string SharedSystemOperationAllowed = "SharedSystemOperationAllowed";
+
+    /// <summary>
     /// Break-glass must be explicit with actor identity and reason.
     /// </summary>
     public const string BreakGlassExplicitAndAudited = "BreakGlassExplicitAndAudited";
@@ -41,6 +46,7 @@ public static class InvariantCode
         ContextInitialized,
         TenantAttributionUnambiguous,
         TenantScopeRequired,
+        SharedSystemOperationAllowed,
         BreakGlassExplicitAndAudited,
         DisclosureSafe
     ];
